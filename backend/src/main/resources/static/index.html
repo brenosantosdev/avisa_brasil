@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AvisaBrasil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --rio: #0B4F73; --fundo: #F3F6F5; --texto: #10262E; }
+    body { margin: 0; font-family: "Atkinson Hyperlegible", system-ui, sans-serif; font-size: 18px;
+           background: var(--fundo); color: var(--texto); line-height: 1.5; }
+    header { background: var(--rio); color: #fff; padding: 20px 16px; }
+    header h1 { margin: 0; font-size: 1.8rem; }
+    main { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+    .aviso { background: #fff; border-left: 6px solid var(--rio); padding: 16px; border-radius: 6px; }
+    a.botao { display: inline-block; min-height: 44px; padding: 10px 18px; margin: 8px 8px 0 0; background: var(--rio);
+              color: #fff; text-decoration: none; border-radius: 8px; font-weight: 700; box-sizing: border-box; }
+  </style>
+</head>
+<body>
+  <header><h1>AvisaBrasil</h1><div>Alerta de cheias e secas · São Gabriel da Cachoeira (AM)</div></header>
+  <main>
+    <p class="aviso"><strong>Sistema em construção.</strong> Esta página é provisória. As telas de alerta
+      com dados reais serão adicionadas nas próximas etapas.</p>
+    <a class="botao" href="/swagger-ui.html">Documentação da API (Swagger)</a>
+    <a class="botao" href="/api/status">Status do sistema</a>
+  </main>
+</body>
+</html>

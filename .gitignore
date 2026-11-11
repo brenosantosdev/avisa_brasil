@@ -1,0 +1,25 @@
+# Segredos
+.env
+.env.*
+!.env.example
+
+# Banco de dados local
+*.db
+*.mv.db
+*.trace.db
+backend/data/
+
+# Build
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDEs e sistema
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+.DS_Store
+Thumbs.db
+*.log
