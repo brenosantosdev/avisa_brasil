@@ -4,27 +4,58 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AvisaBrasil</title>
+  <meta name="theme-color" content="#0B4F73">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilo.css">
   <style>
-    :root { --rio: #0B4F73; --fundo: #F3F6F5; --texto: #10262E; }
-    body { margin: 0; font-family: "Atkinson Hyperlegible", system-ui, sans-serif; font-size: 18px;
-           background: var(--fundo); color: var(--texto); line-height: 1.5; }
-    header { background: var(--rio); color: #fff; padding: 20px 16px; }
-    header h1 { margin: 0; font-size: 1.8rem; }
-    main { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
-    .aviso { background: #fff; border-left: 6px solid var(--rio); padding: 16px; border-radius: 6px; }
-    a.botao { display: inline-block; min-height: 44px; padding: 10px 18px; margin: 8px 8px 0 0; background: var(--rio);
-              color: #fff; text-decoration: none; border-radius: 8px; font-weight: 700; box-sizing: border-box; }
+    .aviso-construcao { border-left: 6px solid var(--rio); }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
   </style>
 </head>
 <body>
-  <header><h1>AvisaBrasil</h1><div>Alerta de cheias e secas · São Gabriel da Cachoeira (AM)</div></header>
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 13c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 18c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/></svg>
+        <span>
+          <span class="marca-nome" data-i18n="app.nome">AvisaBrasil</span>
+          <span class="marca-local" data-comunidade-local></span>
+        </span>
+      </a>
+      <button id="botao-ouvir" class="botao botao-ouvir" type="button" aria-pressed="false">
+        <svg aria-hidden="true"></svg><span data-i18n="ouvir">Ouvir</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="navegacao" data-i18n-aria="nav.principal">
+    <ul>
+      <li><a href="/" aria-current="page" data-i18n="nav.inicio">Início</a></li>
+      <li><a href="/proximos-dias.html" data-i18n="nav.proximosDias">Próximos dias</a></li>
+    </ul>
+  </nav>
+
   <main>
-    <p class="aviso"><strong>Sistema em construção.</strong> Esta página é provisória. As telas de alerta
-      com dados reais serão adicionadas nas próximas etapas.</p>
-    <a class="botao" href="/swagger-ui.html">Documentação da API (Swagger)</a>
-    <a class="botao" href="/api/status">Status do sistema</a>
+    <div class="cartao aviso-construcao">
+      <h1>Sistema em construção</h1>
+      <p id="texto-inicio">Esta tela inicial ainda é provisória. O semáforo da comunidade chega nas próximas etapas.
+        A tela de próximos dias já mostra a chuva e o rio com dados reais.</p>
+      <div class="links">
+        <a class="botao botao-primario" href="/proximos-dias.html">Ver próximos dias</a>
+        <a class="botao" href="/swagger-ui.html">Documentação da API</a>
+      </div>
+    </div>
   </main>
+
+  <footer class="rodape"><p data-i18n="app.rodape"></p></footer>
+
+  <script src="/js/comum.js"></script>
+  <script>
+    AB.iniciarPagina().then(function () {
+      AB.configurarOuvir(function () { return document.getElementById('texto-inicio').textContent; });
+    });
+  </script>
 </body>
 </html>

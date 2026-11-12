@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Próximos dias · AvisaBrasil</title>
+  <meta name="theme-color" content="#0B4F73">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilo.css">
+  <link rel="stylesheet" href="/css/proximos-dias.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 13c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 18c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/></svg>
+        <span>
+          <span class="marca-nome" data-i18n="app.nome">AvisaBrasil</span>
+          <span class="marca-local" data-comunidade-local></span>
+        </span>
+      </a>
+      <button id="botao-ouvir" class="botao botao-ouvir" type="button" aria-pressed="false">
+        <svg aria-hidden="true"></svg><span data-i18n="ouvir">Ouvir</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="navegacao" data-i18n-aria="nav.principal">
+    <ul>
+      <li><a href="/" data-i18n="nav.inicio">Início</a></li>
+      <li><a href="/proximos-dias.html" aria-current="page" data-i18n="nav.proximosDias">Próximos dias</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1 data-i18n="pd.titulo">Próximos dias</h1>
+    <p class="intro" id="intro"></p>
+
+    <section class="cartao resumo" aria-labelledby="titulo-resumo">
+      <h2 id="titulo-resumo" data-i18n="pd.resumo">Resumo</h2>
+      <div id="resumo" aria-live="polite"><p class="carregando" data-i18n="carregando">Carregando dados reais…</p></div>
+    </section>
+
+    <section class="secao" aria-labelledby="titulo-chuva">
+      <h2 id="titulo-chuva" data-i18n="pd.chuva.titulo">Chuva dia a dia</h2>
+      <div id="chuva"><p class="carregando" data-i18n="carregando">Carregando dados reais…</p></div>
+    </section>
+
+    <section class="secao" aria-labelledby="titulo-rio">
+      <h2 id="titulo-rio" data-i18n="rio.titulo">O rio nos próximos 30 dias</h2>
+      <div id="rio"><p class="carregando" data-i18n="carregando">Carregando dados reais…</p></div>
+    </section>
+  </main>
+
+  <footer class="rodape"><p data-i18n="app.rodape"></p></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.6.1/dist/chart.umd.min.js"></script>
+  <script src="/js/comum.js"></script>
+  <script src="/js/proximos-dias.js"></script>
+</body>
+</html>

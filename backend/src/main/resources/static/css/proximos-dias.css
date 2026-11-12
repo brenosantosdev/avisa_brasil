@@ -1,0 +1,100 @@
+/* Tela "Próximos dias" */
+
+/* ---------- Resumo ---------- */
+
+.resumo-linha {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 12px 0;
+}
+.resumo-linha + .resumo-linha { border-top: 1px solid var(--borda); }
+.resumo-icone {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--rio-claro);
+  color: var(--rio);
+}
+.resumo-icone svg { width: 30px; height: 30px; }
+.resumo-titulo { font-size: 1.2rem; font-weight: 700; margin: 0; }
+.resumo-detalhe { margin: 2px 0 0; color: var(--texto-suave); }
+
+/* ---------- Cartões de cada dia ---------- */
+
+.dias {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px;
+}
+.dia { display: flex; flex-direction: column; gap: 10px; }
+.dia-cabecalho { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.dia-nome { font-size: 1.25rem; font-weight: 700; margin: 0; }
+.dia-data { color: var(--texto-suave); }
+.dia-hoje { outline: 3px solid var(--rio); outline-offset: -3px; }
+
+.dia-chuva { display: flex; align-items: center; gap: 12px; }
+.dia-mm { font-size: 1.6rem; font-weight: 700; line-height: 1; white-space: nowrap; }
+.dia-baldes-texto { margin: 0; font-size: 1rem; }
+.dia-info { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 1rem; }
+.dia-info svg { width: 22px; height: 22px; flex: none; color: var(--texto-suave); }
+
+/* Balde desenhado em CSS: a água sobe conforme a chuva */
+.baldes { display: flex; gap: 4px; align-items: flex-end; }
+.balde {
+  position: relative;
+  width: 26px;
+  height: 30px;
+  background: #E6ECEA;
+  clip-path: polygon(0 0, 100% 0, 85% 100%, 15% 100%);
+  border-top: 3px solid var(--texto-suave);
+}
+.balde-agua { position: absolute; left: 0; right: 0; bottom: 0; background: #2F86B5; }
+.baldes-mais { font-weight: 700; color: var(--texto-suave); }
+
+.explica {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  background: var(--rio-claro);
+  border-radius: 10px;
+  color: var(--rio);
+}
+.explica svg { width: 24px; height: 24px; flex: none; margin-top: 2px; }
+
+/* ---------- Rio ---------- */
+
+.rio-destaques {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 14px;
+}
+.destaque { display: flex; gap: 14px; align-items: flex-start; }
+.destaque-icone {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--rio);
+  color: #fff;
+}
+.destaque-icone svg { width: 32px; height: 32px; }
+.destaque-titulo { font-size: 1.25rem; font-weight: 700; margin: 0 0 6px; line-height: 1.3; }
+.destaque p { margin: 6px 0 0; }
+
+.grafico-rio { margin-top: 14px; }
+.grafico-caixa { position: relative; height: 340px; }
+.rio-textos p { margin: 8px 0 0; }
+
+@media (max-width: 600px) {
+  .dias { grid-template-columns: 1fr; }
+  .rio-destaques { grid-template-columns: 1fr; }
+  .grafico-caixa { height: 280px; }
+}

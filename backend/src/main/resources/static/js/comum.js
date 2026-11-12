@@ -1,0 +1,249 @@
+/* AvisaBrasil: funções comuns a todas as telas.
+   Textos em i18n/<idioma>.json; horários sempre no fuso da comunidade (America/Manaus). */
+(function () {
+  'use strict';
+
+  const FUSO = 'America/Manaus';
+  const IDIOMAS_DISPONIVEIS = ['pt'];
+
+  let textos = {};
+  let localidade = 'pt-BR';
+
+  /* ---------- Textos (i18n) ---------- */
+
+  function idiomaEscolhido() {
+    let idioma = 'pt';
+    try { idioma = localStorage.getItem('idioma') || 'pt'; } catch (e) { /* sem localStorage */ }
+    return IDIOMAS_DISPONIVEIS.includes(idioma) ? idioma : 'pt';
+  }
+
+  async function carregarTextos() {
+    const idioma = idiomaEscolhido();
+    const resposta = await fetch('/i18n/' + idioma + '.json');
+    textos = await resposta.json();
+    localidade = textos._idioma || 'pt-BR';
+    document.documentElement.lang = localidade;
+  }
+
+  /** Texto traduzido, trocando {variaveis}. */
+  function t(chave, vars) {
+    let texto = textos[chave];
+    if (texto === undefined) return chave;
+    if (vars) {
+      Object.keys(vars).forEach(function (nome) {
+        texto = texto.split('{' + nome + '}').join(vars[nome]);
+      });
+    }
+    return texto;
+  }
+
+  function aplicarTextos(raiz) {
+    (raiz || document).querySelectorAll('[data-i18n]').forEach(function (el) {
+      el.textContent = t(el.dataset.i18n);
+    });
+    (raiz || document).querySelectorAll('[data-i18n-aria]').forEach(function (el) {
+      el.setAttribute('aria-label', t(el.dataset.i18nAria));
+    });
+  }
+
+  /* ---------- Números ---------- */
+
+  function numero(valor, casas) {
+    if (valor === null || valor === undefined) return '–';
+    return new Intl.NumberFormat(localidade, {
+      minimumFractionDigits: casas || 0,
+      maximumFractionDigits: casas || 0
+    }).format(valor);
+  }
+
+  /** 194921 → "195 mil" */
+  function numeroCompacto(valor) {
+    return new Intl.NumberFormat(localidade, { notation: 'compact', maximumFractionDigits: 0 }).format(valor);
+  }
+
+  /** Explica milímetros de chuva em baldes de 20 litros por metro quadrado. */
+  function textoBaldes(mm) {
+    const baldes = mm / 20;
+    if (mm < 1) return t('baldes.quaseNada');
+    if (baldes < 0.5) return t('baldes.menosMeio');
+    if (baldes < 0.9) return t('baldes.quaseUm');
+    if (baldes < 1.25) return t('baldes.um');
+    const inteiro = Math.floor(baldes);
+    if (baldes - inteiro < 0.15) return t('baldes.cerca', { n: inteiro });
+    return t('baldes.mais', { n: inteiro });
+  }
+
+  /* ---------- Datas em linguagem natural ---------- */
+
+  /** Data de hoje (AAAA-MM-DD) no fuso da comunidade. */
+  function hojeNaComunidade() {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: FUSO }).format(new Date());
+  }
+
+  function somarDias(dataIso, dias) {
+    const d = new Date(dataIso + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() + dias);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function maiuscula(texto) {
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
+  }
+
+  /** "Hoje", "Amanhã" ou o dia da semana ("Sábado"). */
+  function nomeDoDia(dataIso) {
+    const hoje = hojeNaComunidade();
+    if (dataIso === hoje) return t('dia.hoje');
+    if (dataIso === somarDias(hoje, 1)) return t('dia.amanha');
+    const d = new Date(dataIso + 'T12:00:00Z');
+    return maiuscula(new Intl.DateTimeFormat(localidade, { weekday: 'long', timeZone: 'UTC' }).format(d));
+  }
+
+  /** "14/11" */
+  function dataCurta(dataIso) {
+    const d = new Date(dataIso + 'T12:00:00Z');
+    return new Intl.DateTimeFormat(localidade, { day: '2-digit', month: '2-digit', timeZone: 'UTC' }).format(d);
+  }
+
+  /** "dez. de 2019" */
+  function mesEAno(dataIso) {
+    const d = new Date(dataIso + 'T12:00:00Z');
+    return new Intl.DateTimeFormat(localidade, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(d);
+  }
+
+  /** "hoje às 19:45", "ontem às 08:00", "em 09/11 às 14:00" (no fuso da comunidade). */
+  function quando(dataHoraIso) {
+    const momento = new Date(dataHoraIso);
+    const dia = new Intl.DateTimeFormat('en-CA', { timeZone: FUSO }).format(momento);
+    const hora = new Intl.DateTimeFormat(localidade, { hour: '2-digit', minute: '2-digit', timeZone: FUSO }).format(momento);
+    const hoje = hojeNaComunidade();
+    if (dia === hoje) return t('quando.hoje', { hora: hora });
+    if (dia === somarDias(hoje, -1)) return t('quando.ontem', { hora: hora });
+    return t('quando.data', { data: dataCurta(dia), hora: hora });
+  }
+
+  /* ---------- Ícones (SVG, cor herdada do texto) ---------- */
+
+  const caminhos = {
+    rio: '<path d="M3 8c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 13c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 18c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/>',
+    som: '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/>',
+    parar: '<rect x="6" y="6" width="12" height="12" rx="1.5"/>',
+    sol: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    nuvem: '<path d="M7 18h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.1 11.2 3.5 3.5 0 0 0 7 18z"/>',
+    chuva: '<path d="M7 14h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.1 7.2 3.5 3.5 0 0 0 7 14z"/><path d="M8 17l-1 3M12 17l-1 3M16 17l-1 3"/>',
+    trovoada: '<path d="M7 13h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.1 6.2 3.5 3.5 0 0 0 7 13z"/><path d="M12.5 13l-2 4h3l-2 4"/>',
+    neblina: '<path d="M4 9h16M3 13h18M5 17h14"/>',
+    gota: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+    termometro: '<path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/><path d="M12 9v7"/>',
+    sobe: '<path d="M12 20V5M5 11l7-7 7 7"/>',
+    desce: '<path d="M12 4v15M5 13l7 7 7-7"/>',
+    estavel: '<path d="M4 12h14M13 6l6 6-6 6"/>',
+    alerta: '<path d="M12 3l10 18H2L12 3z"/><path d="M12 10v5M12 18v.5"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
+    regua: '<path d="M4 20V4h6v16"/><path d="M4 8h3M4 12h4M4 16h3"/><path d="M14 18c1.5-1.2 3-1.2 4.5 0s2.5 1.2 3.5 0"/>'
+  };
+
+  function icone(nome, titulo) {
+    const rotulo = titulo ? ' role="img" aria-label="' + escapar(titulo) + '"' : ' aria-hidden="true"';
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+      'stroke-linecap="round" stroke-linejoin="round"' + rotulo + '>' + (caminhos[nome] || '') + '</svg>';
+  }
+
+  function escapar(texto) {
+    return String(texto)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  /* ---------- Fonte e situação dos dados ---------- */
+
+  /** Aviso no topo da seção quando o dado está desatualizado ou indisponível. */
+  function avisoSituacao(resposta) {
+    if (!resposta || resposta.situacao === 'ATUALIZADO') return '';
+    const situacao = resposta.situacao || 'INDISPONIVEL';
+    const texto = t('situacao.' + situacao, { quando: resposta.atualizadoEm ? quando(resposta.atualizadoEm) : '' });
+    return '<div class="aviso-situacao aviso-' + situacao + '" role="status">' + icone('alerta') +
+      '<span>' + escapar(texto) + '</span></div>';
+  }
+
+  /** Rodapé da seção: fonte com link e horário da última atualização. */
+  function rodapeFonte(resposta, extra) {
+    const fonte = '<p>' + escapar(t('fonte.de', { fonte: '' })) +
+      '<a href="' + escapar(resposta.fonteUrl) + '" target="_blank" rel="noopener">' + escapar(resposta.fonte) + '</a></p>';
+    const atualizado = resposta.atualizadoEm
+      ? '<p>' + escapar(t('fonte.atualizado', { quando: quando(resposta.atualizadoEm) })) + '</p>'
+      : '<p>' + escapar(t('fonte.nunca')) + '</p>';
+    return '<div class="fonte">' + fonte + atualizado + (extra || '') + '</div>';
+  }
+
+  /* ---------- Botão "Ouvir" (Web Speech API) ---------- */
+
+  function configurarOuvir(gerarTexto) {
+    const botao = document.getElementById('botao-ouvir');
+    if (!botao) return;
+    const rotulo = botao.querySelector('span');
+    const voz = window.speechSynthesis;
+
+    function mostrar(falando) {
+      botao.setAttribute('aria-pressed', falando ? 'true' : 'false');
+      botao.querySelector('svg').outerHTML = icone(falando ? 'parar' : 'som');
+      rotulo.textContent = t(falando ? 'ouvir.parar' : 'ouvir');
+    }
+
+    mostrar(false);
+    if (!voz) {
+      botao.disabled = true;
+      botao.title = t('ouvir.indisponivel');
+      return;
+    }
+
+    botao.addEventListener('click', function () {
+      if (voz.speaking) {
+        voz.cancel();
+        mostrar(false);
+        return;
+      }
+      const fala = new SpeechSynthesisUtterance(gerarTexto());
+      fala.lang = localidade;
+      fala.rate = 0.9;
+      fala.onend = function () { mostrar(false); };
+      fala.onerror = function () { mostrar(false); };
+      voz.speak(fala);
+      mostrar(true);
+    });
+  }
+
+  /* ---------- Topo comum ---------- */
+
+  async function iniciarPagina() {
+    await carregarTextos();
+    aplicarTextos();
+    try {
+      const comunidade = await (await fetch('/api/comunidade')).json();
+      document.querySelectorAll('[data-comunidade-local]').forEach(function (el) {
+        el.textContent = t('app.local', { lugar: comunidade.nome, uf: comunidade.uf, rio: comunidade.rio });
+      });
+      return comunidade;
+    } catch (e) {
+      return { nome: '', uf: '', rio: '' };
+    }
+  }
+
+  window.AB = {
+    t: t,
+    numero: numero,
+    numeroCompacto: numeroCompacto,
+    textoBaldes: textoBaldes,
+    hojeNaComunidade: hojeNaComunidade,
+    nomeDoDia: nomeDoDia,
+    dataCurta: dataCurta,
+    mesEAno: mesEAno,
+    quando: quando,
+    icone: icone,
+    escapar: escapar,
+    avisoSituacao: avisoSituacao,
+    rodapeFonte: rodapeFonte,
+    configurarOuvir: configurarOuvir,
+    iniciarPagina: iniciarPagina
+  };
+})();

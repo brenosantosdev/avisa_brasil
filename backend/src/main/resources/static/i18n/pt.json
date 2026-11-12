@@ -1,0 +1,104 @@
+{
+  "_idioma": "pt-BR",
+
+  "app.nome": "AvisaBrasil",
+  "app.local": "{lugar} ({uf}) · {rio}",
+  "app.rodape": "AvisaBrasil · projeto FIAP Global Solution 2026.2 · dados reais de fontes públicas",
+
+  "nav.principal": "Navegação principal",
+  "nav.inicio": "Início",
+  "nav.proximosDias": "Próximos dias",
+
+  "ouvir": "Ouvir",
+  "ouvir.parar": "Parar",
+  "ouvir.indisponivel": "Este navegador não consegue ler em voz alta.",
+
+  "carregando": "Carregando dados reais…",
+
+  "fonte.de": "Fonte: {fonte}",
+  "fonte.atualizado": "Atualizado {quando}",
+  "fonte.nunca": "Ainda não foi possível obter os dados.",
+  "situacao.DESATUALIZADO": "Desatualizado. Não conseguimos buscar dados novos agora; mostrando o último dado válido, de {quando}.",
+  "situacao.INDISPONIVEL": "Dados indisponíveis agora. O sistema tenta de novo em alguns minutos.",
+
+  "quando.hoje": "hoje às {hora}",
+  "quando.ontem": "ontem às {hora}",
+  "quando.data": "em {data} às {hora}",
+
+  "dia.hoje": "Hoje",
+  "dia.amanha": "Amanhã",
+
+  "periodo.MADRUGADA": "de madrugada",
+  "periodo.MANHA": "de manhã",
+  "periodo.TARDE": "à tarde",
+  "periodo.NOITE": "à noite",
+
+  "chuva.SEM_CHUVA": "Sem chuva",
+  "chuva.FRACA": "Chuva fraca",
+  "chuva.MODERADA": "Chuva moderada",
+  "chuva.FORTE": "Chuva forte",
+  "chuva.MUITO_FORTE": "Chuva muito forte",
+
+  "baldes.quaseNada": "Quase nada de água",
+  "baldes.menosMeio": "Menos de meio balde por metro quadrado",
+  "baldes.quaseUm": "Quase 1 balde por metro quadrado",
+  "baldes.um": "Cerca de 1 balde por metro quadrado",
+  "baldes.mais": "Mais de {n} baldes por metro quadrado",
+  "baldes.cerca": "Cerca de {n} baldes por metro quadrado",
+
+  "pd.titulo": "Próximos dias",
+  "pd.intro": "Chuva e rio em {lugar} nos próximos dias.",
+  "pd.resumo": "Resumo",
+  "pd.resumo.chuva.nenhuma": "Sem chuva prevista nos próximos 7 dias.",
+  "pd.resumo.chuva.maior": "Mais chuva: {quando}. {categoria}, {mm} mm.",
+  "pd.resumo.chuva.dias": "Chove em {n} dos próximos 7 dias.",
+
+  "pd.chuva.titulo": "Chuva dia a dia",
+  "pd.chuva.explica": "Como ler: 1 milímetro de chuva é 1 litro de água em cada metro quadrado de chão. Um balde grande tem uns 20 litros.",
+  "pd.chuva.mm": "{mm} mm",
+  "pd.chuva.chance": "Chance de chuva: {n}%",
+  "pd.chuva.maisChuva": "Mais chuva {periodo}",
+  "pd.chuva.temperatura": "Temperatura: de {min}° a {max}°",
+  "pd.chuva.calorForte": "Calor forte",
+
+  "ceu.LIMPO": "Céu limpo",
+  "ceu.NUBLADO": "Nublado",
+  "ceu.NEBLINA": "Neblina",
+  "ceu.CHUVA": "Chuva",
+  "ceu.TROVOADA": "Trovoada",
+
+  "rio.titulo": "O rio nos próximos 30 dias",
+  "rio.tendencia.SUBINDO": "O rio deve subir nos próximos 7 dias",
+  "rio.tendencia.SUBINDO.rapido": "O rio deve subir rápido nos próximos 7 dias",
+  "rio.tendencia.DESCENDO": "O rio deve descer nos próximos 7 dias",
+  "rio.tendencia.DESCENDO.rapido": "O rio deve descer rápido nos próximos 7 dias",
+  "rio.tendencia.ESTAVEL": "O rio deve ficar parecido nos próximos 7 dias",
+  "rio.tendencia.detalhe": "Hoje: {hoje} m³/s. Daqui a 7 dias: {em7} m³/s ({variacao}%).",
+  "rio.tendencia.semDados": "Não há dados suficientes para dizer se o rio vai subir ou descer.",
+
+  "rio.normal.MUITO_ABAIXO": "Muito abaixo do normal para esta época",
+  "rio.normal.ABAIXO": "Abaixo do normal para esta época",
+  "rio.normal.NORMAL": "Normal para esta época",
+  "rio.normal.ACIMA": "Acima do normal para esta época",
+  "rio.normal.MUITO_ACIMA": "Muito acima do normal para esta época",
+  "rio.normal.detalhe": "Nesta época do ano, o rio costuma ter entre {p25} e {p75} m³/s (metade dos anos de {ini} a {fim}).",
+  "rio.normal.seca": "Rio muito baixo pode dificultar o transporte de barco, a pesca e o acesso à água.",
+  "rio.normal.cheia": "Rio muito alto para a época: fique atento aos avisos de cheia.",
+  "rio.normal.semHistorico": "A comparação com os anos anteriores ainda não está disponível.",
+
+  "rio.baldes": "Hoje passam uns {hoje} baldes de água por segundo neste trecho do rio.",
+  "rio.baldes.normal": "Numa época normal, seriam uns {normal}.",
+  "rio.pico": "Maior vazão prevista até {fim}: {quando}, {vazao} m³/s.",
+  "rio.incerteza": "Quanto mais longe a data, mais incerta a previsão. A faixa azul mostra onde o rio deve ficar na maioria dos cenários.",
+  "rio.extremos": "Nesta série, desde {ano}, a maior vazão foi {max} m³/s ({dataMax}) e a menor foi {min} m³/s ({dataMin}).",
+  "rio.aviso": "Esta é a previsão de um modelo de computador (GloFAS) para o trecho do {rio} perto da cidade. Não é a medição da régua do rio.",
+  "rio.unidade": "m³/s = metros cúbicos de água passando por segundo. 1 m³ = 1.000 litros = 50 baldes.",
+
+  "rio.grafico.titulo": "Vazão do rio: últimos 30 dias e previsão",
+  "rio.grafico.vazao": "Vazão",
+  "rio.grafico.faixa": "Faixa provável",
+  "rio.grafico.normal": "Normal para a época",
+  "rio.grafico.hoje": "Hoje",
+  "rio.grafico.eixo": "m³/s",
+  "rio.grafico.descricao": "Gráfico da vazão do rio. Linha contínua: últimos 30 dias. Linha tracejada: previsão. Faixa cinza: o normal para a época."
+}
