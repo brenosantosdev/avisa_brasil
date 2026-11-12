@@ -10,4 +10,6 @@ public interface LeituraRepositorio extends JpaRepository<Leitura, Long> {
 
     /** Últimas leituras na ordem em que chegaram (a mais recente primeiro). */
     List<Leitura> findBySensorOrderByIdDesc(Sensor sensor, Pageable pagina);
+
+    long deleteBySensor(Sensor sensor);
 }

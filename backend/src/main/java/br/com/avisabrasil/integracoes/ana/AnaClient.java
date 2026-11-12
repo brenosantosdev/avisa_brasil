@@ -37,7 +37,7 @@ public class AnaClient {
     private final SessaoAna sessao;
 
     public AnaClient(RestClient.Builder builder, AvisaBrasilProperties propriedades, Clock relogio,
-            @Value("${ANA_USUARIO:}") String usuario, @Value("${ANA_SENHA:}") String senha) {
+            @Value("${avisabrasil.segredos.ana-usuario:}") String usuario, @Value("${avisabrasil.segredos.ana-senha:}") String senha) {
         HttpClient cliente = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .connectTimeout(Duration.ofSeconds(15))

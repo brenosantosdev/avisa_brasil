@@ -121,6 +121,89 @@
     await carregarPontos();
   }
 
+  /* ---------- Alertas: canais, teste, limpeza da simulação, histórico e respostas ---------- */
+
+  async function json(url, opcoes) {
+    const resposta = await fetch(url, Object.assign({ cache: 'no-store' }, opcoes || {}));
+    if (!resposta.ok) throw new Error('HTTP ' + resposta.status);
+    return resposta.json();
+  }
+
+  async function carregarCanais() {
+    const canais = await json('/api/alertas/canais').catch(function () { return []; });
+    document.getElementById('canais').innerHTML = canais.map(function (c) {
+      return '<li class="' + (c.ligado ? 'canal-ligado' : 'canal-desligado') + '">' + AB.icone(c.ligado ? 'seguro' : 'info') +
+        '<span><strong>' + AB.escapar(t('painel.canal.' + c.canal)) + '</strong> · ' +
+        AB.escapar(c.ligado ? t('painel.canal.ligado') : t('painel.canal.desligado', { motivo: c.motivoDesligado })) + '</span></li>';
+    }).join('');
+  }
+
+  async function enviarTeste() {
+    const alvo = document.getElementById('resultado-teste');
+    const resultados = await json('/api/alertas/teste', { method: 'POST' }).catch(function () { return null; });
+    if (!resultados) { alvo.innerHTML = '<p class="mensagem-erro">' + AB.escapar(t('painel.erro')) + '</p>'; return; }
+    const externos = resultados.filter(function (r) { return r.canal !== 'LOG'; });
+    if (!externos.length) { alvo.innerHTML = '<p class="mensagem-alerta">' + AB.escapar(t('painel.teste.nenhum')) + '</p>'; return; }
+    alvo.innerHTML = externos.map(function (r) {
+      const canal = t('painel.canal.' + r.canal);
+      return '<p class="' + (r.ok ? 'mensagem-ok' : 'mensagem-erro') + '">' + AB.escapar(r.ok
+        ? t('painel.teste.ok', { canal: canal }) : t('painel.teste.falha', { canal: canal, erro: r.erro })) + '</p>';
+    }).join('');
+  }
+
+  /** Limpeza em dois cliques (sem janela de confirmação do navegador). */
+  async function limparSimulacao(e) {
+    const botao = e.currentTarget;
+    if (botao.dataset.confirmar !== 'true') {
+      botao.dataset.confirmar = 'true';
+      botao.querySelector('span').textContent = t('painel.limpar.confirmar');
+      return;
+    }
+    botao.dataset.confirmar = 'false';
+    botao.querySelector('span').textContent = t('painel.limpar');
+    const r = await json('/api/simulacao/limpar', { method: 'POST' }).catch(function () { return null; });
+    document.getElementById('resultado-limpar').innerHTML = r
+      ? '<p class="mensagem-ok">' + AB.escapar(t('painel.limpar.feito', {
+        leituras: r.leituras, alertas: r.alertas,
+        nivel: t('nivel.' + r.situacaoAtual.nivel) + (r.situacaoAtual.tipo ? ' · ' + t('tipoRisco.' + r.situacaoAtual.tipo) : '')
+      })) + '</p>'
+      : '<p class="mensagem-erro">' + AB.escapar(t('painel.erro')) + '</p>';
+    carregarAlertas();
+  }
+
+  async function carregarAlertas() {
+    const lista = await json('/api/alertas/envios').catch(function () { return []; });
+    const alvo = document.getElementById('ultimos-alertas');
+    if (!lista.length) { alvo.innerHTML = '<p>' + AB.escapar(t('painel.ultimos.vazio')) + '</p>'; return; }
+    alvo.innerHTML = '<div class="rolagem"><table class="tabela-alertas"><tbody>' + lista.map(function (item) {
+      const a = item.alerta;
+      const envios = item.envios.filter(function (e) { return e.canal !== 'LOG'; }).map(function (e) {
+        return t('painel.canal.' + e.canal) + ': ' + t('painel.envio.' + e.status) + (e.erro ? ' (' + e.erro + ')' : '');
+      });
+      return '<tr><td>' + AB.escapar(AB.quando(a.criadoEm)) + '</td><td>' + AB.etiquetaNivel(a.nivel, a.tipo) +
+        (a.simulado ? '<span class="marca-simulacao">' + AB.escapar(t('painel.simulado')) + '</span>' : '') + '</td>' +
+        '<td class="coluna-mensagem">' + AB.escapar(a.mensagem) +
+        (envios.length ? '<div class="envios">' + AB.escapar(envios.join(' · ')) + '</div>' : '') + '</td></tr>';
+    }).join('') + '</tbody></table></div>';
+  }
+
+  async function carregarRespostas() {
+    const lista = await json('/api/pedidos-ajuda').catch(function () { return []; });
+    const alvo = document.getElementById('respostas');
+    if (!lista.length) { alvo.innerHTML = '<p>' + AB.escapar(t('painel.respostas.vazio')) + '</p>'; return; }
+    alvo.innerHTML = '<ul class="lista-pontos">' + lista.slice(0, 20).map(function (p) {
+      const ajuda = p.tipo === 'PRECISO_DE_AJUDA';
+      const detalhes = [AB.quando(p.criadoEm)];
+      if (p.pessoas) detalhes.push(t('painel.resposta.pessoas', { n: p.pessoas }));
+      return '<li><span class="etiqueta ' + (ajuda ? 'nivel-EMERGENCIA' : 'nivel-NORMAL') + '">' + AB.icone(ajuda ? 'alerta' : 'seguro') +
+        AB.escapar(t('painel.resposta.' + p.tipo)) + '</span><div class="texto"><p class="nome">' + AB.escapar(p.nome || '') + '</p>' +
+        '<p class="detalhe">' + AB.escapar(detalhes.join(' · ')) + '</p></div>' +
+        (p.latitude !== null ? '<a class="botao botao-secundario" href="https://www.openstreetmap.org/?mlat=' + p.latitude + '&mlon=' + p.longitude +
+          '#map=17/' + p.latitude + '/' + p.longitude + '" target="_blank" rel="noopener">' + AB.icone('local') +
+          AB.escapar(t('painel.resposta.local')) + '</a>' : '') + '</li>';
+    }).join('') + '</ul>';
+  }
+
   async function iniciar() {
     estado.comunidade = await AB.iniciarPagina();
     document.getElementById('aviso-acesso').innerHTML = AB.icone('alerta') + '<span>' + AB.escapar(t('painel.aviso')) + '</span>';
@@ -137,7 +220,10 @@
 
     document.getElementById('formulario').addEventListener('submit', salvar);
     document.getElementById('lista').addEventListener('click', aoClicarNaLista);
-    await carregarPontos();
+    document.getElementById('botao-teste').addEventListener('click', enviarTeste);
+    document.getElementById('botao-limpar').addEventListener('click', limparSimulacao);
+    await Promise.all([carregarPontos(), carregarCanais(), carregarAlertas(), carregarRespostas()]);
+    setInterval(function () { carregarAlertas(); carregarRespostas(); }, 15000);
   }
 
   iniciar();

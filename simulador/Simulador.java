@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
  *   java simulador/Simulador.java seca
  *   java simulador/Simulador.java normal
  *
+ * Se o servidor usar SENSOR_API_KEY, defina a mesma variável no terminal do simulador.
+ *
  * Opções:
  *   --url http://localhost:8080   endereço do servidor
  *   --sensor SGC-01               código do sensor
@@ -135,10 +137,19 @@ public class Simulador {
     }
 
     private static int post(HttpClient http, String url, String json) throws Exception {
-        HttpRequest pedido = HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(30))
+        HttpRequest.Builder pedido = HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(30))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json)).build();
-        return http.send(pedido, HttpResponse.BodyHandlers.ofString()).statusCode();
+                .POST(HttpRequest.BodyPublishers.ofString(json));
+        // mesma chave do servidor (variável SENSOR_API_KEY), se estiver definida
+        String chave = System.getenv("SENSOR_API_KEY");
+        if (chave != null && !chave.isBlank()) {
+            pedido.header("X-API-Key", chave.trim());
+        }
+        int status = http.send(pedido.build(), HttpResponse.BodyHandlers.ofString()).statusCode();
+        if (status == 401) {
+            throw new IllegalStateException("Servidor recusou a chave do sensor: defina SENSOR_API_KEY igual à do servidor");
+        }
+        return status;
     }
 
     /** Lê um número de um JSON simples ("chave": 123.4), sem bibliotecas. */

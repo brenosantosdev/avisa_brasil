@@ -33,6 +33,11 @@ public class EstadoRisco {
 
     private Instant atualizadoEm;
 
+    /** O nível atual foi decidido por dado simulado (a "situação normalizada" seguinte também é simulada). */
+    // valor padrão para o banco já existente receber a coluna nova sem erro
+    @Column(nullable = false, columnDefinition = "boolean default false not null")
+    private boolean simulado;
+
     public Nivel getNivel() {
         return nivel;
     }
@@ -45,9 +50,14 @@ public class EstadoRisco {
         return atualizadoEm;
     }
 
-    public void mudar(Nivel nivel, TipoRisco tipo, Instant quando) {
+    public boolean isSimulado() {
+        return simulado;
+    }
+
+    public void mudar(Nivel nivel, TipoRisco tipo, boolean simulado, Instant quando) {
         this.nivel = nivel;
         this.tipo = tipo;
+        this.simulado = simulado;
         this.atualizadoEm = quando;
     }
 }

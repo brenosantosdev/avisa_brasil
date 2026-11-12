@@ -4,7 +4,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-/** Liga as tarefas agendadas. Nos testes fica desligado para não acessar a internet. */
+/**
+ * Liga as tarefas agendadas. Nos testes fica desligado para não acessar a internet.
+ * (O envio assíncrono de alertas é ligado em {@link AssincronoConfig}.)
+ */
 @Configuration
 @EnableScheduling
 @ConditionalOnProperty(name = "avisabrasil.agendador.habilitado", havingValue = "true", matchIfMissing = true)

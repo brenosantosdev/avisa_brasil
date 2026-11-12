@@ -85,6 +85,15 @@ class MotorDeRiscoTest {
                 .andExpect(jsonPath("$[2].nivel").value("ALERTA"))
                 .andExpect(jsonPath("$[2].mensagem").value(org.hamcrest.Matchers.startsWith("[SIMULAÇÃO] ALERTA – CHEIA.")))
                 .andExpect(jsonPath("$[3].nivel").value("ATENCAO"));
+
+        // antes da demonstração: limpa tudo que é simulado; o estado volta ao real sem gerar alerta
+        mockMvc.perform(post("/api/simulacao/limpar"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.leituras").value(7))
+                .andExpect(jsonPath("$.alertas").value(4))
+                .andExpect(jsonPath("$.situacaoAtual.nivel").value("NORMAL"));
+        mockMvc.perform(get("/api/risco/alertas")).andExpect(jsonPath("$.length()").value(0));
+        mockMvc.perform(get("/api/sensores/SGC-01/leituras")).andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test

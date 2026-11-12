@@ -35,6 +35,31 @@
     <h1 data-i18n="painel.titulo">Painel da Defesa Civil</h1>
     <p class="aviso-situacao aviso-DESATUALIZADO" id="aviso-acesso"></p>
 
+    <section class="secao" aria-labelledby="titulo-alertas">
+      <h2 id="titulo-alertas" data-i18n="painel.alertas.titulo">Alertas</h2>
+      <div class="painel-grade">
+        <div class="cartao">
+          <h3 data-i18n="painel.alertas.canais">Canais de envio</h3>
+          <ul class="lista-canais" id="canais"></ul>
+          <button id="botao-teste" class="botao botao-primario botao-largo" type="button" data-i18n="painel.teste"></button>
+          <div id="resultado-teste" role="status" aria-live="polite"></div>
+        </div>
+        <div class="cartao">
+          <p class="nota" data-i18n="painel.limpar.explica"></p>
+          <button id="botao-limpar" class="botao botao-perigo botao-largo" type="button"><span data-i18n="painel.limpar"></span></button>
+          <div id="resultado-limpar" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="cartao secao">
+        <h3 data-i18n="painel.ultimos">Últimos alertas</h3>
+        <div id="ultimos-alertas"></div>
+      </div>
+      <div class="cartao secao">
+        <h3 data-i18n="painel.respostas">Respostas da comunidade</h3>
+        <div id="respostas"></div>
+      </div>
+    </section>
+
     <section class="secao" aria-labelledby="titulo-pontos">
       <h2 id="titulo-pontos" data-i18n="painel.pontos.titulo">Pontos seguros</h2>
       <p data-i18n="painel.pontos.explica"></p>

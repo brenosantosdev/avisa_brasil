@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AlertaRepositorio extends JpaRepository<Alerta, Long> {
 
     List<Alerta> findAllByOrderByIdDesc(Pageable pagina);
+
+    List<Alerta> findBySimuladoTrue();
 }

@@ -79,7 +79,20 @@ public class MotorDeRisco {
     }
 
     @Transactional
-    public synchronized AvaliacaoDeRisco avaliar() {
+    public AvaliacaoDeRisco avaliar() {
+        return avaliar(true);
+    }
+
+    /**
+     * Reavalia e grava o estado sem gerar alerta. Usado depois de limpar dados simulados, para o
+     * estado voltar ao real sem mandar uma notificação por causa da limpeza.
+     */
+    @Transactional
+    public AvaliacaoDeRisco sincronizarSemAlerta() {
+        return avaliar(false);
+    }
+
+    private synchronized AvaliacaoDeRisco avaliar(boolean gerarAlertas) {
         RioAgora rio = rioAgora.consultar().dados();
         List<Fator> fatores = new ArrayList<>();
 
@@ -113,29 +126,36 @@ public class MotorDeRisco {
                 rio == null ? null : rio.cotas(),
                 OffsetDateTime.now(relogio),
                 principal.map(Fator::simulado).orElse(false));
-        registrarMudanca(avaliacao);
+        registrarMudanca(avaliacao, gerarAlertas);
         ultima = avaliacao;
         return avaliacao;
     }
 
     /** Alerta só quando o nível sobe (ou muda de cheia para seca); "normalizada" quando volta ao Normal. */
-    private void registrarMudanca(AvaliacaoDeRisco a) {
+    private void registrarMudanca(AvaliacaoDeRisco a, boolean gerarAlertas) {
         EstadoRisco estado = estados.findById(EstadoRisco.ID).orElseGet(EstadoRisco::new);
         Nivel antes = estado.getNivel();
+        boolean antesSimulado = estado.isSimulado();
         Alerta.Evento evento = null;
         if (a.nivel().maiorQue(antes) || (a.nivel() != Nivel.NORMAL && a.nivel() == antes && a.tipo() != estado.getTipo())) {
             evento = Alerta.Evento.NIVEL_SUBIU;
         } else if (a.nivel() == Nivel.NORMAL && antes != Nivel.NORMAL) {
             evento = Alerta.Evento.NORMALIZADO;
         }
-        if (a.nivel() != antes || a.tipo() != estado.getTipo()) {
-            estado.mudar(a.nivel(), a.tipo(), relogio.instant());
+        if (a.nivel() != antes || a.tipo() != estado.getTipo() || a.simulado() != antesSimulado) {
+            estado.mudar(a.nivel(), a.tipo(), a.simulado(), relogio.instant());
             estados.save(estado);
         }
-        if (evento != null) {
+        if (evento != null && gerarAlertas) {
+            // "normalizada" depois de uma simulação também é simulada
+            boolean simulado = evento == Alerta.Evento.NORMALIZADO ? antesSimulado : a.simulado();
+            String mensagem = MensagensDeRisco.mensagem(a);
+            if (simulado && !mensagem.startsWith("[SIMULAÇÃO]")) {
+                mensagem = "[SIMULAÇÃO] " + mensagem;
+            }
             Alerta alerta = alertas.save(new Alerta(evento, a.nivel(), a.tipo(),
-                    a.principal() == null ? null : a.principal().fonte(), a.simulado(),
-                    MensagensDeRisco.mensagem(a), relogio.instant()));
+                    a.principal() == null ? null : a.principal().fonte(), simulado,
+                    mensagem, relogio.instant()));
             log.info("Risco: {} → {} ({})", antes, a.nivel(), alerta.getMensagem());
             eventos.publishEvent(new AlertaRegistrado(alerta, a));
         }

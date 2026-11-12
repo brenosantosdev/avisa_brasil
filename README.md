@@ -3,7 +3,7 @@
 Rede de alerta de cheias e secas para comunidades ribeirinhas e indígenas, com linguagem simples, voz e orientação do que fazer.
 Projeto da **Global Solution 2026.2 da FIAP** (tema CitizenTech). Território piloto: **São Gabriel da Cachoeira (AM), Rio Negro**.
 
-> Estado atual: **etapa 5**. A tela **Início** mostra o semáforo da comunidade (maior risco entre cheia e seca),
+> Estado atual: **etapa 6** (alertas por ntfy, Telegram e SMS). A tela **Início** mostra o semáforo da comunidade (maior risco entre cheia e seca),
 > calculado pelo motor de risco com dados reais da ANA, chuva e GloFAS, mais um sensor **simulado**. As telas
 > **O rio agora**, **Próximos dias** e **Mapa** também usam dados reais.
 
@@ -99,8 +99,8 @@ O arquivo do banco fica em `backend/data/` e não vai para o Git.
   (sem reprojeção: SIRGAS 2000 ≈ WGS84). Pontos que caem dentro de um setor são marcados no mapa e no painel.
 - **Overpass:** uma consulta por dia, com servidor reserva. Em horário de pico a fila pode passar de 30 s, por isso o
   tempo limite dessa fonte é 90 s.
-- **Painel e sensor sem senha (por enquanto):** qualquer pessoa com o endereço consegue cadastrar ou remover pontos e
-  enviar leituras para o sensor. O acesso restrito precisa entrar antes de usar fora da demonstração.
+- **Painel sem senha (por enquanto):** qualquer pessoa com o endereço consegue cadastrar ou remover pontos,
+  enviar mensagem de teste e limpar a simulação. O sensor já pode exigir chave (`SENSOR_API_KEY`).
 
 ## Motor de risco
 
@@ -115,7 +115,30 @@ Níveis **Normal, Atenção, Alerta e Emergência**, de **cheia** ou de **seca**
 | Vazão prevista (GloFAS) | subida rápida (mais de 20% em 7 dias): Atenção |
 
 Em empate, vale a medição oficial (ANA). Alerta é registrado **só quando o nível sobe**; quando volta ao Normal,
-registra "situação normalizada". Os limites ficam em `avisabrasil.risco.*`. O envio das notificações vem na etapa 6.
+registra "situação normalizada". Os limites ficam em `avisabrasil.risco.*`.
+
+## Alertas (ntfy, Telegram, SMS)
+
+Cada alerta do motor de risco vai por todos os canais ligados. A mensagem segue o estilo das telas: nível, o que
+está acontecendo, o que fazer agora (3 orientações) e a fonte. Alertas simulados levam **[SIMULAÇÃO]**.
+Um alerta nunca é enviado duas vezes pelo mesmo canal, e um alerta com o mesmo conteúdo do anterior não é reenviado
+em sequência. O resultado de cada envio aparece no **Painel da Defesa Civil**.
+
+| Canal | Variáveis | Observação |
+|---|---|---|
+| ntfy (push no celular) | `NTFY_TOPICO` | use um nome difícil de adivinhar |
+| Telegram | `TELEGRAM_BOT_TOKEN` | a pessoa envia /start ao bot; responde 1 = estou bem / 2 = preciso de ajuda (long polling, funciona em localhost) |
+| SMS (Twilio) | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM`, `TWILIO_DESTINOS` | só envio; na conta trial, só para números verificados |
+
+Sem a variável, o canal fica desligado. No painel há o botão **Enviar mensagem de teste** (não é alerta) e o botão
+**Limpar dados simulados** (apaga leituras e alertas simulados antes da demonstração, sem enviar nada).
+
+```powershell
+# Exemplo no PowerShell (vale só para este terminal)
+$env:NTFY_TOPICO = "avisabrasil-sgc-k7q2m9x4"
+$env:TELEGRAM_BOT_TOKEN = "<token do BotFather>"
+.\mvnw.cmd spring-boot:run
+```
 
 ## Simulador do sensor (demonstração)
 
@@ -130,6 +153,9 @@ java simulador/Simulador.java normal    # devolve o sensor ao normal
 
 Cada leitura vale 1 hora simulada (`--horas-por-passo`), e o padrão é uma leitura a cada 2 s (`--intervalo`) por
 40 passos (`--passos`). O sensor deixa de contar 30 minutos depois da última leitura.
+
+Se o servidor tiver `SENSOR_API_KEY`, as leituras precisam do cabeçalho `X-API-Key`; defina a mesma variável no
+terminal do simulador. Sem ela, o servidor aceita qualquer leitura e avisa no log (use só em demonstração).
 
 ## Testes
 
