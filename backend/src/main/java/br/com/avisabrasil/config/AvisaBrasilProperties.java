@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /** Configurações do AvisaBrasil (prefixo "avisabrasil" no application.properties). */
 @ConfigurationProperties(prefix = "avisabrasil")
-public record AvisaBrasilProperties(Comunidade comunidade, Fontes fontes, Ana ana) {
+public record AvisaBrasilProperties(Comunidade comunidade, Fontes fontes, Ana ana, Risco risco, Sensor sensor) {
 
     /**
      * Integração com a ANA (HidroWebService). Usuário e senha vêm só das variáveis de ambiente
@@ -43,9 +43,42 @@ public record AvisaBrasilProperties(Comunidade comunidade, Fontes fontes, Ana an
      * Cotas de referência em centímetros, na régua da estação principal. Vazias = não há cota
      * oficial; o sistema calcula valores provisórios a partir do histórico da ANA.
      *
-     * @param fonte de onde vieram as cotas configuradas (obrigatório quando forem preenchidas)
+     * @param fonte de onde vieram as cotas de cheia configuradas (obrigatório quando preenchidas)
+     * @param secaFonte de onde vieram as cotas de seca configuradas (obrigatório quando preenchidas)
      */
-    public record Cotas(Integer atencaoCm, Integer alertaCm, Integer emergenciaCm, String fonte) {
+    public record Cotas(
+            Integer atencaoCm,
+            Integer alertaCm,
+            Integer emergenciaCm,
+            String fonte,
+            Integer secaAtencaoCm,
+            Integer secaAlertaCm,
+            Integer secaEmergenciaCm,
+            String secaFonte) {
+    }
+
+    /**
+     * Regras do motor de risco.
+     *
+     * @param horasAntecedenciaCheia sobe o nível antes, se a tendência indicar que a próxima cota de
+     *     cheia será atingida em até este número de horas
+     * @param horasAntecedenciaSeca o mesmo para a seca (o rio desce devagar, então o prazo é maior)
+     * @param chuvaForteMm chuva prevista para hoje ou amanhã a partir da qual o nível vai a Atenção
+     * @param sensorSemDadosApos sem leitura nova nesse tempo, o sensor deixa de contar
+     */
+    public record Risco(
+            int horasAntecedenciaCheia,
+            int horasAntecedenciaSeca,
+            double chuvaForteMm,
+            Duration sensorSemDadosApos) {
+    }
+
+    /**
+     * Sensor de nível da comunidade. Nesta versão é simulado (não há hardware): as leituras vêm do
+     * simulador ou do firmware no Wokwi e usam a régua da estação principal, para valerem as mesmas cotas.
+     */
+    public record Sensor(String codigo, String nome, boolean simulado, double latitude, double longitude,
+            String descricao) {
     }
 
     /**

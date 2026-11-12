@@ -46,6 +46,7 @@ public class SerieHistorica {
         }
         Collections.sort(amostras);
         return Optional.of(new FaixaNormal(
+                percentil(amostras, 5),
                 percentil(amostras, 10),
                 percentil(amostras, 25),
                 percentil(amostras, 50),

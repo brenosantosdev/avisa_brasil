@@ -41,33 +41,45 @@ class CotasEHistoricoTest {
     }
 
     @Test
-    void cotasProvisoriasPelasCheiasAnuais() {
+    void cotasProvisoriasDeCheiaEDeSeca() {
         var cotas = CotasDeReferencia.definir(semCotas(), new ExtremosAnuais(serieSintetica())).orElseThrow();
 
-        // cheias: 1000, 1010, ..., 1190 → mediana 1095, p80 1152, p95 1180,5
-        assertThat(cotas.origem()).isEqualTo(CotasDeReferencia.Origem.PROVISORIA);
-        assertThat(cotas.atencaoCm()).isEqualTo(1095);
-        assertThat(cotas.alertaCm()).isEqualTo(1152);
-        assertThat(cotas.emergenciaCm()).isEqualTo(1181);
-        assertThat(cotas.anoInicial()).isEqualTo(2000);
-        assertThat(cotas.anoFinal()).isEqualTo(2019);
+        // cheias 1000, 1010, ..., 1190 → p50 1095 (1 em 2 anos), p67 1127 (1 em 3), p90 1171 (1 em 10)
+        var cheia = cotas.cheia();
+        assertThat(cheia.origem()).isEqualTo(CotasDeReferencia.Origem.PROVISORIA);
+        assertThat(cheia.atencaoCm()).isEqualTo(1095);
+        assertThat(cheia.alertaCm()).isEqualTo(1127);
+        assertThat(cheia.emergenciaCm()).isEqualTo(1171);
+        assertThat(cheia.anoInicial()).isEqualTo(2000);
+        assertThat(cheia.anoFinal()).isEqualTo(2019);
 
-        assertThat(cotas.nivel(900)).isEqualTo(Nivel.NORMAL);
-        assertThat(cotas.nivel(1100)).isEqualTo(Nivel.ATENCAO);
-        assertThat(cotas.nivel(1160)).isEqualTo(Nivel.ALERTA);
-        assertThat(cotas.nivel(1181)).isEqualTo(Nivel.EMERGENCIA);
-        assertThat(cotas.proximoNivel(1100)).contains(Nivel.ALERTA);
-        assertThat(cotas.proximoNivel(1200)).isEmpty();
+        // secas 281, ..., 300 → p50 290,5 (1 em 2 anos), p33 287 (1 em 3), p10 283 (1 em 10)
+        var seca = cotas.seca();
+        assertThat(seca.origem()).isEqualTo(CotasDeReferencia.Origem.PROVISORIA);
+        assertThat(seca.atencaoCm()).isEqualTo(291);
+        assertThat(seca.alertaCm()).isEqualTo(287);
+        assertThat(seca.emergenciaCm()).isEqualTo(283);
+
+        assertThat(cotas.nivelCheia(900)).isEqualTo(Nivel.NORMAL);
+        assertThat(cotas.nivelCheia(1100)).isEqualTo(Nivel.ATENCAO);
+        assertThat(cotas.nivelCheia(1130)).isEqualTo(Nivel.ALERTA);
+        assertThat(cotas.nivelCheia(1171)).isEqualTo(Nivel.EMERGENCIA);
+        assertThat(cotas.nivelSeca(400)).isEqualTo(Nivel.NORMAL);
+        assertThat(cotas.nivelSeca(291)).isEqualTo(Nivel.ATENCAO);
+        assertThat(cotas.nivelSeca(285)).isEqualTo(Nivel.ALERTA);
+        assertThat(cotas.nivelSeca(283)).isEqualTo(Nivel.EMERGENCIA);
     }
 
     @Test
     void cotasConfiguradasExigemFonte() {
-        var oficiais = new AvisaBrasilProperties.Cotas(900, 1000, 1100, "Boletim SGB nº X");
-        var cotas = CotasDeReferencia.definir(oficiais, null).orElseThrow();
-        assertThat(cotas.origem()).isEqualTo(CotasDeReferencia.Origem.OFICIAL_CONFIGURADA);
-        assertThat(cotas.fonte()).isEqualTo("Boletim SGB nº X");
+        var oficiais = new AvisaBrasilProperties.Cotas(900, 1000, 1100, "Boletim SGB nº X", null, null, null, null);
+        var cotas = CotasDeReferencia.definir(oficiais, new ExtremosAnuais(serieSintetica())).orElseThrow();
+        assertThat(cotas.cheia().origem()).isEqualTo(CotasDeReferencia.Origem.OFICIAL_CONFIGURADA);
+        assertThat(cotas.cheia().fonte()).isEqualTo("Boletim SGB nº X");
+        // a seca continua provisória enquanto não houver cota oficial
+        assertThat(cotas.seca().origem()).isEqualTo(CotasDeReferencia.Origem.PROVISORIA);
 
-        var semFonte = new AvisaBrasilProperties.Cotas(900, 1000, 1100, " ");
+        var semFonte = new AvisaBrasilProperties.Cotas(900, 1000, 1100, " ", null, null, null, null);
         assertThatThrownBy(() -> CotasDeReferencia.definir(semFonte, null)).isInstanceOf(IllegalStateException.class);
     }
 
@@ -102,6 +114,6 @@ class CotasEHistoricoTest {
     }
 
     private static AvisaBrasilProperties.Cotas semCotas() {
-        return new AvisaBrasilProperties.Cotas(null, null, null, null);
+        return new AvisaBrasilProperties.Cotas(null, null, null, null, null, null, null, null);
     }
 }

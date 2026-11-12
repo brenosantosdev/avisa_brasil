@@ -3,6 +3,7 @@ package br.com.avisabrasil.rio;
 import br.com.avisabrasil.config.AvisaBrasilProperties;
 import br.com.avisabrasil.previsao.ComparacaoNormal;
 import br.com.avisabrasil.previsao.FaixaNormal;
+import br.com.avisabrasil.risco.AvaliacaoMedicao;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  *
  * @param velocidadeCmPorDia velocidade de subida (positiva) ou descida (negativa), por regressão
  *     linear das leituras das últimas 24 horas
- * @param horasAteProximoNivel estimativa pela tendência; nula se o rio não está subindo
+ * @param avaliacao níveis de cheia e de seca desta medição, pelas regras do motor de risco
  * @param comparacaoAna nível de hoje comparado com a mesma época nos anos anteriores (régua da ANA)
  * @param comparacaoGlofas o que o modelo GloFAS diz para hoje
  * @param divergem ANA e GloFAS discordam sobre seca/cheia; nesse caso vale a ANA
@@ -25,10 +26,7 @@ public record RioAgora(
         Double velocidadeCmPorDia,
         List<Ponto> ultimosDias,
         CotasDeReferencia cotas,
-        Nivel nivel,
-        Nivel proximoNivel,
-        Double faltaParaProximoCm,
-        Double horasAteProximoNivel,
+        AvaliacaoMedicao avaliacao,
         FaixaNormal normalHoje,
         ComparacaoNormal comparacaoAna,
         ComparacaoNormal comparacaoGlofas,

@@ -9,10 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/estilo.css">
-  <style>
-    .aviso-construcao { border-left: 6px solid var(--rio); }
-    .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-  </style>
+  <link rel="stylesheet" href="/css/inicio.css">
 </head>
 <body>
   <header class="topo">
@@ -33,25 +30,41 @@
   <nav class="navegacao" id="navegacao" data-atual="inicio"></nav>
 
   <main>
-    <div class="cartao aviso-construcao">
-      <h1>Sistema em construção</h1>
-      <p id="texto-inicio">Esta tela inicial ainda é provisória. O semáforo da comunidade chega nas próximas etapas.
-        As telas de próximos dias e do mapa já mostram dados reais.</p>
-      <div class="links">
-        <a class="botao botao-primario" href="/proximos-dias.html">Ver próximos dias</a>
-        <a class="botao botao-primario" href="/mapa.html">Ver mapa</a>
-        <a class="botao" href="/swagger-ui.html">Documentação da API</a>
-      </div>
+    <h1 class="so-leitor" data-i18n="inicio.titulo">Como está a comunidade agora</h1>
+    <div id="simulacao"></div>
+
+    <section id="semaforo" class="semaforo" aria-live="polite" aria-labelledby="pergunta-seguro">
+      <p class="carregando" data-i18n="carregando">Carregando dados reais…</p>
+    </section>
+
+    <div class="inicio-grade">
+      <section class="cartao" aria-labelledby="pergunta-acontecendo">
+        <h2 id="pergunta-acontecendo" data-i18n="inicio.perguntaAcontecendo">O que está acontecendo?</h2>
+        <div id="acontecendo"></div>
+      </section>
+      <section class="cartao" aria-labelledby="pergunta-fazer">
+        <h2 id="pergunta-fazer" data-i18n="inicio.perguntaFazer">O que eu faço agora?</h2>
+        <div id="fazer"></div>
+      </section>
     </div>
+
+    <section class="secao" aria-labelledby="titulo-legenda">
+      <h2 id="titulo-legenda" data-i18n="inicio.legendaTitulo">O que significa cada cor</h2>
+      <ul class="legenda-niveis" id="legenda"></ul>
+    </section>
+
+    <section class="cartao secao" aria-labelledby="titulo-mochila">
+      <h2 id="titulo-mochila" data-i18n="inicio.mochilaTitulo">Mochila de emergência</h2>
+      <p data-i18n="inicio.mochilaIntro"></p>
+      <ul class="checklist" id="mochila"></ul>
+    </section>
+
+    <section class="cartao secao" id="fontes"></section>
   </main>
 
   <footer class="rodape"><p data-i18n="app.rodape"></p></footer>
 
   <script src="/js/comum.js"></script>
-  <script>
-    AB.iniciarPagina().then(function () {
-      AB.configurarOuvir(function () { return document.getElementById('texto-inicio').textContent; });
-    });
-  </script>
+  <script src="/js/inicio.js"></script>
 </body>
 </html>

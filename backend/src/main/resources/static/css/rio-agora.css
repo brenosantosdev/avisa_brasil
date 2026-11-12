@@ -13,11 +13,6 @@
 .linha-icone { display: flex; gap: 10px; align-items: flex-start; }
 .linha-icone svg { width: 26px; height: 26px; flex: none; color: var(--rio); margin-top: 2px; }
 
-/* Semáforo: ícone + cor + palavra */
-.nivel-NORMAL { background: var(--normal); color: #fff; }
-.nivel-ATENCAO { background: var(--atencao); color: var(--texto); }
-.nivel-ALERTA { background: var(--alerta); color: #fff; }
-.nivel-EMERGENCIA { background: var(--emergencia); color: #fff; }
 .etiqueta-grande { font-size: 1.15rem; padding: 6px 16px 6px 10px; }
 .etiqueta-grande svg { width: 26px; height: 26px; }
 .provisoria { background: #FFF4CC; color: var(--texto); border: 2px dashed #B38A00; }

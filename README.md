@@ -3,8 +3,9 @@
 Rede de alerta de cheias e secas para comunidades ribeirinhas e indígenas, com linguagem simples, voz e orientação do que fazer.
 Projeto da **Global Solution 2026.2 da FIAP** (tema CitizenTech). Território piloto: **São Gabriel da Cachoeira (AM), Rio Negro**.
 
-> Estado atual: **etapa 4**. As telas **O rio agora** (nível medido pela ANA), **Próximos dias** (chuva e vazão do
-> Rio Negro) e **Mapa** (pontos de apoio do OpenStreetMap e setores de risco oficiais do SGB) já usam dados reais.
+> Estado atual: **etapa 5**. A tela **Início** mostra o semáforo da comunidade (maior risco entre cheia e seca),
+> calculado pelo motor de risco com dados reais da ANA, chuva e GloFAS, mais um sensor **simulado**. As telas
+> **O rio agora**, **Próximos dias** e **Mapa** também usam dados reais.
 
 ## Requisitos
 
@@ -26,7 +27,7 @@ Quando aparecer `Started AvisabrasilApplication`, abra no navegador:
 
 | O quê | Endereço |
 |---|---|
-| Página inicial | http://localhost:8080 |
+| **Início** (semáforo e o que fazer) | http://localhost:8080 |
 | **O rio agora** (nível da ANA, régua e histórico) | http://localhost:8080/rio-agora.html |
 | **Próximos dias** (chuva e rio, dados reais) | http://localhost:8080/proximos-dias.html |
 | **Mapa** (pontos de apoio e setores de risco) | http://localhost:8080/mapa.html |
@@ -35,6 +36,7 @@ Quando aparecer `Started AvisabrasilApplication`, abra no navegador:
 | Previsão do tempo (JSON) | http://localhost:8080/api/previsao/tempo |
 | Previsão do rio (JSON) | http://localhost:8080/api/previsao/rio |
 | Rio agora (JSON) | http://localhost:8080/api/rio/agora |
+| Risco atual e alertas (JSON) | http://localhost:8080/api/risco e http://localhost:8080/api/risco/alertas |
 | Status do sistema | http://localhost:8080/api/status |
 | Console do banco H2 | http://localhost:8080/h2-console |
 | Saúde (Actuator) | http://localhost:8080/actuator/health |
@@ -69,9 +71,14 @@ O arquivo do banco fica em `backend/data/` e não vai para o Git.
   de reiniciar: a sessão (token e horários, nunca usuário/senha) fica em `backend/data/cache/ana-sessao.json`, fora do Git.
   Token e credenciais nunca vão para o log.
 - **Cotas de Atenção, Alerta e Emergência:** não encontramos cota oficial do SGB/SACE para estas estações (11/2026).
-  Enquanto não houver, a tela mostra **cotas provisórias**, calculadas pelas maiores cheias anuais da ANA
-  (Atenção = mediana; Alerta = percentil 80; Emergência = percentil 95). Para usar cotas oficiais, preencha
-  `avisabrasil.ana.cotas.*` em `application.properties` **com a fonte** em `avisabrasil.ana.cotas.fonte`.
+  Enquanto não houver, as telas mostram **cotas provisórias**, calculadas pelo histórico da ANA (1978–2025):
+  - **Cheia** (maiores cheias de cada ano): Atenção = passa em 1 de cada 2 anos (p50); Alerta = 1 de cada 3 anos (p67);
+    Emergência = 1 de cada 10 anos (p90).
+  - **Seca** (menores cotas de cada ano): Atenção = fica abaixo em 1 de cada 2 anos (p50); Alerta = 1 de cada 3 anos
+    (p33); Emergência = 1 de cada 10 anos (p10). Também é seca quando o rio está entre os 25% / 10% / 5% níveis mais
+    baixos para a **época do ano** (Atenção / Alerta / Emergência).
+  - Para usar cotas oficiais, preencha `avisabrasil.ana.cotas.*` em `application.properties` **com a fonte**
+    (`avisabrasil.ana.cotas.fonte` e `seca-fonte`). Sem fonte o sistema não aceita.
 - **ANA × GloFAS:** a tela compara a medição com o modelo. Se discordarem sobre seca ou cheia, vale a ANA (também
   no resumo de "Próximos dias").
 
@@ -92,8 +99,37 @@ O arquivo do banco fica em `backend/data/` e não vai para o Git.
   (sem reprojeção: SIRGAS 2000 ≈ WGS84). Pontos que caem dentro de um setor são marcados no mapa e no painel.
 - **Overpass:** uma consulta por dia, com servidor reserva. Em horário de pico a fila pode passar de 30 s, por isso o
   tempo limite dessa fonte é 90 s.
-- **Painel sem senha (por enquanto):** qualquer pessoa com o endereço consegue cadastrar ou remover pontos. O acesso
-  restrito precisa entrar antes de usar fora da demonstração.
+- **Painel e sensor sem senha (por enquanto):** qualquer pessoa com o endereço consegue cadastrar ou remover pontos e
+  enviar leituras para o sensor. O acesso restrito precisa entrar antes de usar fora da demonstração.
+
+## Motor de risco
+
+Níveis **Normal, Atenção, Alerta e Emergência**, de **cheia** ou de **seca**. Vale o maior risco entre todos os fatores:
+
+| Fator | Regra |
+|---|---|
+| Régua da ANA e sensor | cota acima das cotas de cheia ou abaixo das cotas de seca |
+| Seca pela época | cota entre os 25% / 10% / 5% níveis mais baixos para esta época do ano |
+| Preventivo | pela tendência (regressão linear), a próxima cota chega em até 24 h (cheia) ou 7 dias (seca): o nível sobe antes |
+| Chuva prevista | 50 mm ou mais hoje ou amanhã: Atenção (alagamento e deslizamento) |
+| Vazão prevista (GloFAS) | subida rápida (mais de 20% em 7 dias): Atenção |
+
+Em empate, vale a medição oficial (ANA). Alerta é registrado **só quando o nível sobe**; quando volta ao Normal,
+registra "situação normalizada". Os limites ficam em `avisabrasil.risco.*`. O envio das notificações vem na etapa 6.
+
+## Simulador do sensor (demonstração)
+
+Não há hardware: o sensor `SGC-01` é **simulado**, e as telas mostram a faixa "SIMULAÇÃO" quando é ele que decide o nível.
+Com o servidor rodando, em outro terminal, na pasta do projeto:
+
+```powershell
+java simulador/Simulador.java cheia     # sobe a partir de 60 cm abaixo da Atenção de cheia
+java simulador/Simulador.java seca      # desce a partir do normal da época
+java simulador/Simulador.java normal    # devolve o sensor ao normal
+```
+
+Cada leitura vale 1 hora simulada (`--horas-por-passo`), e o padrão é uma leitura a cada 2 s (`--intervalo`) por
+40 passos (`--passos`). O sensor deixa de contar 30 minutos depois da última leitura.
 
 ## Testes
 
@@ -129,7 +165,7 @@ $env:NTFY_TOPICO = "meu-topico"
 avisabrasil/
 ├── backend/        Spring Boot (API REST, front-end em src/main/resources/static)
 ├── ferramentas/    scripts de apoio (conversão da setorização do SGB para GeoJSON)
-├── simulador/      simulador do sensor de nível (etapa 5)
+├── simulador/      Simulador.java: sensor de nível simulado (cheia, seca, normal)
 └── firmware/       ESP32 para o Wokwi (etapa 11)
 ```
 

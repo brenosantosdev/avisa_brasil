@@ -5,7 +5,6 @@
   const AB = window.AB;
   const t = AB.t;
   const ATUALIZAR_A_CADA_MS = 5 * 60 * 1000;
-  const ICONE_DO_NIVEL = { NORMAL: 'seguro', ATENCAO: 'info', ALERTA: 'alerta', EMERGENCIA: 'alerta' };
   const COR_DO_NIVEL = { NORMAL: '#1E7A46', ATENCAO: '#F2C230', ALERTA: '#C2541A', EMERGENCIA: '#A3221B' };
 
   const estado = { resposta: null, grafico: null };
@@ -30,9 +29,8 @@
     return new Intl.DateTimeFormat(document.documentElement.lang, { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(d);
   }
 
-  function etiquetaNivel(nivel, grande) {
-    return '<span class="etiqueta ' + (grande ? 'etiqueta-grande ' : '') + 'nivel-' + nivel + '">' +
-      AB.icone(ICONE_DO_NIVEL[nivel]) + AB.escapar(t('nivel.' + nivel)) + '</span>';
+  function ordem(nivel) {
+    return ['NORMAL', 'ATENCAO', 'ALERTA', 'EMERGENCIA'].indexOf(nivel);
   }
 
   function textoTendencia(v) {
@@ -53,10 +51,15 @@
     let html = '<p class="rotulo">' + AB.escapar(t('ra.nivelAtual')) + '</p>';
     html += '<p class="nivel-grande">' + AB.escapar(metros(a.cotaCm)) + '</p>';
     html += '<p>' + AB.escapar(t('ra.medidoEm', { quando: quandoLocal(a.dataHora) })) + '</p>';
-    if (d.nivel) {
-      html += '<p>' + etiquetaNivel(d.nivel, true) +
-        (d.cotas && d.cotas.origem === 'PROVISORIA' ? ' <span class="etiqueta provisoria">' + AB.icone('info') +
-          AB.escapar(t('ra.cotas.PROVISORIA')) + '</span>' : '') + '</p>';
+    const av = d.avaliacao;
+    if (av) {
+      const provisorias = d.cotas.cheia.origem === 'PROVISORIA' || d.cotas.seca.origem === 'PROVISORIA';
+      html += '<p>' + AB.etiquetaNivel(av.nivel, av.tipo, 'etiqueta-grande') +
+        (provisorias ? ' <span class="etiqueta provisoria">' + AB.icone('info') + AB.escapar(t('ra.cotas.provisoriasCurto')) + '</span>' : '') + '</p>';
+      if (av.fatores.length) {
+        const principal = av.fatores.slice().sort(function (x, y) { return ordem(y.nivel) - ordem(x.nivel); })[0];
+        html += '<p><strong>' + AB.escapar(AB.textoFator(principal)) + '</strong></p>';
+      }
     }
     const tendencia = textoTendencia(d.velocidadeCmPorDia);
     if (tendencia) {
@@ -70,21 +73,20 @@
         vazao: AB.numero(a.vazaoM3s), baldes: AB.numeroCompacto(a.vazaoM3s * 50)
       })) + '</span></p>';
     }
-    if (d.cotas) {
-      if (d.proximoNivel) {
+    if (av) {
+      const p = av.proximo;
+      if (p) {
         html += '<p class="falta">' + AB.escapar(t('ra.falta', {
-          cm: diferenca(d.faltaParaProximoCm),
-          nivel: t('nivel.' + d.proximoNivel),
-          comparacao: AB.comparacaoAltura(d.faltaParaProximoCm)
+          cm: diferenca(p.faltaCm),
+          nivel: t('nivel.' + p.nivel),
+          tipo: t('tipoRisco.de.' + p.tipo),
+          comparacao: AB.comparacaoAltura(p.faltaCm)
         })) + '</p>';
-        if (d.horasAteProximoNivel) {
-          const h = d.horasAteProximoNivel;
-          const tempo = h < 48 ? t('ra.chegaEm.horas', { n: AB.numero(h) }) : t('ra.chegaEm.dias', { n: AB.numero(h / 24) });
-          html += '<p>' + AB.escapar(t('ra.chegaEm', { tempo: tempo })) + '</p>';
-        }
-      } else {
+        if (p.horas) html += '<p>' + AB.escapar(t('ra.chegaEm', { tempo: AB.duracao(p.horas) })) + '</p>';
+      } else if (av.nivel === 'EMERGENCIA') {
         html += '<p class="falta">' + AB.escapar(t('ra.acimaDeTodas')) + '</p>';
       }
+      html += '<p><a href="/">' + AB.escapar(t('inicio.perguntaFazer')) + '</a></p>';
     } else {
       const p = d.historicoPrincipal.progresso;
       html += '<p class="nota">' + AB.escapar(t('ra.semCotas', { feito: p.anosBaixados, total: p.anosTotal })) + '</p>';
@@ -101,11 +103,12 @@
     const cheia = d.historicoPrincipal.maioresCheias[0];
     const seca = d.historicoPrincipal.maioresSecas[0];
     const c = d.cotas;
-    const valores = [hoje].concat(cheia ? [cheia.cotaCm] : [], seca ? [seca.cotaCm] : [], c ? [c.emergenciaCm + 250] : []);
+    const valores = [hoje].concat(cheia ? [cheia.cotaCm] : [], seca ? [seca.cotaCm] : [],
+      c ? [c.cheia.emergenciaCm + 250, c.seca.emergenciaCm] : []);
     const minimo = Math.floor((Math.min.apply(null, valores) - 120) / 100) * 100;
     const maximo = Math.ceil((Math.max.apply(null, valores) + 120) / 100) * 100;
 
-    const L = 400, A = 470, topo = 14, base = A - 14, xRegua = 54, larguraRegua = 26;
+    const L = 400, A = 540, topo = 14, base = A - 14, xRegua = 54, larguraRegua = 26;
     const y = function (cm) { return topo + (maximo - cm) / (maximo - minimo) * (base - topo); };
     const pxPorCm = (base - topo) / (maximo - minimo);
     let s = '<svg class="regua-svg" viewBox="0 0 ' + L + ' ' + A + '" role="img" aria-label="' +
@@ -118,7 +121,11 @@
 
     // faixas do semáforo na régua
     if (c) {
-      const faixas = [[minimo, c.atencaoCm, 'NORMAL'], [c.atencaoCm, c.alertaCm, 'ATENCAO'], [c.alertaCm, c.emergenciaCm, 'ALERTA'], [c.emergenciaCm, maximo, 'EMERGENCIA']];
+      // de baixo para cima: seca (vermelho, laranja, amarelo), normal (verde), cheia (amarelo, laranja, vermelho)
+      const faixas = [[minimo, c.seca.emergenciaCm, 'EMERGENCIA'], [c.seca.emergenciaCm, c.seca.alertaCm, 'ALERTA'],
+        [c.seca.alertaCm, c.seca.atencaoCm, 'ATENCAO'], [c.seca.atencaoCm, c.cheia.atencaoCm, 'NORMAL'],
+        [c.cheia.atencaoCm, c.cheia.alertaCm, 'ATENCAO'], [c.cheia.alertaCm, c.cheia.emergenciaCm, 'ALERTA'],
+        [c.cheia.emergenciaCm, maximo, 'EMERGENCIA']];
       faixas.forEach(function (f) {
         s += '<rect x="' + xRegua + '" y="' + y(f[1]) + '" width="' + larguraRegua + '" height="' + (y(f[0]) - y(f[1])) + '" fill="' + COR_DO_NIVEL[f[2]] + '"/>';
       });
@@ -131,9 +138,9 @@
       s += '<text x="' + (xRegua - 9) + '" y="' + (y(cm) + 4) + '" text-anchor="end">' + AB.numero(cm / 100) + ' m</text>';
     }
 
-    // casa de palafita com o piso na cota de Emergência (ilustração) e o bonequinho de 1,60 m
+    // casa de palafita com o piso na cota de Emergência de cheia (ilustração) e o bonequinho de 1,60 m
     if (c) {
-      const piso = y(c.emergenciaCm), xCasa = 280, larguraCasa = 100, parede = 250 * pxPorCm;
+      const piso = y(c.cheia.emergenciaCm), xCasa = 280, larguraCasa = 100, parede = 250 * pxPorCm;
       for (let i = 0; i < 4; i++) {
         const x = xCasa + 8 + i * (larguraCasa - 16) / 3;
         s += '<line x1="' + x + '" x2="' + x + '" y1="' + piso + '" y2="' + base + '" stroke="#6B4A2B" stroke-width="5"/>';
@@ -157,9 +164,12 @@
     const linhas = [];
     if (cheia) linhas.push([cheia.cotaCm, '#4A6169', t('ra.regua.maiorCheia', { ano: cheia.ano }), true]);
     if (c) {
-      linhas.push([c.emergenciaCm, '#A3221B', t('nivel.EMERGENCIA'), true]);
-      linhas.push([c.alertaCm, '#C2541A', t('nivel.ALERTA'), true]);
-      linhas.push([c.atencaoCm, '#8A6A00', t('nivel.ATENCAO'), true]);
+      linhas.push([c.cheia.emergenciaCm, '#A3221B', t('ra.regua.cheia', { nivel: t('nivel.EMERGENCIA') }), true]);
+      linhas.push([c.cheia.alertaCm, '#C2541A', t('ra.regua.cheia', { nivel: t('nivel.ALERTA') }), true]);
+      linhas.push([c.cheia.atencaoCm, '#8A6A00', t('ra.regua.cheia', { nivel: t('nivel.ATENCAO') }), true]);
+      linhas.push([c.seca.atencaoCm, '#8A6A00', t('ra.regua.seca', { nivel: t('nivel.ATENCAO') }), true]);
+      linhas.push([c.seca.alertaCm, '#C2541A', t('ra.regua.seca', { nivel: t('nivel.ALERTA') }), true]);
+      linhas.push([c.seca.emergenciaCm, '#A3221B', t('ra.regua.seca', { nivel: t('nivel.EMERGENCIA') }), true]);
     }
     if (seca) linhas.push([seca.cotaCm, '#8A5A00', t('ra.regua.maiorSeca', { ano: seca.ano }), true]);
     linhas.push([hoje, '#0B4F73', t('ra.regua.hoje'), false, true]);
@@ -288,10 +298,12 @@
     const d = r.dados;
     let extra = d ? '<p>' + AB.escapar(t('ra.fonte.estacao', { codigo: d.estacao.codigo, nome: d.estacao.nome })) + '</p>' : '';
     if (d && d.cotas) {
-      const c = d.cotas;
-      extra += '<p><strong>' + AB.escapar(t('ra.cotas.' + c.origem)) + ':</strong> ' + AB.escapar(c.origem === 'PROVISORIA'
-        ? t('ra.cotas.PROVISORIA.explica', { ini: c.anoInicial, fim: c.anoFinal, anos: c.anos })
-        : t('ra.cotas.OFICIAL_CONFIGURADA.explica', { fonte: c.fonte })) + '</p>';
+      ['cheia', 'seca'].forEach(function (tipo) {
+        const f = d.cotas[tipo];
+        extra += '<p><strong>' + AB.escapar(t('ra.cotas.' + tipo + '.' + f.origem, {
+          ini: f.anoInicial, fim: f.anoFinal, anos: f.anos, fonte: f.fonte
+        })) + '</strong></p>';
+      });
     }
     document.getElementById('fontes').innerHTML = r.fonte ? AB.rodapeFonte(r, extra) : '';
   }
@@ -302,11 +314,16 @@
     const partes = [t('ra.titulo') + '. ' + document.getElementById('intro').textContent];
     if (d && d.atual) {
       partes.push(t('ra.nivelAtual') + ': ' + metros(d.atual.cotaCm) + '. ' + t('ra.medidoEm', { quando: quandoLocal(d.atual.dataHora) }) + '.');
-      if (d.nivel) partes.push(t('nivel.' + d.nivel) + (d.cotas.origem === 'PROVISORIA' ? ', ' + t('ra.cotas.PROVISORIA') : '') + '.');
+      const av = d.avaliacao;
+      if (av) {
+        partes.push(t('nivel.' + av.nivel) + (av.tipo ? ', ' + t('tipoRisco.' + av.tipo) : '') + ', ' + t('ra.cotas.provisoriasCurto') + '.');
+        av.fatores.forEach(function (f) { partes.push(AB.textoFator(f)); });
+      }
       const tendencia = textoTendencia(d.velocidadeCmPorDia);
       if (tendencia) partes.push(tendencia + '.');
-      if (d.proximoNivel) {
-        partes.push(t('ra.falta', { cm: diferenca(d.faltaParaProximoCm), nivel: t('nivel.' + d.proximoNivel), comparacao: AB.comparacaoAltura(d.faltaParaProximoCm) }));
+      if (av && av.proximo) {
+        partes.push(t('ra.falta', { cm: diferenca(av.proximo.faltaCm), nivel: t('nivel.' + av.proximo.nivel),
+          tipo: t('tipoRisco.de.' + av.proximo.tipo), comparacao: AB.comparacaoAltura(av.proximo.faltaCm) }));
       }
       if (d.comparacaoAna) partes.push(t('ra.comparacao.ana', { texto: t('rio.normal.' + d.comparacaoAna) }) + '.');
       if (d.divergem) partes.push(t('ra.comparacao.divergem'));

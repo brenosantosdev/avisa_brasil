@@ -1,0 +1,86 @@
+/* Tela Início: semáforo grande e as 3 perguntas */
+
+.semaforo {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  align-items: center;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: var(--sombra);
+  background: var(--superficie);
+}
+.semaforo.nivel-NORMAL { background: var(--normal); color: #fff; }
+.semaforo.nivel-ATENCAO { background: var(--atencao); color: var(--texto); }
+.semaforo.nivel-ALERTA { background: var(--alerta); color: #fff; }
+.semaforo.nivel-EMERGENCIA { background: var(--emergencia); color: #fff; }
+
+/* As 4 luzes: a acesa tem ícone e contorno; as outras ficam apagadas (não é só cor) */
+.luzes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #10262E;
+  padding: 10px;
+  border-radius: 14px;
+}
+.luz {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  opacity: 0.28;
+}
+.luz svg { width: 26px; height: 26px; }
+.luz.acesa { opacity: 1; outline: 4px solid #fff; outline-offset: 2px; }
+.luz.l-NORMAL { background: var(--normal); color: #fff; }
+.luz.l-ATENCAO { background: var(--atencao); color: var(--texto); }
+.luz.l-ALERTA { background: var(--alerta); color: #fff; }
+.luz.l-EMERGENCIA { background: var(--emergencia); color: #fff; }
+
+.pergunta { font-size: 1.1rem; font-weight: 700; margin: 0; opacity: 0.9; }
+.palavra-nivel { font-size: 2.6rem; line-height: 1.1; font-weight: 700; margin: 4px 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.palavra-nivel svg { width: 44px; height: 44px; }
+.resposta { font-size: 1.35rem; font-weight: 700; margin: 6px 0 0; }
+
+.inicio-grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+  align-items: start;
+}
+
+.motivo-principal { font-size: 1.15rem; font-weight: 700; margin: 0 0 10px; }
+.fatores { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.fatores li { display: flex; gap: 10px; align-items: flex-start; font-size: 1rem; }
+.fatores .etiqueta { flex: none; }
+.atalhos { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+
+.checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.checklist label { display: flex; gap: 12px; align-items: flex-start; min-height: 44px; padding: 8px 4px; cursor: pointer; }
+.checklist input { width: 26px; height: 26px; flex: none; accent-color: var(--rio); margin-top: 1px; }
+.checklist input:checked + span { text-decoration: line-through; color: var(--texto-suave); }
+
+.legenda-niveis {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.legenda-niveis li { border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.legenda-niveis strong { display: flex; align-items: center; gap: 8px; font-size: 1.15rem; }
+.legenda-niveis svg { width: 26px; height: 26px; }
+
+@media (max-width: 860px) {
+  .inicio-grade { grid-template-columns: 1fr; }
+  .legenda-niveis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .semaforo { grid-template-columns: 1fr; }
+  .luzes { flex-direction: row; justify-content: center; }
+  .palavra-nivel { font-size: 2.1rem; }
+}

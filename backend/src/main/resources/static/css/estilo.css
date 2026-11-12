@@ -124,6 +124,8 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 }
 
 .nota { color: var(--texto-suave); font-size: 0.95rem; }
+.rotulo { font-weight: 700; color: var(--texto-suave); margin: 0; }
+.botao-secundario { background: var(--superficie); color: var(--rio); border-color: var(--rio); }
 
 /* ---------- Etiquetas (ícone + cor + palavra) ---------- */
 
@@ -150,6 +152,26 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 .normal-MUITO_ABAIXO, .normal-MUITO_ACIMA { background: var(--atencao); color: var(--texto); }
 .normal-ABAIXO, .normal-ACIMA { background: #E6ECEA; color: var(--texto); }
 .normal-NORMAL { background: #D7EEDF; color: #145232; }
+
+/* Semáforo: ícone + cor + palavra (Atenção usa texto escuro) */
+.nivel-NORMAL { background: var(--normal); color: #fff; }
+.nivel-ATENCAO { background: var(--atencao); color: var(--texto); }
+.nivel-ALERTA { background: var(--alerta); color: #fff; }
+.nivel-EMERGENCIA { background: var(--emergencia); color: #fff; }
+
+.aviso-simulacao {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 10px;
+  margin: 0 0 16px;
+  font-weight: 700;
+  color: var(--texto);
+  border: 3px dashed var(--texto);
+  background: repeating-linear-gradient(135deg, #FFF4CC, #FFF4CC 12px, #FFE89A 12px, #FFE89A 24px);
+}
+.aviso-simulacao svg { width: 28px; height: 28px; flex: none; }
 
 /* ---------- Avisos de fonte e situação ---------- */
 

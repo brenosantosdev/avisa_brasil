@@ -1,5 +1,7 @@
 package br.com.avisabrasil;
 
+import br.com.avisabrasil.previsao.FaixaNormal;
+import br.com.avisabrasil.rio.CotasDeReferencia;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -19,6 +21,13 @@ public final class Fixtures {
     public static final String ANA_SEM_REGISTROS = "/ana/telemetria-sem-registros.json";
     public static final String ANA_COTAS_CIDADE = "/ana/cotas-14320001-2026.json";
     public static final String ANA_COTAS_PRINCIPAL = "/ana/cotas-14330000-2026.json";
+
+    /** Cotas provisórias reais de Curicuriari (11/2026): cheia p50/p67/p90, seca p50/p33/p10. */
+    public static final CotasDeReferencia COTAS_CURICURIARI = new CotasDeReferencia(
+            new CotasDeReferencia.Faixa(1385, 1417, 1473, CotasDeReferencia.Origem.PROVISORIA, "teste", 1978, 2025, 48),
+            new CotasDeReferencia.Faixa(640, 589, 529, CotasDeReferencia.Origem.PROVISORIA, "teste", 1978, 2025, 48));
+    /** Normal da ANA em Curicuriari para 11/11 (1978–2025): 5% abaixo de 723, 10% abaixo de 746, 25% abaixo de 821. */
+    public static final FaixaNormal NORMAL_NOVEMBRO = new FaixaNormal(723, 746, 821, 874, 947, 1012, 1978, 2025, 7, 720);
 
     private Fixtures() {
     }

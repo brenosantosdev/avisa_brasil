@@ -37,6 +37,12 @@
     return texto;
   }
 
+  /** Lista traduzida (por exemplo, o checklist de cada nível). */
+  function lista(chave) {
+    const valor = textos[chave];
+    return Array.isArray(valor) ? valor : [];
+  }
+
   function aplicarTextos(raiz) {
     (raiz || document).querySelectorAll('[data-i18n]').forEach(function (el) {
       el.textContent = t(el.dataset.i18n);
@@ -179,6 +185,45 @@
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
+  /* ---------- Risco (motor) ---------- */
+
+  const ICONE_DO_NIVEL = { NORMAL: 'seguro', ATENCAO: 'info', ALERTA: 'alerta', EMERGENCIA: 'alerta' };
+
+  /** cm na régua → "7,74 m" */
+  function metros(cm) {
+    return t('ra.metros', { n: numero(cm / 100, 2) });
+  }
+
+  /** 30 → "30 horas"; 100 → "4,2 dias" */
+  function duracao(horas) {
+    return horas < 48 ? t('tempo.horas', { n: numero(horas) }) : t('tempo.dias', { n: numero(horas / 24, 1) });
+  }
+
+  /** Etiqueta do nível: ícone + cor + palavra (e o tipo, se houver). */
+  function etiquetaNivel(nivel, tipo, classeExtra) {
+    return '<span class="etiqueta nivel-' + nivel + (classeExtra ? ' ' + classeExtra : '') + '">' + icone(ICONE_DO_NIVEL[nivel]) +
+      escapar(t('nivel.' + nivel) + (tipo ? ' · ' + t('tipoRisco.' + tipo) : '')) + '</span>';
+  }
+
+  /** Explica um fator do motor de risco em linguagem simples. */
+  function textoFator(f) {
+    const d = f.dados || {};
+    const fonte = f.fonte === 'SENSOR' && f.simulado ? t('fonteRisco.SENSOR.simulado') : t('fonteRisco.' + f.fonte);
+    return t('motivo.' + f.motivo, {
+      fonte: fonte,
+      nivel: t('nivel.' + f.nivel),
+      cota: d.cotaCm !== undefined ? metros(d.cotaCm) : '',
+      limite: d.limiteCm !== undefined ? metros(d.limiteCm) : '',
+      percentual: d.percentual,
+      ini: d.anoInicial,
+      fim: d.anoFinal,
+      tempo: d.horas !== undefined ? duracao(d.horas) : '',
+      mm: d.mm !== undefined ? numero(d.mm, 1) : '',
+      dia: d.data ? nomeDoDia(d.data).toLowerCase() : '',
+      variacao: d.variacao !== undefined ? numero(d.variacao, 1) : ''
+    });
+  }
+
   /* ---------- Fonte e situação dos dados ---------- */
 
   /** Aviso no topo da seção quando o dado está desatualizado ou indisponível. */
@@ -275,6 +320,11 @@
 
   window.AB = {
     t: t,
+    lista: lista,
+    metros: metros,
+    duracao: duracao,
+    etiquetaNivel: etiquetaNivel,
+    textoFator: textoFator,
     numero: numero,
     numeroCompacto: numeroCompacto,
     distancia: distancia,

@@ -9,6 +9,9 @@ import br.com.avisabrasil.previsao.ComparacaoNormal;
 import br.com.avisabrasil.previsao.FaixaNormal;
 import br.com.avisabrasil.previsao.PrevisaoRioServico;
 import br.com.avisabrasil.previsao.SerieHistorica;
+import br.com.avisabrasil.risco.AvaliacaoMedicao;
+import br.com.avisabrasil.risco.FonteRisco;
+import br.com.avisabrasil.risco.RegrasDeRisco;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -31,6 +34,7 @@ public class RioAgoraServico {
     private final HistoricoAnaServico historico;
     private final PrevisaoRioServico glofas;
     private final AvisaBrasilProperties.Ana config;
+    private final AvisaBrasilProperties.Risco risco;
     private final Clock relogio;
     private final CacheDeFonte<List<LeituraRio>> telemetria;
 
@@ -40,6 +44,7 @@ public class RioAgoraServico {
         this.historico = historico;
         this.glofas = glofas;
         this.config = propriedades.ana();
+        this.risco = propriedades.risco();
         this.relogio = relogio;
         this.telemetria = new CacheDeFonte<>(
                 "ANA telemetria " + config.principal().codigo(),
@@ -83,10 +88,7 @@ public class RioAgoraServico {
         RioAgora.Leitura atual = null;
         Double variacao24h = null;
         Double velocidade = null;
-        Nivel nivel = null;
-        Nivel proximo = null;
-        Double falta = null;
-        Double horas = null;
+        AvaliacaoMedicao avaliacao = null;
         ComparacaoNormal daAna = null;
         if (!leituras.isEmpty()) {
             LeituraRio ultima = leituras.get(leituras.size() - 1);
@@ -94,14 +96,8 @@ public class RioAgoraServico {
             variacao24h = variacaoEm24h(leituras);
             velocidade = velocidadeCmPorDia(leituras);
             if (cotas.isPresent()) {
-                nivel = cotas.get().nivel(ultima.cotaCm());
-                proximo = cotas.get().proximoNivel(ultima.cotaCm()).orElse(null);
-                if (proximo != null) {
-                    falta = (double) Math.round(cotas.get().cota(proximo) - ultima.cotaCm());
-                    if (velocidade != null && velocidade > 0) {
-                        horas = Math.round(falta / (velocidade / 24) * 10) / 10.0;
-                    }
-                }
+                avaliacao = RegrasDeRisco.avaliarMedicao(FonteRisco.ANA, false, ultima.cotaCm(), velocidade,
+                        normal.orElse(null), cotas.get(), risco.horasAntecedenciaCheia(), risco.horasAntecedenciaSeca());
             }
             daAna = normal.map(n -> n.comparar(ultima.cotaCm())).orElse(null);
         }
@@ -113,10 +109,7 @@ public class RioAgoraServico {
                 velocidade,
                 porHora(leituras),
                 cotas.orElse(null),
-                nivel,
-                proximo,
-                falta,
-                horas,
+                avaliacao,
                 normal.orElse(null),
                 daAna,
                 doGlofas,
