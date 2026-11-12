@@ -12,6 +12,8 @@ public final class Fixtures {
     public static final String GLOFAS_PREVISAO = "/glofas/previsao-sao-gabriel.json";
     /** Histórico real reduzido a outubro–dezembro de cada ano, para o arquivo ficar pequeno. */
     public static final String GLOFAS_HISTORICO = "/glofas/historico-out-dez.json";
+    /** Resposta real do Overpass (raio de 8 km da sede), salva em 12/11/2026 (UTC). */
+    public static final String OVERPASS = "/overpass/pontos-sao-gabriel.json";
 
     private Fixtures() {
     }

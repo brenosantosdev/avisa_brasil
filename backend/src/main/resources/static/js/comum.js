@@ -111,6 +111,12 @@
     return new Intl.DateTimeFormat(localidade, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(d);
   }
 
+  /** 236 → "236 m"; 1063 → "1,1 km" */
+  function distancia(metros) {
+    if (metros < 1000) return t('distancia.m', { n: numero(Math.round(metros / 10) * 10) });
+    return t('distancia.km', { n: numero(metros / 1000, 1) });
+  }
+
   /** "hoje às 19:45", "ontem às 08:00", "em 09/11 às 14:00" (no fuso da comunidade). */
   function quando(dataHoraIso) {
     const momento = new Date(dataHoraIso);
@@ -140,7 +146,16 @@
     estavel: '<path d="M4 12h14M13 6l6 6-6 6"/>',
     alerta: '<path d="M12 3l10 18H2L12 3z"/><path d="M12 10v5M12 18v.5"/>',
     info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
-    regua: '<path d="M4 20V4h6v16"/><path d="M4 8h3M4 12h4M4 16h3"/><path d="M14 18c1.5-1.2 3-1.2 4.5 0s2.5 1.2 3.5 0"/>'
+    regua: '<path d="M4 20V4h6v16"/><path d="M4 8h3M4 12h4M4 16h3"/><path d="M14 18c1.5-1.2 3-1.2 4.5 0s2.5 1.2 3.5 0"/>',
+    escola: '<path d="M2 9l10-5 10 5-10 5L2 9z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/>',
+    saude: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 7v10M7 12h10"/>',
+    predio: '<path d="M3 21h18M5 21V10M19 21V10M9 21v-6h6v6"/><path d="M2 10l10-6 10 6"/>',
+    abrigo: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
+    seguro: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+    local: '<path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+    pessoa: '<circle cx="12" cy="6" r="3"/><path d="M12 10v6M8 21l4-5 4 5M7 13h10"/>',
+    lixeira: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+    camadas: '<path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/>'
   };
 
   function icone(nome, titulo) {
@@ -215,9 +230,28 @@
 
   /* ---------- Topo comum ---------- */
 
+  const PAGINAS = [
+    { id: 'inicio', href: '/', texto: 'nav.inicio' },
+    { id: 'proximos-dias', href: '/proximos-dias.html', texto: 'nav.proximosDias' },
+    { id: 'mapa', href: '/mapa.html', texto: 'nav.mapa' },
+    { id: 'painel', href: '/painel.html', texto: 'nav.painel' }
+  ];
+
+  /** Monta o menu em <nav id="navegacao" data-atual="..."> marcando a página atual. */
+  function montarNavegacao() {
+    const nav = document.getElementById('navegacao');
+    if (!nav) return;
+    nav.setAttribute('aria-label', t('nav.principal'));
+    nav.innerHTML = '<ul>' + PAGINAS.map(function (p) {
+      const atual = p.id === nav.dataset.atual ? ' aria-current="page"' : '';
+      return '<li><a href="' + p.href + '"' + atual + '>' + escapar(t(p.texto)) + '</a></li>';
+    }).join('') + '</ul>';
+  }
+
   async function iniciarPagina() {
     await carregarTextos();
     aplicarTextos();
+    montarNavegacao();
     try {
       const comunidade = await (await fetch('/api/comunidade')).json();
       document.querySelectorAll('[data-comunidade-local]').forEach(function (el) {
@@ -233,6 +267,7 @@
     t: t,
     numero: numero,
     numeroCompacto: numeroCompacto,
+    distancia: distancia,
     textoBaldes: textoBaldes,
     hojeNaComunidade: hojeNaComunidade,
     nomeDoDia: nomeDoDia,

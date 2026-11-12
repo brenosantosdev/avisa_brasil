@@ -1,0 +1,32 @@
+/* Painel da Defesa Civil */
+
+.mapa-painel { height: 520px; min-height: 360px; cursor: crosshair; }
+
+.formulario { display: flex; flex-direction: column; gap: 6px; }
+.formulario label { font-weight: 700; margin-top: 8px; }
+.formulario input,
+.formulario select,
+.formulario textarea {
+  font: inherit;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 2px solid var(--borda);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--texto);
+  width: 100%;
+}
+.formulario textarea { min-height: 88px; resize: vertical; }
+.formulario input:focus,
+.formulario select:focus,
+.formulario textarea:focus { border-color: var(--rio); }
+.formulario [aria-invalid="true"] { border-color: var(--emergencia); }
+.formulario .botao { margin-top: 14px; }
+.duas-colunas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.mensagem-ok { background: #D7EEDF; color: #145232; padding: 12px 14px; border-radius: 10px; margin-top: 10px; font-weight: 700; }
+.mensagem-alerta { background: #FFF4CC; border: 2px solid var(--atencao); padding: 12px 14px; border-radius: 10px; margin-top: 10px; font-weight: 700; }
+.mensagem-erro { background: #FBE3E1; border: 2px solid var(--emergencia); padding: 12px 14px; border-radius: 10px; margin-top: 10px; font-weight: 700; }
+
+.botao-perigo { background: var(--superficie); color: var(--emergencia); border-color: var(--emergencia); }
+.botao-perigo[data-confirmar="true"] { background: var(--emergencia); color: #fff; }

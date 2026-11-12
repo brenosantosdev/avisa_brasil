@@ -2,7 +2,10 @@ package br.com.avisabrasil.previsao;
 
 /**
  * O que é "normal" para o rio numa época do ano, a partir dos anos anteriores.
- * Metade dos anos ficou entre {@code p25} e {@code p75}.
+ * Metade dos dias da amostra ficou entre {@code p25} e {@code p75}.
+ *
+ * @param janelaDias em cada ano, quantos dias antes e depois da mesma data entram na conta
+ * @param amostras total de dias usados
  */
 public record FaixaNormal(
         double p10,
@@ -12,6 +15,7 @@ public record FaixaNormal(
         double p90,
         int anoInicial,
         int anoFinal,
+        int janelaDias,
         int amostras) {
 
     /** Compara uma vazão com esta faixa. */

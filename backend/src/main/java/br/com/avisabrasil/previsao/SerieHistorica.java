@@ -53,6 +53,7 @@ public class SerieHistorica {
                 percentil(amostras, 90),
                 anoInicial,
                 anoFinal,
+                JANELA_DIAS,
                 amostras.size()));
     }
 

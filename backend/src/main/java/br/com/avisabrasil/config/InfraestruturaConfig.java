@@ -17,6 +17,7 @@ import org.springframework.web.client.RestClient;
 public class InfraestruturaConfig {
 
     public static final ZoneId FUSO_COMUNIDADE = ZoneId.of("America/Manaus");
+    public static final String USER_AGENT = "AvisaBrasil/0.1 (FIAP Global Solution 2026.2)";
 
     @Bean
     public Clock relogio() {
@@ -32,7 +33,7 @@ public class InfraestruturaConfig {
         fabrica.setReadTimeout(Duration.ofSeconds(30));
         return builder
                 .requestFactory(fabrica)
-                .defaultHeader(HttpHeaders.USER_AGENT, "AvisaBrasil/0.1 (FIAP Global Solution 2026.2)")
+                .defaultHeader(HttpHeaders.USER_AGENT, USER_AGENT)
                 .build();
     }
 }

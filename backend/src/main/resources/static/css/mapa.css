@@ -1,0 +1,103 @@
+/* Telas com mapa (Mapa e painel da Defesa Civil) */
+
+.mapa-grade {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.mapa-cartao { padding: 0; overflow: hidden; }
+.mapa { height: 62vh; min-height: 380px; width: 100%; }
+.mapa-lateral { display: flex; flex-direction: column; gap: 16px; }
+
+/* ---------- Marcadores (ícone + cor; a palavra está na legenda e no balão) ---------- */
+
+.marcador {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+.marcador svg { width: 20px; height: 20px; }
+.marcador-ESCOLA { background: var(--rio); }
+.marcador-SAUDE { background: #6A3D9A; }
+.marcador-APOIO { background: #4A6169; }
+.marcador-ABRIGO { background: #8A5A00; }
+.marcador-dc { background: var(--normal); width: 44px; height: 44px; }
+.marcador-dc svg { width: 26px; height: 26px; }
+.marcador-sede { background: var(--texto); }
+.marcador-voce { background: #fff; color: var(--rio); border-color: var(--rio); }
+.marcador-em-risco { outline: 3px dashed var(--alerta); outline-offset: 2px; }
+
+/* ---------- Legenda ---------- */
+
+.legenda { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.legenda li { display: flex; align-items: center; gap: 10px; font-size: 1rem; line-height: 1.3; }
+.legenda .marcador { width: 30px; height: 30px; border-width: 2px; flex: none; }
+.legenda .marcador svg { width: 17px; height: 17px; }
+.legenda .marcador-dc { width: 30px; height: 30px; }
+.amostra-risco {
+  flex: none;
+  width: 30px;
+  height: 22px;
+  border: 2px dashed;
+  border-radius: 4px;
+}
+.amostra-risco-muito-alto { border-color: var(--emergencia); background: rgba(163, 34, 27, 0.35); }
+.amostra-risco-alto { border-color: var(--alerta); background: rgba(194, 84, 26, 0.25); }
+
+.camadas { margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
+.opcao { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; font-size: 1rem; }
+.opcao input { width: 24px; height: 24px; accent-color: var(--rio); flex: none; }
+
+.botao-largo { width: 100%; }
+#resultado-localizacao p { margin: 10px 0 0; }
+
+/* ---------- Balões (popups) ---------- */
+
+.leaflet-container { font-family: inherit; font-size: 16px; }
+.leaflet-popup-content { margin: 14px 16px; line-height: 1.45; }
+.leaflet-popup-content h3 { font-size: 1.05rem; margin: 0 0 6px; }
+.leaflet-popup-content p { margin: 4px 0; }
+.balao-risco { color: #8A1C16; font-weight: 700; }
+
+/* ---------- Lista ---------- */
+
+.lista-pontos { list-style: none; margin: 0; padding: 0; }
+.lista-pontos li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--borda);
+}
+.lista-pontos .marcador { flex: none; }
+.lista-pontos .texto { flex: 1; min-width: 0; }
+.lista-pontos .nome { font-weight: 700; margin: 0; }
+.lista-pontos .detalhe { margin: 0; color: var(--texto-suave); font-size: 0.95rem; }
+.botao-secundario { background: var(--superficie); color: var(--rio); border-color: var(--rio); }
+
+.aviso-info {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--rio-claro);
+  color: var(--rio);
+  margin: 0 0 12px;
+}
+.aviso-info svg { width: 24px; height: 24px; flex: none; margin-top: 2px; }
+
+@media (max-width: 860px) {
+  .mapa-grade { grid-template-columns: 1fr; }
+  .mapa { height: 55vh; min-height: 320px; }
+}
+@media (max-width: 600px) {
+  .lista-pontos li { flex-wrap: wrap; }
+  .lista-pontos .botao { width: 100%; }
+}

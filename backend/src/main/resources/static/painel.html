@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel da Defesa Civil · AvisaBrasil</title>
+  <meta name="theme-color" content="#0B4F73">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/css/estilo.css">
+  <link rel="stylesheet" href="/css/mapa.css">
+  <link rel="stylesheet" href="/css/painel.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 13c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 18c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/></svg>
+        <span>
+          <span class="marca-nome" data-i18n="app.nome">AvisaBrasil</span>
+          <span class="marca-local" data-comunidade-local></span>
+        </span>
+      </a>
+      <button id="botao-ouvir" class="botao botao-ouvir" type="button" aria-pressed="false">
+        <svg aria-hidden="true"></svg><span data-i18n="ouvir">Ouvir</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="navegacao" id="navegacao" data-atual="painel"></nav>
+
+  <main>
+    <h1 data-i18n="painel.titulo">Painel da Defesa Civil</h1>
+    <p class="aviso-situacao aviso-DESATUALIZADO" id="aviso-acesso"></p>
+
+    <section class="secao" aria-labelledby="titulo-pontos">
+      <h2 id="titulo-pontos" data-i18n="painel.pontos.titulo">Pontos seguros</h2>
+      <p data-i18n="painel.pontos.explica"></p>
+
+      <div class="mapa-grade">
+        <div class="cartao mapa-cartao">
+          <div id="mapa" class="mapa mapa-painel"></div>
+        </div>
+
+        <form id="formulario" class="cartao formulario" novalidate>
+          <p class="nota" data-i18n="painel.pontos.cliqueMapa"></p>
+          <label for="campo-nome" data-i18n="painel.campo.nome"></label>
+          <input id="campo-nome" name="nome" required maxlength="120" autocomplete="off">
+
+          <label for="campo-tipo" data-i18n="painel.campo.tipo"></label>
+          <select id="campo-tipo" name="tipo"></select>
+
+          <div class="duas-colunas">
+            <div>
+              <label for="campo-latitude" data-i18n="painel.campo.latitude"></label>
+              <input id="campo-latitude" name="latitude" required inputmode="decimal">
+            </div>
+            <div>
+              <label for="campo-longitude" data-i18n="painel.campo.longitude"></label>
+              <input id="campo-longitude" name="longitude" required inputmode="decimal">
+            </div>
+          </div>
+
+          <label for="campo-capacidade" data-i18n="painel.campo.capacidade"></label>
+          <input id="campo-capacidade" name="capacidade" type="number" min="0" max="100000" inputmode="numeric">
+
+          <label for="campo-observacao" data-i18n="painel.campo.observacao"></label>
+          <textarea id="campo-observacao" name="observacao" maxlength="500" rows="3"></textarea>
+
+          <button class="botao botao-primario botao-largo" type="submit" data-i18n="painel.salvar"></button>
+          <div id="mensagem" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div class="cartao secao">
+        <div id="lista"><p class="carregando" data-i18n="carregando">Carregando dados reais…</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape"><p data-i18n="app.rodape"></p></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/js/comum.js"></script>
+  <script src="/js/mapa-comum.js"></script>
+  <script src="/js/painel.js"></script>
+</body>
+</html>

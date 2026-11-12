@@ -33,6 +33,7 @@ class GlofasConversorTest {
         assertThat(normal.amostras()).isEqualTo(435);
         assertThat(normal.anoInicial()).isEqualTo(1997);
         assertThat(normal.anoFinal()).isEqualTo(2025);
+        assertThat(normal.janelaDias()).isEqualTo(7); // 29 anos × 15 dias = 435
         assertThat(normal.p10()).isCloseTo(5933.72, within(0.01));
         assertThat(normal.p25()).isCloseTo(7480.72, within(0.01));
         assertThat(normal.mediana()).isCloseTo(8471.27, within(0.01));

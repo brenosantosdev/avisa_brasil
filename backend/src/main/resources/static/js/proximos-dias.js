@@ -159,6 +159,10 @@
           p25: AB.numero(r.normalHoje.p25), p75: AB.numero(r.normalHoje.p75),
           ini: r.normalHoje.anoInicial, fim: r.normalHoje.anoFinal
         })) + '</p>';
+        html += '<p class="nota">' + AB.escapar(t('rio.normal.metodo', {
+          ini: r.normalHoje.anoInicial, fim: r.normalHoje.anoFinal, janela: r.normalHoje.janelaDias,
+          data: AB.dataCurta(dados.hoje), amostras: AB.numero(r.normalHoje.amostras)
+        })) + '</p>';
         if (r.comparacaoHoje === 'MUITO_ABAIXO') html += '<p><strong>' + AB.escapar(t('rio.normal.seca')) + '</strong></p>';
         if (r.comparacaoHoje === 'MUITO_ACIMA') html += '<p><strong>' + AB.escapar(t('rio.normal.cheia')) + '</strong></p>';
       } else {

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mapa · AvisaBrasil</title>
+  <meta name="theme-color" content="#0B4F73">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/css/estilo.css">
+  <link rel="stylesheet" href="/css/mapa.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 13c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 18c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/></svg>
+        <span>
+          <span class="marca-nome" data-i18n="app.nome">AvisaBrasil</span>
+          <span class="marca-local" data-comunidade-local></span>
+        </span>
+      </a>
+      <button id="botao-ouvir" class="botao botao-ouvir" type="button" aria-pressed="false">
+        <svg aria-hidden="true"></svg><span data-i18n="ouvir">Ouvir</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="navegacao" id="navegacao" data-atual="mapa"></nav>
+
+  <main>
+    <h1 data-i18n="mapa.titulo">Mapa</h1>
+    <p class="intro" id="intro"></p>
+
+    <div id="aviso-situacao"></div>
+
+    <div class="mapa-grade">
+      <div class="cartao mapa-cartao">
+        <div id="mapa" class="mapa"></div>
+      </div>
+
+      <aside class="mapa-lateral">
+        <section class="cartao" aria-labelledby="titulo-legenda">
+          <h2 id="titulo-legenda" data-i18n="mapa.legenda">Legenda</h2>
+          <ul class="legenda" id="legenda"></ul>
+          <div class="camadas">
+            <label class="opcao"><input type="checkbox" id="camada-risco" checked> <span data-i18n="mapa.camadas.risco"></span></label>
+            <label class="opcao"><input type="checkbox" id="camada-pontos" checked> <span data-i18n="mapa.camadas.pontos"></span></label>
+          </div>
+        </section>
+
+        <section class="cartao">
+          <button id="botao-localizacao" class="botao botao-primario botao-largo" type="button"></button>
+          <div id="resultado-localizacao" aria-live="polite"></div>
+        </section>
+      </aside>
+    </div>
+
+    <section class="cartao secao" aria-labelledby="titulo-lista">
+      <h2 id="titulo-lista" data-i18n="mapa.lista.titulo">Pontos de apoio</h2>
+      <div id="lista"><p class="carregando" data-i18n="carregando">Carregando dados reais…</p></div>
+      <div id="fontes"></div>
+    </section>
+  </main>
+
+  <footer class="rodape"><p data-i18n="app.rodape"></p></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/js/comum.js"></script>
+  <script src="/js/mapa-comum.js"></script>
+  <script src="/js/mapa.js"></script>
+</body>
+</html>

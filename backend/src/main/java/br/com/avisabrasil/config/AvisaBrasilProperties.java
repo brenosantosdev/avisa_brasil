@@ -2,6 +2,7 @@ package br.com.avisabrasil.config;
 
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /** Configurações do AvisaBrasil (prefixo "avisabrasil" no application.properties). */
@@ -27,11 +28,19 @@ public record AvisaBrasilProperties(Comunidade comunidade, Fontes fontes) {
             Fonte openMeteo,
             Fonte glofas,
             Fonte glofasHistorico,
+            Overpass overpass,
             Duration novaTentativa,
             Path pastaCache) {
     }
 
     /** URL da API e de quanto em quanto tempo buscar dados novos. */
     public record Fonte(String url, Duration intervalo) {
+    }
+
+    /**
+     * @param servidores servidores Overpass, tentados em ordem
+     * @param raioMetros raio em volta da sede onde procurar pontos
+     */
+    public record Overpass(List<String> servidores, Duration intervalo, int raioMetros) {
     }
 }

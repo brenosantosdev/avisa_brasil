@@ -3,7 +3,8 @@
 Rede de alerta de cheias e secas para comunidades ribeirinhas e indígenas, com linguagem simples, voz e orientação do que fazer.
 Projeto da **Global Solution 2026.2 da FIAP** (tema CitizenTech). Território piloto: **São Gabriel da Cachoeira (AM), Rio Negro**.
 
-> Estado atual: **etapa 2**. A tela **Próximos dias** já mostra chuva (Open-Meteo) e vazão do Rio Negro (GloFAS) com dados reais.
+> Estado atual: **etapa 3**. As telas **Próximos dias** (chuva e vazão do Rio Negro) e **Mapa** (pontos de apoio
+> do OpenStreetMap e setores de risco oficiais do SGB) já usam dados reais.
 
 ## Requisitos
 
@@ -27,6 +28,8 @@ Quando aparecer `Started AvisabrasilApplication`, abra no navegador:
 |---|---|
 | Página inicial | http://localhost:8080 |
 | **Próximos dias** (chuva e rio, dados reais) | http://localhost:8080/proximos-dias.html |
+| **Mapa** (pontos de apoio e setores de risco) | http://localhost:8080/mapa.html |
+| **Painel da Defesa Civil** (cadastro de pontos seguros) | http://localhost:8080/painel.html |
 | Swagger UI (testar a API) | http://localhost:8080/swagger-ui.html |
 | Previsão do tempo (JSON) | http://localhost:8080/api/previsao/tempo |
 | Previsão do rio (JSON) | http://localhost:8080/api/previsao/rio |
@@ -48,6 +51,8 @@ O arquivo do banco fica em `backend/data/` e não vai para o Git.
 | [Open-Meteo](https://open-meteo.com/) | Chuva, chance de chuva e temperatura dos próximos 7 dias | a cada 1 hora |
 | [GloFAS / Copernicus](https://open-meteo.com/en/docs/flood-api) via Open-Meteo | Vazão do rio: últimos 30 dias e previsão de 30 dias | a cada 6 horas |
 | GloFAS, série desde 1997 | O que é "normal" para o rio em cada época do ano | 1 vez por dia |
+| [OpenStreetMap](https://www.openstreetmap.org/copyright) via Overpass API | Escolas, unidades de saúde, prédios públicos e abrigos num raio de 8 km | 1 vez por dia |
+| [SGB/CPRM: Setorização de risco de São Gabriel da Cachoeira (2022)](https://rigeo.sgb.gov.br/handle/doc/22730) | 14 setores oficiais de risco alto e muito alto | arquivo fixo |
 
 - **Cache:** a última resposta válida de cada fonte fica em memória e em `backend/data/cache/`. Se a internet ou a API cair,
   a tela continua mostrando o último dado válido com o aviso **"Desatualizado"**. Depois de uma falha, o sistema
@@ -56,6 +61,18 @@ O arquivo do banco fica em `backend/data/` e não vai para o Git.
   pega um igarapé (vazão < 1 m³/s). Por isso a vazão é lida no ponto -0,17 / -67,08, que cai no leito do Rio Negro
   (~4.000 m³/s). Os dois pontos estão em `application.properties`.
 - **GloFAS é modelo, não medição.** A tela diz isso. A medição oficial (régua da ANA) entra na etapa 4.
+  O "normal da época" usa a própria série do GloFAS (1997 até o ano anterior), com 7 dias antes e 7 depois da data em
+  cada ano. Os maiores e menores valores da série são do modelo; os recordes oficiais devem ser conferidos com a ANA.
+- **Pontos de apoio do OSM não são abrigos oficiais.** Em 11/2026 o OSM tinha só 13 pontos úteis no raio de 8 km
+  (vários sem nome). A tela mostra só os reais e avisa isso. Abrigos confirmados são cadastrados pela Defesa Civil no
+  painel e aparecem em verde, antes dos outros.
+- **Setores de risco:** só aparecem porque existe fonte oficial (SGB, vistoria de março/abril de 2022). O GeoJSON em
+  `backend/src/main/resources/static/dados/` foi gerado do shapefile oficial com `ferramentas/sgb_para_geojson.py`
+  (sem reprojeção: SIRGAS 2000 ≈ WGS84). Pontos que caem dentro de um setor são marcados no mapa e no painel.
+- **Overpass:** uma consulta por dia, com servidor reserva. Em horário de pico a fila pode passar de 30 s, por isso o
+  tempo limite dessa fonte é 90 s.
+- **Painel sem senha (por enquanto):** qualquer pessoa com o endereço consegue cadastrar ou remover pontos. O acesso
+  restrito precisa entrar antes de usar fora da demonstração.
 
 ## Testes
 
@@ -90,6 +107,7 @@ $env:NTFY_TOPICO = "meu-topico"
 ```
 avisabrasil/
 ├── backend/        Spring Boot (API REST, front-end em src/main/resources/static)
+├── ferramentas/    scripts de apoio (conversão da setorização do SGB para GeoJSON)
 ├── simulador/      simulador do sensor de nível (etapa 5)
 └── firmware/       ESP32 para o Wokwi (etapa 11)
 ```
