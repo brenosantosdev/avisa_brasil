@@ -6,7 +6,7 @@
   const t = AB.t;
   const ATUALIZAR_A_CADA_MS = 10 * 60 * 1000;
 
-  const estado = { comunidade: null, tempo: null, rio: null, grafico: null };
+  const estado = { comunidade: null, tempo: null, rio: null, ana: null, grafico: null };
 
   const ICONE_DA_TENDENCIA = { SUBINDO: 'sobe', DESCENDO: 'desce', ESTAVEL: 'estavel' };
 
@@ -163,8 +163,16 @@
           ini: r.normalHoje.anoInicial, fim: r.normalHoje.anoFinal, janela: r.normalHoje.janelaDias,
           data: AB.dataCurta(dados.hoje), amostras: AB.numero(r.normalHoje.amostras)
         })) + '</p>';
-        if (r.comparacaoHoje === 'MUITO_ABAIXO') html += '<p><strong>' + AB.escapar(t('rio.normal.seca')) + '</strong></p>';
-        if (r.comparacaoHoje === 'MUITO_ACIMA') html += '<p><strong>' + AB.escapar(t('rio.normal.cheia')) + '</strong></p>';
+        const ana = estado.ana && estado.ana.dados;
+        if (ana && ana.divergem) {
+          // ANA e GloFAS discordam sobre seca/cheia: vale a medição da ANA
+          html += '<p class="vale-ana">' + AB.icone('regua') + '<span>' + AB.escapar(t('pd.anaDiverge', {
+            texto: t('rio.normal.' + ana.comparacaoAna).toLowerCase()
+          })).replace('O rio agora', '<a href="/rio-agora.html">O rio agora</a>') + '</span></p>';
+        } else {
+          if (r.comparacaoHoje === 'MUITO_ABAIXO') html += '<p><strong>' + AB.escapar(t('rio.normal.seca')) + '</strong></p>';
+          if (r.comparacaoHoje === 'MUITO_ACIMA') html += '<p><strong>' + AB.escapar(t('rio.normal.cheia')) + '</strong></p>';
+        }
       } else {
         html += '<p>' + AB.escapar(t('rio.normal.semHistorico')) + '</p>';
       }
@@ -295,10 +303,13 @@
     const rio = estado.rio && estado.rio.dados;
     if (rio) {
       const r = rio.resumo;
+      // se a medição da ANA discorda do modelo sobre seca/cheia, o resumo usa a ANA
+      const ana = estado.ana && estado.ana.dados;
+      const comparacao = ana && ana.divergem ? ana.comparacaoAna : r.comparacaoHoje;
       linhas.push({
         icone: ICONE_DA_TENDENCIA[r.tendencia] || 'rio',
         titulo: tituloDaTendencia(r) + '.',
-        detalhe: r.comparacaoHoje ? t('rio.normal.' + r.comparacaoHoje) + '.' : ''
+        detalhe: comparacao ? t('rio.normal.' + comparacao) + '.' : ''
       });
     }
     const alvo = document.getElementById('resumo');
@@ -342,9 +353,10 @@
   }
 
   async function carregarDados() {
-    const resultados = await Promise.all([buscar('/api/previsao/tempo'), buscar('/api/previsao/rio')]);
+    const resultados = await Promise.all([buscar('/api/previsao/tempo'), buscar('/api/previsao/rio'), buscar('/api/rio/agora')]);
     estado.tempo = resultados[0];
     estado.rio = resultados[1];
+    estado.ana = resultados[2];
     renderizarResumo();
     renderizarChuva();
     renderizarRio();

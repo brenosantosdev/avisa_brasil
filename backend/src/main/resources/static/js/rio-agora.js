@@ -1,0 +1,347 @@
+/* Tela "O rio agora": nível medido pela ANA, régua ilustrada, comparação com o GloFAS e histórico. */
+(function () {
+  'use strict';
+
+  const AB = window.AB;
+  const t = AB.t;
+  const ATUALIZAR_A_CADA_MS = 5 * 60 * 1000;
+  const ICONE_DO_NIVEL = { NORMAL: 'seguro', ATENCAO: 'info', ALERTA: 'alerta', EMERGENCIA: 'alerta' };
+  const COR_DO_NIVEL = { NORMAL: '#1E7A46', ATENCAO: '#F2C230', ALERTA: '#C2541A', EMERGENCIA: '#A3221B' };
+
+  const estado = { resposta: null, grafico: null };
+
+  /** cm na régua → "7,74 m" */
+  function metros(cm) {
+    return t('ra.metros', { n: AB.numero(cm / 100, 2) });
+  }
+
+  /** Diferença de nível: "40 cm" até 1 m; acima disso, "6,11 m". */
+  function diferenca(cm) {
+    return cm < 100 ? t('ra.cm', { n: AB.numero(cm) }) : metros(cm);
+  }
+
+  /** "2026-11-11T20:45:00" (hora local da comunidade, sem fuso) → texto natural */
+  function quandoLocal(dataHora) {
+    return AB.quando(dataHora + '-04:00');
+  }
+
+  function dataCompleta(dataIso) {
+    const d = new Date(dataIso + 'T12:00:00Z');
+    return new Intl.DateTimeFormat(document.documentElement.lang, { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(d);
+  }
+
+  function etiquetaNivel(nivel, grande) {
+    return '<span class="etiqueta ' + (grande ? 'etiqueta-grande ' : '') + 'nivel-' + nivel + '">' +
+      AB.icone(ICONE_DO_NIVEL[nivel]) + AB.escapar(t('nivel.' + nivel)) + '</span>';
+  }
+
+  function textoTendencia(v) {
+    if (v === null || v === undefined) return null;
+    if (Math.abs(v) < 1) return t('ra.tendencia.estavel');
+    return t(v > 0 ? 'ra.tendencia.sobe' : 'ra.tendencia.desce', { n: AB.numero(Math.abs(v), 1) });
+  }
+
+  /* ---------- Cartão "agora" ---------- */
+
+  function renderizarAgora(d) {
+    const alvo = document.getElementById('agora');
+    if (!d || !d.atual) {
+      alvo.innerHTML = AB.avisoSituacao(estado.resposta) || '';
+      return;
+    }
+    const a = d.atual;
+    let html = '<p class="rotulo">' + AB.escapar(t('ra.nivelAtual')) + '</p>';
+    html += '<p class="nivel-grande">' + AB.escapar(metros(a.cotaCm)) + '</p>';
+    html += '<p>' + AB.escapar(t('ra.medidoEm', { quando: quandoLocal(a.dataHora) })) + '</p>';
+    if (d.nivel) {
+      html += '<p>' + etiquetaNivel(d.nivel, true) +
+        (d.cotas && d.cotas.origem === 'PROVISORIA' ? ' <span class="etiqueta provisoria">' + AB.icone('info') +
+          AB.escapar(t('ra.cotas.PROVISORIA')) + '</span>' : '') + '</p>';
+    }
+    const tendencia = textoTendencia(d.velocidadeCmPorDia);
+    if (tendencia) {
+      html += '<p class="linha-icone">' + AB.icone(d.velocidadeCmPorDia > 1 ? 'sobe' : d.velocidadeCmPorDia < -1 ? 'desce' : 'estavel') +
+        '<span><strong>' + AB.escapar(tendencia) + '</strong><br><span class="nota">' + AB.escapar(t('ra.tendencia.explica')) +
+        (d.variacao24hCm !== null ? ' ' + AB.escapar(t('ra.variacao24h', { sinal: (d.variacao24hCm > 0 ? '+' : '') + AB.numero(d.variacao24hCm) })) : '') +
+        '</span></span></p>';
+    }
+    if (a.vazaoM3s) {
+      html += '<p class="linha-icone">' + AB.icone('rio') + '<span>' + AB.escapar(t('ra.vazao', {
+        vazao: AB.numero(a.vazaoM3s), baldes: AB.numeroCompacto(a.vazaoM3s * 50)
+      })) + '</span></p>';
+    }
+    if (d.cotas) {
+      if (d.proximoNivel) {
+        html += '<p class="falta">' + AB.escapar(t('ra.falta', {
+          cm: diferenca(d.faltaParaProximoCm),
+          nivel: t('nivel.' + d.proximoNivel),
+          comparacao: AB.comparacaoAltura(d.faltaParaProximoCm)
+        })) + '</p>';
+        if (d.horasAteProximoNivel) {
+          const h = d.horasAteProximoNivel;
+          const tempo = h < 48 ? t('ra.chegaEm.horas', { n: AB.numero(h) }) : t('ra.chegaEm.dias', { n: AB.numero(h / 24) });
+          html += '<p>' + AB.escapar(t('ra.chegaEm', { tempo: tempo })) + '</p>';
+        }
+      } else {
+        html += '<p class="falta">' + AB.escapar(t('ra.acimaDeTodas')) + '</p>';
+      }
+    } else {
+      const p = d.historicoPrincipal.progresso;
+      html += '<p class="nota">' + AB.escapar(t('ra.semCotas', { feito: p.anosBaixados, total: p.anosTotal })) + '</p>';
+    }
+    alvo.innerHTML = html;
+  }
+
+  /* ---------- Régua ilustrada (SVG em escala) ---------- */
+
+  function renderizarRegua(d) {
+    const alvo = document.getElementById('regua');
+    if (!d || !d.atual) { alvo.innerHTML = ''; return; }
+    const hoje = d.atual.cotaCm;
+    const cheia = d.historicoPrincipal.maioresCheias[0];
+    const seca = d.historicoPrincipal.maioresSecas[0];
+    const c = d.cotas;
+    const valores = [hoje].concat(cheia ? [cheia.cotaCm] : [], seca ? [seca.cotaCm] : [], c ? [c.emergenciaCm + 250] : []);
+    const minimo = Math.floor((Math.min.apply(null, valores) - 120) / 100) * 100;
+    const maximo = Math.ceil((Math.max.apply(null, valores) + 120) / 100) * 100;
+
+    const L = 400, A = 470, topo = 14, base = A - 14, xRegua = 54, larguraRegua = 26;
+    const y = function (cm) { return topo + (maximo - cm) / (maximo - minimo) * (base - topo); };
+    const pxPorCm = (base - topo) / (maximo - minimo);
+    let s = '<svg class="regua-svg" viewBox="0 0 ' + L + ' ' + A + '" role="img" aria-label="' +
+      AB.escapar(t('ra.regua.descricao', { hoje: metros(hoje) })) + '">';
+
+    // céu e água (a água vai do nível de hoje até o fundo)
+    s += '<rect x="0" y="0" width="' + L + '" height="' + A + '" fill="#EAF3F8"/>';
+    s += '<rect x="0" y="' + y(hoje) + '" width="' + L + '" height="' + (A - y(hoje)) + '" fill="#2F86B5" opacity="0.55"/>';
+    s += '<path d="M0 ' + y(hoje) + ' q 12 -5 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0" stroke="#0B4F73" stroke-width="2" fill="none"/>';
+
+    // faixas do semáforo na régua
+    if (c) {
+      const faixas = [[minimo, c.atencaoCm, 'NORMAL'], [c.atencaoCm, c.alertaCm, 'ATENCAO'], [c.alertaCm, c.emergenciaCm, 'ALERTA'], [c.emergenciaCm, maximo, 'EMERGENCIA']];
+      faixas.forEach(function (f) {
+        s += '<rect x="' + xRegua + '" y="' + y(f[1]) + '" width="' + larguraRegua + '" height="' + (y(f[0]) - y(f[1])) + '" fill="' + COR_DO_NIVEL[f[2]] + '"/>';
+      });
+    } else {
+      s += '<rect x="' + xRegua + '" y="' + topo + '" width="' + larguraRegua + '" height="' + (base - topo) + '" fill="#fff" stroke="#10262E"/>';
+    }
+    // marcas a cada metro
+    for (let cm = minimo; cm <= maximo; cm += 100) {
+      s += '<line x1="' + (xRegua - 6) + '" x2="' + (xRegua + larguraRegua) + '" y1="' + y(cm) + '" y2="' + y(cm) + '" stroke="#10262E"/>';
+      s += '<text x="' + (xRegua - 9) + '" y="' + (y(cm) + 4) + '" text-anchor="end">' + AB.numero(cm / 100) + ' m</text>';
+    }
+
+    // casa de palafita com o piso na cota de Emergência (ilustração) e o bonequinho de 1,60 m
+    if (c) {
+      const piso = y(c.emergenciaCm), xCasa = 280, larguraCasa = 100, parede = 250 * pxPorCm;
+      for (let i = 0; i < 4; i++) {
+        const x = xCasa + 8 + i * (larguraCasa - 16) / 3;
+        s += '<line x1="' + x + '" x2="' + x + '" y1="' + piso + '" y2="' + base + '" stroke="#6B4A2B" stroke-width="5"/>';
+      }
+      s += '<rect x="' + (xCasa - 6) + '" y="' + (piso - 3) + '" width="' + (larguraCasa + 12) + '" height="6" fill="#6B4A2B"/>';
+      s += '<rect x="' + xCasa + '" y="' + (piso - parede) + '" width="' + larguraCasa + '" height="' + parede + '" fill="#E3C9A1" stroke="#6B4A2B" stroke-width="2"/>';
+      s += '<polygon points="' + (xCasa - 12) + ',' + (piso - parede) + ' ' + (xCasa + larguraCasa / 2) + ',' + (piso - parede - 40 * pxPorCm - 18) + ' ' + (xCasa + larguraCasa + 12) + ',' + (piso - parede) + '" fill="#A3221B"/>';
+      s += '<rect x="' + (xCasa + 16) + '" y="' + (piso - 200 * pxPorCm) + '" width="' + (80 * pxPorCm + 8) + '" height="' + (200 * pxPorCm) + '" fill="#6B4A2B"/>';
+      // bonequinho de 1,60 m em pé no piso
+      const altura = 160 * pxPorCm, xp = xCasa + larguraCasa - 26, cabeca = altura * 0.13;
+      s += '<g stroke="#10262E" stroke-width="3" stroke-linecap="round" fill="none">' +
+        '<circle cx="' + xp + '" cy="' + (piso - altura + cabeca) + '" r="' + cabeca + '" fill="#F3F6F5"/>' +
+        '<line x1="' + xp + '" y1="' + (piso - altura + 2 * cabeca) + '" x2="' + xp + '" y2="' + (piso - altura * 0.45) + '"/>' +
+        '<line x1="' + xp + '" y1="' + (piso - altura * 0.45) + '" x2="' + (xp - altura * 0.12) + '" y2="' + piso + '"/>' +
+        '<line x1="' + xp + '" y1="' + (piso - altura * 0.45) + '" x2="' + (xp + altura * 0.12) + '" y2="' + piso + '"/>' +
+        '<line x1="' + (xp - altura * 0.18) + '" y1="' + (piso - altura * 0.68) + '" x2="' + (xp + altura * 0.18) + '" y2="' + (piso - altura * 0.68) + '"/>' +
+        '</g>';
+    }
+
+    // linhas de referência: cotas, maior cheia, maior seca e hoje
+    const linhas = [];
+    if (cheia) linhas.push([cheia.cotaCm, '#4A6169', t('ra.regua.maiorCheia', { ano: cheia.ano }), true]);
+    if (c) {
+      linhas.push([c.emergenciaCm, '#A3221B', t('nivel.EMERGENCIA'), true]);
+      linhas.push([c.alertaCm, '#C2541A', t('nivel.ALERTA'), true]);
+      linhas.push([c.atencaoCm, '#8A6A00', t('nivel.ATENCAO'), true]);
+    }
+    if (seca) linhas.push([seca.cotaCm, '#8A5A00', t('ra.regua.maiorSeca', { ano: seca.ano }), true]);
+    linhas.push([hoje, '#0B4F73', t('ra.regua.hoje'), false, true]);
+    linhas.sort(function (a, b) { return b[0] - a[0]; });
+    // as linhas ficam na altura real; só os rótulos são afastados quando as cotas estão muito próximas
+    let ultimoRotulo = -Infinity;
+    linhas.forEach(function (l) {
+      const yl = y(l[0]);
+      const yr = Math.max(yl - 4, ultimoRotulo + 15);
+      ultimoRotulo = yr;
+      s += '<line x1="' + (xRegua + larguraRegua) + '" x2="' + (L - 6) + '" y1="' + yl + '" y2="' + yl + '" stroke="' + l[1] + '" stroke-width="' + (l[4] ? 3 : 2) + '"' +
+        (l[3] ? ' stroke-dasharray="6 4"' : '') + '/>';
+      s += '<text x="' + (xRegua + larguraRegua + 6) + '" y="' + yr + '" class="' + (l[4] ? 'rotulo-cota' : '') + '" fill="' + l[1] + '"' +
+        ' paint-order="stroke" stroke="#EAF3F8" stroke-width="3">' + AB.escapar(l[2] + ' · ' + metros(l[0])) + '</text>';
+    });
+    s += '</svg>';
+
+    alvo.innerHTML = s + '<p class="nota">' + AB.escapar(t('ra.regua.legenda', { estacao: d.estacao.nome })) + '</p>';
+  }
+
+  /* ---------- Medição × modelo ---------- */
+
+  function renderizarComparacao(d) {
+    const alvo = document.getElementById('comparacao');
+    if (!d) { alvo.innerHTML = ''; return; }
+    let html = '<h2>' + AB.escapar(t('ra.comparacao.titulo')) + '</h2>';
+    if (!d.comparacaoAna) {
+      html += '<p>' + AB.escapar(t('ra.comparacao.semNormal')) + '</p>';
+    } else {
+      html += '<ul class="comparacao-lista">';
+      html += '<li>' + AB.icone('regua') + '<span><strong>' + AB.escapar(t('ra.comparacao.ana', { texto: t('rio.normal.' + d.comparacaoAna) })) + '</strong></span></li>';
+      if (d.comparacaoGlofas) {
+        html += '<li>' + AB.icone('info') + '<span>' + AB.escapar(t('ra.comparacao.glofas', { texto: t('rio.normal.' + d.comparacaoGlofas) })) + '</span></li>';
+      }
+      html += '</ul>';
+      if (d.divergem) html += '<p class="vale-ana">' + AB.escapar(t('ra.comparacao.divergem')) + '</p>';
+      else if (d.comparacaoGlofas) html += '<p class="concordam">' + AB.escapar(t('ra.comparacao.concordam')) + '</p>';
+      const n = d.normalHoje;
+      html += '<p class="nota">' + AB.escapar(t('ra.normal.metodo', {
+        ini: n.anoInicial, fim: n.anoFinal, p25: AB.numero(n.p25 / 100, 2), p75: AB.numero(n.p75 / 100, 2),
+        data: AB.dataCurta(AB.hojeNaComunidade()), amostras: AB.numero(n.amostras)
+      })) + '</p>';
+    }
+    alvo.innerHTML = html;
+  }
+
+  /* ---------- Gráfico dos últimos 7 dias ---------- */
+
+  function desenharGrafico(d) {
+    if (!window.Chart || !d || !d.ultimosDias.length) return;
+    if (estado.grafico) estado.grafico.destroy();
+    const canvas = document.getElementById('grafico');
+    canvas.setAttribute('aria-label', t('ra.grafico.descricao'));
+    const rotulos = d.ultimosDias.map(function (p) {
+      return AB.dataCurta(p.dataHora.slice(0, 10)) + ' ' + p.dataHora.slice(11, 13) + 'h';
+    });
+    estado.grafico = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: rotulos,
+        datasets: [{
+          label: t('ra.grafico.nivel'), data: d.ultimosDias.map(function (p) { return p.cotaCm / 100; }),
+          borderColor: '#0B4F73', backgroundColor: 'rgba(47,134,181,0.15)', fill: true, borderWidth: 3, pointRadius: 0, tension: 0
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        animation: false,
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+          x: { ticks: { maxRotation: 0, autoSkipPadding: 24, font: { size: 14 } }, grid: { display: false } },
+          // a régua mede de 1 em 1 cm: marcas com no mínimo 1 cm, sem rótulos repetidos
+          y: { ticks: { font: { size: 14 }, precision: 2, callback: function (v) { return AB.numero(v, 2) + ' m'; } } }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: function (ctx) { return AB.numero(ctx.raw, 2) + ' m'; } } }
+        }
+      }
+    });
+  }
+
+  /* ---------- Já aconteceu antes? ---------- */
+
+  function tabela(classe, titulo, eventos) {
+    if (!eventos.length) return '<p class="nota">' + AB.escapar(t('ra.historico.vazio')) + '</p>';
+    return '<table class="tabela-eventos ' + classe + '"><caption>' + AB.escapar(titulo) + '</caption>' +
+      '<thead><tr><th scope="col">' + AB.escapar(t('ra.historico.data')) + '</th><th scope="col">' + AB.escapar(t('ra.historico.cota')) + '</th></tr></thead><tbody>' +
+      eventos.map(function (e) {
+        return '<tr><td>' + AB.escapar(dataCompleta(e.data)) + '</td><td>' + AB.escapar(metros(e.cotaCm)) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  function cartaoHistorico(h, hojeCm) {
+    const e = h.estacao;
+    let html = '<div class="cartao"><h3>' + AB.escapar(t('ra.historico.estacao', { nome: e.nome, codigo: e.codigo, localizacao: e.localizacao })) + '</h3>';
+    if (h.primeiraLeitura) {
+      html += '<p class="nota">' + AB.escapar(t('ra.historico.periodo', {
+        ini: h.primeiraLeitura.slice(0, 4), fim: h.ultimaLeitura.slice(0, 4), anos: h.anosCompletos
+      })) + ' ' + AB.escapar(t('ra.historico.atraso', { data: dataCompleta(h.ultimaLeitura) })) + '</p>';
+    }
+    if (h.progresso.anosBaixados < h.progresso.anosTotal) {
+      html += '<p class="aviso-situacao aviso-DESATUALIZADO">' + AB.icone('info') + '<span>' +
+        AB.escapar(t('ra.historico.baixando', { feito: h.progresso.anosBaixados, total: h.progresso.anosTotal })) + '</span></p>';
+    }
+    html += tabela('cheia', t('ra.historico.cheias'), h.maioresCheias);
+    html += tabela('seca', t('ra.historico.secas'), h.maioresSecas);
+    if (hojeCm !== null && h.maioresCheias.length) {
+      const dif = h.maioresCheias[0].cotaCm - hojeCm;
+      if (dif > 0) html += '<p>' + AB.escapar(t('ra.historico.hoje', { dif: metros(dif) })) + '</p>';
+    }
+    return html + '</div>';
+  }
+
+  function renderizarHistorico(d) {
+    const alvo = document.getElementById('historico');
+    if (!d) { alvo.innerHTML = ''; return; }
+    alvo.innerHTML = cartaoHistorico(d.historicoPrincipal, d.atual ? d.atual.cotaCm : null) +
+      cartaoHistorico(d.historicoCidade, null) +
+      '<p class="nota">' + AB.escapar(t('ra.historico.reguasDiferentes')) + '</p>';
+  }
+
+  /* ---------- Fontes e voz ---------- */
+
+  function renderizarFontes(r) {
+    const d = r.dados;
+    let extra = d ? '<p>' + AB.escapar(t('ra.fonte.estacao', { codigo: d.estacao.codigo, nome: d.estacao.nome })) + '</p>' : '';
+    if (d && d.cotas) {
+      const c = d.cotas;
+      extra += '<p><strong>' + AB.escapar(t('ra.cotas.' + c.origem)) + ':</strong> ' + AB.escapar(c.origem === 'PROVISORIA'
+        ? t('ra.cotas.PROVISORIA.explica', { ini: c.anoInicial, fim: c.anoFinal, anos: c.anos })
+        : t('ra.cotas.OFICIAL_CONFIGURADA.explica', { fonte: c.fonte })) + '</p>';
+    }
+    document.getElementById('fontes').innerHTML = r.fonte ? AB.rodapeFonte(r, extra) : '';
+  }
+
+  function textoParaOuvir() {
+    const r = estado.resposta;
+    const d = r && r.dados;
+    const partes = [t('ra.titulo') + '. ' + document.getElementById('intro').textContent];
+    if (d && d.atual) {
+      partes.push(t('ra.nivelAtual') + ': ' + metros(d.atual.cotaCm) + '. ' + t('ra.medidoEm', { quando: quandoLocal(d.atual.dataHora) }) + '.');
+      if (d.nivel) partes.push(t('nivel.' + d.nivel) + (d.cotas.origem === 'PROVISORIA' ? ', ' + t('ra.cotas.PROVISORIA') : '') + '.');
+      const tendencia = textoTendencia(d.velocidadeCmPorDia);
+      if (tendencia) partes.push(tendencia + '.');
+      if (d.proximoNivel) {
+        partes.push(t('ra.falta', { cm: diferenca(d.faltaParaProximoCm), nivel: t('nivel.' + d.proximoNivel), comparacao: AB.comparacaoAltura(d.faltaParaProximoCm) }));
+      }
+      if (d.comparacaoAna) partes.push(t('ra.comparacao.ana', { texto: t('rio.normal.' + d.comparacaoAna) }) + '.');
+      if (d.divergem) partes.push(t('ra.comparacao.divergem'));
+    }
+    if (r && r.situacao !== 'ATUALIZADO') partes.push(t('situacao.' + r.situacao, { quando: r.atualizadoEm ? AB.quando(r.atualizadoEm) : '' }));
+    return partes.join(' ');
+  }
+
+  async function carregar() {
+    let r;
+    try {
+      r = await (await fetch('/api/rio/agora', { cache: 'no-store' })).json();
+    } catch (e) {
+      r = { situacao: 'INDISPONIVEL', dados: null };
+    }
+    estado.resposta = r;
+    const d = r.dados;
+    if (d) {
+      document.getElementById('intro').textContent = t('ra.intro', { rio: d.estacao.rio, estacao: d.estacao.nome, localizacao: d.estacao.localizacao });
+    }
+    document.getElementById('aviso-situacao').innerHTML = AB.avisoSituacao(r);
+    renderizarAgora(d);
+    renderizarRegua(d);
+    renderizarComparacao(d);
+    desenharGrafico(d);
+    renderizarHistorico(d);
+    renderizarFontes(r);
+  }
+
+  async function iniciar() {
+    await AB.iniciarPagina();
+    AB.configurarOuvir(textoParaOuvir);
+    await carregar();
+    setInterval(carregar, ATUALIZAR_A_CADA_MS);
+  }
+
+  iniciar();
+})();

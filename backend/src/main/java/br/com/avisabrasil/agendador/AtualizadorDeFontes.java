@@ -3,6 +3,8 @@ package br.com.avisabrasil.agendador;
 import br.com.avisabrasil.mapa.MapaServico;
 import br.com.avisabrasil.previsao.PrevisaoRioServico;
 import br.com.avisabrasil.previsao.PrevisaoTempoServico;
+import br.com.avisabrasil.rio.HistoricoAnaServico;
+import br.com.avisabrasil.rio.RioAgoraServico;
 import java.util.concurrent.TimeUnit;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,11 +22,16 @@ public class AtualizadorDeFontes {
     private final PrevisaoTempoServico tempo;
     private final PrevisaoRioServico rio;
     private final MapaServico mapa;
+    private final RioAgoraServico rioAgora;
+    private final HistoricoAnaServico historicoAna;
 
-    public AtualizadorDeFontes(PrevisaoTempoServico tempo, PrevisaoRioServico rio, MapaServico mapa) {
+    public AtualizadorDeFontes(PrevisaoTempoServico tempo, PrevisaoRioServico rio, MapaServico mapa,
+            RioAgoraServico rioAgora, HistoricoAnaServico historicoAna) {
         this.tempo = tempo;
         this.rio = rio;
         this.mapa = mapa;
+        this.rioAgora = rioAgora;
+        this.historicoAna = historicoAna;
     }
 
     @Scheduled(initialDelay = 0, fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
@@ -32,5 +39,12 @@ public class AtualizadorDeFontes {
         tempo.atualizarSeNecessario();
         rio.atualizarSeNecessario();
         mapa.atualizarSeNecessario();
+        rioAgora.atualizarSeNecessario();
+    }
+
+    /** Baixa um ano do histórico da ANA por vez, com pausa entre os pedidos. */
+    @Scheduled(initialDelay = 30_000, fixedDelayString = "${avisabrasil.ana.pausa-historico}")
+    public void baixarHistoricoAna() {
+        historicoAna.baixarProximoAno();
     }
 }

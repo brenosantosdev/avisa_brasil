@@ -117,6 +117,15 @@
     return t('distancia.km', { n: numero(metros / 1000, 1) });
   }
 
+  /** Explica centímetros com partes do corpo: 40 → "mais ou menos a altura de um joelho". */
+  function comparacaoAltura(cm) {
+    if (cm <= 20) return t('altura.palmo');
+    if (cm <= 60) return t('altura.joelho');
+    if (cm <= 110) return t('altura.cintura');
+    if (cm <= 190) return t('altura.pessoa');
+    return t('altura.pessoas', { n: numero(cm / 160, 1) });
+  }
+
   /** "hoje às 19:45", "ontem às 08:00", "em 09/11 às 14:00" (no fuso da comunidade). */
   function quando(dataHoraIso) {
     const momento = new Date(dataHoraIso);
@@ -232,6 +241,7 @@
 
   const PAGINAS = [
     { id: 'inicio', href: '/', texto: 'nav.inicio' },
+    { id: 'rio-agora', href: '/rio-agora.html', texto: 'nav.rioAgora' },
     { id: 'proximos-dias', href: '/proximos-dias.html', texto: 'nav.proximosDias' },
     { id: 'mapa', href: '/mapa.html', texto: 'nav.mapa' },
     { id: 'painel', href: '/painel.html', texto: 'nav.painel' }
@@ -268,6 +278,7 @@
     numero: numero,
     numeroCompacto: numeroCompacto,
     distancia: distancia,
+    comparacaoAltura: comparacaoAltura,
     textoBaldes: textoBaldes,
     hojeNaComunidade: hojeNaComunidade,
     nomeDoDia: nomeDoDia,

@@ -14,6 +14,11 @@ public final class Fixtures {
     public static final String GLOFAS_HISTORICO = "/glofas/historico-out-dez.json";
     /** Resposta real do Overpass (raio de 8 km da sede), salva em 12/11/2026 (UTC). */
     public static final String OVERPASS = "/overpass/pontos-sao-gabriel.json";
+    /** Respostas reais da ANA (11/11/2026). Não contêm token nem credenciais. */
+    public static final String ANA_TELEMETRIA = "/ana/telemetria-14330000-7dias.json";
+    public static final String ANA_SEM_REGISTROS = "/ana/telemetria-sem-registros.json";
+    public static final String ANA_COTAS_CIDADE = "/ana/cotas-14320001-2026.json";
+    public static final String ANA_COTAS_PRINCIPAL = "/ana/cotas-14330000-2026.json";
 
     private Fixtures() {
     }

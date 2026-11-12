@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>O rio agora · AvisaBrasil</title>
+  <meta name="theme-color" content="#0B4F73">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilo.css">
+  <link rel="stylesheet" href="/css/rio-agora.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 13c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 18c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/></svg>
+        <span>
+          <span class="marca-nome" data-i18n="app.nome">AvisaBrasil</span>
+          <span class="marca-local" data-comunidade-local></span>
+        </span>
+      </a>
+      <button id="botao-ouvir" class="botao botao-ouvir" type="button" aria-pressed="false">
+        <svg aria-hidden="true"></svg><span data-i18n="ouvir">Ouvir</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="navegacao" id="navegacao" data-atual="rio-agora"></nav>
+
+  <main>
+    <h1 data-i18n="ra.titulo">O rio agora</h1>
+    <p class="intro" id="intro"></p>
+    <div id="aviso-situacao"></div>
+
+    <div class="ra-grade">
+      <section class="cartao" id="agora" aria-live="polite"><p class="carregando" data-i18n="carregando">Carregando dados reais…</p></section>
+      <section class="cartao" aria-labelledby="titulo-regua">
+        <h2 id="titulo-regua" data-i18n="ra.regua.titulo">Régua do rio</h2>
+        <div id="regua"></div>
+      </section>
+    </div>
+
+    <section class="cartao secao" id="comparacao"></section>
+
+    <section class="cartao secao" aria-labelledby="titulo-grafico">
+      <h2 id="titulo-grafico" data-i18n="ra.grafico.titulo">Últimos 7 dias</h2>
+      <div class="grafico-caixa"><canvas id="grafico" role="img"></canvas></div>
+    </section>
+
+    <section class="secao" aria-labelledby="titulo-historico">
+      <h2 id="titulo-historico" data-i18n="ra.historico.titulo">Já aconteceu antes?</h2>
+      <p data-i18n="ra.historico.intro"></p>
+      <div id="historico" class="historico-grade"></div>
+    </section>
+
+    <section class="cartao secao" id="fontes"></section>
+  </main>
+
+  <footer class="rodape"><p data-i18n="app.rodape"></p></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.6.1/dist/chart.umd.min.js"></script>
+  <script src="/js/comum.js"></script>
+  <script src="/js/rio-agora.js"></script>
+</body>
+</html>

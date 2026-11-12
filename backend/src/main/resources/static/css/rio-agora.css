@@ -1,0 +1,56 @@
+/* Tela "O rio agora" */
+
+.ra-grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.nivel-grande { font-size: 3rem; font-weight: 700; line-height: 1.1; margin: 4px 0; }
+.rotulo { font-weight: 700; color: var(--texto-suave); margin: 0; }
+#agora p { margin: 8px 0 0; }
+.linha-icone { display: flex; gap: 10px; align-items: flex-start; }
+.linha-icone svg { width: 26px; height: 26px; flex: none; color: var(--rio); margin-top: 2px; }
+
+/* Semáforo: ícone + cor + palavra */
+.nivel-NORMAL { background: var(--normal); color: #fff; }
+.nivel-ATENCAO { background: var(--atencao); color: var(--texto); }
+.nivel-ALERTA { background: var(--alerta); color: #fff; }
+.nivel-EMERGENCIA { background: var(--emergencia); color: #fff; }
+.etiqueta-grande { font-size: 1.15rem; padding: 6px 16px 6px 10px; }
+.etiqueta-grande svg { width: 26px; height: 26px; }
+.provisoria { background: #FFF4CC; color: var(--texto); border: 2px dashed #B38A00; }
+
+.falta { background: var(--fundo); border-radius: 10px; padding: 12px 14px; margin-top: 12px !important; font-weight: 700; }
+
+/* ---------- Régua ilustrada ---------- */
+
+.regua-svg { width: 100%; height: auto; display: block; }
+.regua-svg text { font-family: inherit; font-size: 13px; fill: var(--texto); }
+.regua-svg .rotulo-cota { font-weight: 700; }
+
+/* ---------- Comparação ANA × GloFAS ---------- */
+
+.comparacao-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.comparacao-lista li { display: flex; gap: 10px; align-items: center; }
+.comparacao-lista svg { width: 24px; height: 24px; flex: none; }
+.vale-ana { margin-top: 12px; padding: 12px 14px; border-radius: 10px; font-weight: 700; background: #FFF4CC; border: 2px solid var(--atencao); }
+.concordam { margin-top: 12px; color: #145232; font-weight: 700; }
+
+.grafico-caixa { position: relative; height: 320px; }
+
+/* ---------- Histórico ---------- */
+
+.historico-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.tabela-eventos { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 1rem; }
+.tabela-eventos caption { text-align: left; font-weight: 700; font-size: 1.05rem; padding: 6px 0; }
+.tabela-eventos th, .tabela-eventos td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--borda); }
+.tabela-eventos td:last-child, .tabela-eventos th:last-child { text-align: right; white-space: nowrap; }
+.cheia caption { color: var(--rio); }
+.seca caption { color: #8A5A00; }
+
+@media (max-width: 860px) {
+  .ra-grade { grid-template-columns: 1fr; }
+  .nivel-grande { font-size: 2.5rem; }
+}

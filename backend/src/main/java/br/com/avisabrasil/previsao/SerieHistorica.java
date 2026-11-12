@@ -57,6 +57,10 @@ public class SerieHistorica {
                 amostras.size()));
     }
 
+    public NavigableMap<LocalDate, Double> valores() {
+        return valores;
+    }
+
     public Optional<Map.Entry<LocalDate, Double>> maximo() {
         return valores.entrySet().stream().max(Map.Entry.comparingByValue());
     }
