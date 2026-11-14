@@ -209,15 +209,16 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 
 /* ---------- Celular ---------- */
 
-@media (max-width: 700px) {
-  /* menu em grade: as 6 telas ficam à vista, sem rolar para o lado */
+@media (max-width: 960px) {
+  /* menu em grade: as 7 telas ficam à vista (4 + 3), sem rolar para o lado */
   .navegacao ul {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 0;
     padding: 0;
     overflow: visible;
   }
+  .navegacao li { flex: 1 1 25%; }
   .navegacao a {
     justify-content: center;
     text-align: center;
@@ -228,6 +229,9 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
     font-size: 0.92rem;
     border-bottom-width: 4px;
   }
+}
+@media (max-width: 400px) {
+  .navegacao a { font-size: 0.85rem; padding: 6px 2px; }
 }
 
 @media (max-width: 600px) {
@@ -296,3 +300,20 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 
 .atalhos-offline { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 0; }
 .atalhos-offline .botao { flex: 1 1 220px; margin-top: 0; min-height: 60px; font-size: 1.15rem; }
+
+/* ---------- Avisos oficiais do INMET (Início e Entenda os riscos) ---------- */
+
+.avisos-inmet h2 { display: flex; align-items: center; gap: 10px; }
+.avisos-inmet h2 svg { width: 28px; height: 28px; flex: none; color: var(--alerta); }
+.avisos-inmet.com-aviso { border: 3px solid var(--alerta); }
+.aviso-inmet { border-top: 1px solid var(--borda); padding-top: 12px; margin-top: 12px; }
+.aviso-inmet:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
+.aviso-inmet-topo { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px; }
+.aviso-inmet-topo h3 { margin: 0; font-size: 1.3rem; }
+.aviso-inmet-quando { display: flex; gap: 8px; align-items: flex-start; font-weight: 700; margin: 0 0 8px; }
+.aviso-inmet-quando svg { width: 22px; height: 22px; flex: none; margin-top: 2px; }
+.inmet-nenhum { display: flex; gap: 10px; align-items: center; font-weight: 700; color: var(--normal); margin: 0 0 10px; }
+.inmet-nenhum svg { width: 28px; height: 28px; flex: none; }
+.inmet-recentes summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 700; color: var(--rio); }
+.inmet-recentes ul { margin: 4px 0 0; padding-left: 1.2em; }
+.inmet-recentes li { margin: 6px 0; }

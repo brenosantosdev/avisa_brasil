@@ -101,6 +101,7 @@ public record AvisaBrasilProperties(Comunidade comunidade, Fontes fontes, Ana an
             Fonte glofas,
             Fonte glofasHistorico,
             Overpass overpass,
+            Inmet inmet,
             Duration novaTentativa,
             Path pastaCache) {
     }
@@ -113,6 +114,17 @@ public record AvisaBrasilProperties(Comunidade comunidade, Fontes fontes, Ana an
      * @param servidores servidores Overpass, tentados em ordem
      * @param raioMetros raio em volta da sede onde procurar pontos
      */
+    /**
+     * Avisos meteorológicos do INMET. O RSS lista as áreas por mesorregião; o aviso completo (CAP) traz os
+     * municípios com o código do IBGE, que é o que decide se o aviso vale para a comunidade.
+     *
+     * @param mesorregiao mesorregião do IBGE da comunidade, para escolher quais avisos abrir
+     * @param codigoIbge código do município no IBGE (São Gabriel da Cachoeira = 1303809)
+     * @param diasRecentes quantos dias de avisos já encerrados mostrar como "últimos avisos"
+     */
+    public record Inmet(String url, Duration intervalo, String mesorregiao, String codigoIbge, int diasRecentes) {
+    }
+
     public record Overpass(List<String> servidores, Duration intervalo, int raioMetros) {
     }
 }

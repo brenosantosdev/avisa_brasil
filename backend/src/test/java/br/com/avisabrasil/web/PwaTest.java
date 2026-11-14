@@ -84,7 +84,7 @@ class PwaTest {
         String codigo = sw();
         List<String> arquivos = new ArrayList<>(lista(codigo, "TELAS_SEM_CONEXAO"));
         arquivos.addAll(lista(codigo, "ARQUIVOS"));
-        assertThat(arquivos).contains("/", "/ajuda.html", "/offline.html");
+        assertThat(arquivos).contains("/", "/ajuda.html", "/riscos.html", "/offline.html");
         for (String arquivo : arquivos) {
             mockMvc.perform(get(arquivo)).andExpect(status().isOk());
         }
@@ -93,7 +93,7 @@ class PwaTest {
     @Test
     void serviceWorkerSoGuardaDadosPublicos() throws Exception {
         List<String> dados = lista(sw(), "DADOS_SEM_CONEXAO");
-        assertThat(dados).containsExactlyInAnyOrder("/api/comunidade", "/api/risco", "/api/pedidos-ajuda/privacidade");
+        assertThat(dados).containsExactlyInAnyOrder("/api/comunidade", "/api/risco", "/api/avisos-inmet", "/api/pedidos-ajuda/privacidade");
         // nenhum deles exige a senha do painel (dados da Defesa Civil e pedidos de outras pessoas nunca ficam no celular)
         for (String dado : dados) {
             mockMvc.perform(get(dado)).andExpect(status().isOk());

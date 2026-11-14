@@ -1,0 +1,58 @@
+/* Tela "Entenda os riscos" */
+
+.risco-cheia { --cor-risco: #0B4F73; --fundo-risco: #E3EFF6; }
+.risco-seca { --cor-risco: #8A5A00; --fundo-risco: #FFF4CC; }
+.risco-calor { --cor-risco: #A3221B; --fundo-risco: #FBE3E1; }
+.risco-deslizamento { --cor-risco: #6B4A2B; --fundo-risco: #F1E6DA; }
+
+/* Índice: 4 botões grandes (ícone + cor + palavra) */
+.indice-riscos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 8px;
+}
+.botao-risco {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 96px;
+  padding: 12px 8px;
+  border-radius: 12px;
+  border: 3px solid var(--cor-risco);
+  background: var(--fundo-risco);
+  color: var(--cor-risco);
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-align: center;
+  text-decoration: none;
+}
+.botao-risco svg { width: 36px; height: 36px; }
+
+/* Cada risco */
+.risco { border-top: 8px solid var(--cor-risco); scroll-margin-top: 12px; }
+.risco-topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+.risco h2 { display: flex; align-items: center; gap: 12px; margin: 0; color: var(--cor-risco); font-size: 1.8rem; }
+.risco h2 svg { width: 40px; height: 40px; flex: none; }
+.risco h3 { margin: 18px 0 8px; font-size: 1.2rem; }
+.risco p { margin: 0 0 8px; }
+
+.botao-ouvir-risco[aria-pressed="true"] { background: var(--atencao); color: var(--texto); border-color: var(--texto); }
+
+.lista-sinais, .lista-proteger { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.lista-sinais li, .lista-proteger li { display: flex; gap: 10px; align-items: flex-start; }
+.lista-sinais svg, .lista-proteger svg { width: 24px; height: 24px; flex: none; margin-top: 2px; }
+.lista-sinais svg { color: var(--alerta); }
+.lista-proteger svg { color: var(--normal); }
+
+.risco-aqui { margin-top: 18px; padding: 14px; border-radius: 10px; background: var(--fundo-risco); }
+.risco-aqui h3 { margin-top: 0; }
+.risco-aqui .botao { margin-top: 6px; }
+
+@media (max-width: 700px) {
+  .indice-riscos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .risco h2 { font-size: 1.5rem; }
+  .botao-ouvir-risco { width: 100%; }
+}

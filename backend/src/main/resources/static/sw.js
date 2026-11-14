@@ -1,5 +1,5 @@
 /* AvisaBrasil: service worker (PWA).
-   - Telas que funcionam sem internet: Início, Preciso de ajuda (e Entenda os riscos, quando existir).
+   - Telas que funcionam sem internet: Início, Preciso de ajuda e Entenda os riscos.
    - Sempre tenta a rede primeiro; se não houver conexão, usa o que ficou salvo neste aparelho.
    - Dados: só os públicos da lista DADOS_SEM_CONEXAO. Nada do painel da Defesa Civil nem pedidos de ajuda
      de outras pessoas é guardado aqui.
@@ -7,23 +7,23 @@
      o dado foi salvo, para a tela mostrar o aviso "sem conexão" com o horário. */
 'use strict';
 
-const VERSAO = 'v1'; // mude quando a lista abaixo mudar, para baixar tudo de novo
+const VERSAO = 'v2'; // mude quando a lista abaixo mudar, para baixar tudo de novo
 const CACHE_TELAS = 'avisabrasil-telas-' + VERSAO;
 const CACHE_DADOS = 'avisabrasil-dados'; // não muda com a versão: guarda o último dado válido
 const CACHE_FONTES = 'avisabrasil-fontes';
 
 /** Telas abertas sem internet. Para acrescentar uma, ponha aqui o endereço e os arquivos dela em ARQUIVOS. */
-const TELAS_SEM_CONEXAO = ['/', '/ajuda.html', '/offline.html'];
+const TELAS_SEM_CONEXAO = ['/', '/ajuda.html', '/riscos.html', '/offline.html'];
 
 const ARQUIVOS = TELAS_SEM_CONEXAO.concat([
-  '/css/estilo.css', '/css/inicio.css', '/css/ajuda.css',
-  '/js/comum.js', '/js/inicio.js', '/js/ajuda.js',
+  '/css/estilo.css', '/css/inicio.css', '/css/ajuda.css', '/css/riscos.css',
+  '/js/comum.js', '/js/inicio.js', '/js/ajuda.js', '/js/riscos.js', '/js/avisos-inmet.js',
   '/i18n/pt.json', '/i18n/es.json', '/i18n/en.json',
   '/manifest.webmanifest', '/icones/icone.svg', '/icones/icone-192.png'
 ]);
 
 /** Dados públicos guardados para uso sem conexão (o caminho exato, sem parâmetros). */
-const DADOS_SEM_CONEXAO = ['/api/comunidade', '/api/risco', '/api/pedidos-ajuda/privacidade'];
+const DADOS_SEM_CONEXAO = ['/api/comunidade', '/api/risco', '/api/avisos-inmet', '/api/pedidos-ajuda/privacidade'];
 
 const FONTE_DO_TEXTO = 'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap';
 

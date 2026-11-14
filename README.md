@@ -3,7 +3,7 @@
 Rede de alerta de cheias e secas para comunidades ribeirinhas e indígenas, com linguagem simples, voz e orientação do que fazer.
 Projeto da **Global Solution 2026.2 da FIAP** (tema CitizenTech). Território piloto: **São Gabriel da Cachoeira (AM), Rio Negro**.
 
-> Estado atual: **etapa 10** (versão para celular: layout revisado, PWA instalável e telas principais sem internet). A etapa 9 (INMET e "Entenda os riscos") ainda não foi feita. Já prontos: idiomas (PT, ES, EN), VLibras, Ouvir, "Preciso de ajuda" com fila offline e Painel da Defesa Civil ao vivo. A tela **Início** mostra o semáforo da comunidade (maior risco entre cheia e seca),
+> Estado atual: **etapas 1 a 10** prontas; falta a 11 (firmware ESP32 no Wokwi). Já prontos: avisos oficiais do INMET, "Entenda os riscos", versão para celular (PWA instalável e sem internet), idiomas (PT, ES, EN), VLibras, Ouvir, "Preciso de ajuda" com fila offline e Painel da Defesa Civil ao vivo. **Apresentação:** roteiro, túnel HTTPS e checklist em [`docs/APRESENTACAO.md`](docs/APRESENTACAO.md). A tela **Início** mostra o semáforo da comunidade (maior risco entre cheia e seca),
 > calculado pelo motor de risco com dados reais da ANA, chuva e GloFAS, mais um sensor **simulado**. As telas
 > **O rio agora**, **Próximos dias** e **Mapa** também usam dados reais.
 
@@ -44,7 +44,7 @@ Quando aparecer `Started AvisabrasilApplication`, abra no navegador:
 
 Para parar, pressione `Ctrl + C` no terminal.
 
-**Console do H2:** JDBC URL `jdbc:h2:file:./data/avisabrasil;AUTO_SERVER=TRUE`, usuário `sa`, senha em branco.
+**Console do H2** (desligado por padrão; ligue com `$env:H2_CONSOLE = "true"` antes de subir, e nunca com um túnel aberto): JDBC URL `jdbc:h2:file:./data/avisabrasil;AUTO_SERVER=TRUE`, usuário `sa`, senha em branco.
 O arquivo do banco fica em `backend/data/` e não vai para o Git.
 
 **Porta ocupada?** Rode em outra porta: `.\mvnw.cmd spring-boot:run "-Dspring-boot.run.arguments=--server.port=8081"`
@@ -59,7 +59,19 @@ O arquivo do banco fica em `backend/data/` e não vai para o Git.
 | [OpenStreetMap](https://www.openstreetmap.org/copyright) via Overpass API | Escolas, unidades de saúde, prédios públicos e abrigos num raio de 8 km | 1 vez por dia |
 | [SGB/CPRM: Setorização de risco de São Gabriel da Cachoeira (2022)](https://rigeo.sgb.gov.br/handle/doc/22730) | 14 setores oficiais de risco alto e muito alto | arquivo fixo |
 | [ANA HidroWebService](https://www.ana.gov.br/hidrowebservice/swagger-ui/index.html), telemetria | Nível (cota) e vazão do Rio Negro a cada 15 min na estação 14330000 (Curicuriari) | a cada 15 min |
+| [INMET: avisos meteorológicos](https://avisos.inmet.gov.br/) (RSS + aviso completo CAP) | Avisos oficiais (tempestade, chuvas intensas, onda de calor...) que incluem São Gabriel da Cachoeira | a cada 30 min |
 | ANA HidroWebService, régua convencional | Histórico diário das estações 14330000 (desde 1977) e 14320001 (cidade, desde 1982) | baixado ano a ano; ano atual 1 vez por dia |
+
+### INMET: como os avisos são filtrados
+
+O RSS do INMET (`https://apiprevmet3.inmet.gov.br/avisos/rss`) lista as áreas só por **mesorregião**, e a
+"Norte Amazonense" é enorme (inclui Barcelos, Santa Isabel do Rio Negro, Japurá...). Por isso, o sistema abre o
+**aviso completo (CAP)** de cada aviso da mesorregião e só mostra os que trazem **São Gabriel da Cachoeira (código
+IBGE 1303809)** na lista de municípios. Exemplo real de 14/11/2026: um aviso de chuvas intensas valia para Barcelos e
+Santa Isabel, mas não para São Gabriel, e não aparece. Cada aviso CAP é baixado uma vez só. Quando o INMET
+republica o mesmo aviso com outro número, aparece só a versão mais recente. Os textos do aviso são os oficiais,
+em português (em espanhol e inglês, a tela diz isso). Os avisos aparecem no **Início** e em **Entenda os riscos**,
+mas não mudam o nível do motor de risco.
 
 ### ANA: estações e cotas
 
@@ -195,15 +207,22 @@ cookie HttpOnly e SameSite=Lax, válida por 8 horas. Para parar o servidor use `
   `static/icones/`. No Chrome do Android aparece o cartão **"Instalar no celular"** (Início e Preciso de ajuda);
   no iPhone, o cartão explica o "Adicionar à Tela de Início". Segurar o ícone mostra os atalhos "Preciso de ajuda"
   e "O rio agora".
-- **Sem internet** (`static/sw.js`, service worker): **Início** e **Preciso de ajuda** abrem com o último dado
-  salvo no celular e uma faixa escura **"Sem conexão"** com o horário do dado (o botão Ouvir também lê o aviso).
-  As outras telas mostram a página "Sem conexão", com atalhos e os telefones 199, 193 e 192. A tela
-  **Entenda os riscos** entra na lista `TELAS_SEM_CONEXAO` do `sw.js` quando existir (etapa 9).
-- O service worker sempre tenta a rede primeiro. Ele guarda só dados públicos (`/api/comunidade`, `/api/risco`
-  e o prazo de privacidade). **Nada do painel nem pedidos de ajuda de outras pessoas fica no celular.**
+- **Sem internet** (`static/sw.js`, service worker): **Início**, **Preciso de ajuda** e **Entenda os riscos** abrem
+  com o último dado salvo no celular e uma faixa escura **"Sem conexão"** com o horário do dado (o botão Ouvir
+  também lê o aviso). As outras telas mostram a página "Sem conexão", com atalhos e os telefones 199, 193 e 192.
+- O service worker sempre tenta a rede primeiro. Ele guarda só dados públicos (`/api/comunidade`, `/api/risco`,
+  `/api/avisos-inmet` e o prazo de privacidade). **Nada do painel nem pedidos de ajuda de outras pessoas fica no celular.**
 - O "instalar" e o service worker funcionam em `localhost` ou em HTTPS. Para testar num celular de verdade,
   publique o sistema com HTTPS (um IP da rede local com http não basta).
 - Teste rápido no computador: Chrome → F12 → Application → Service workers → marque **Offline** e recarregue.
+
+## Entenda os riscos
+
+`/riscos.html`: **cheia, seca, calor extremo e deslizamento**, cada um com "o que é", "sinais de perigo", "como se
+proteger" e "aqui em São Gabriel da Cachoeira", nos 3 idiomas. Cada risco tem o seu botão **Ouvir**, além do Ouvir
+da página. Os avisos do INMET aparecem no topo. Os dados locais citados vêm do próprio sistema:
+- as maiores cheias e secas das réguas da ANA (cheias entre junho e agosto; secas em fevereiro e março);
+- os setores do SGB de 2022 (8 dos 14 com deslizamento, outros com queda de blocos e erosão da margem do rio).
 
 ## Simulador do sensor (demonstração)
 

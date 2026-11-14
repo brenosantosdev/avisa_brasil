@@ -125,6 +125,8 @@
     partes.push(t('inicio.perguntaSeguro') + ' ' + t('nivel.' + r.nivel) + (r.tipo ? ', ' + t('tipoRisco.' + r.tipo) : '') + '. ' +
       t('seguro.' + chaveDoNivel(r)));
     partes.push(t('inicio.perguntaAcontecendo') + ' ' + (r.principal ? AB.textoFator(r.principal) : t('inicio.semRisco')));
+    const inmet = AvisosInmet.textoParaOuvir(AvisosInmet.ultima(), false);
+    if (inmet) partes.push(inmet);
     partes.push(t('inicio.perguntaFazer') + ' ' + AB.lista('acoes.' + chaveDoNivel(r)).join(' '));
     return partes.join(' ');
   }
@@ -141,6 +143,7 @@
     renderizarAcontecendo(risco);
     renderizarFazer(risco);
     renderizarFontes(risco);
+    AvisosInmet.renderizar(document.getElementById('avisos-inmet'), await AvisosInmet.carregar());
   }
 
   async function iniciar() {

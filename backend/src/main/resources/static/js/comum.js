@@ -188,6 +188,9 @@
     lixeira: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
     camadas: '<path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/>',
     semSinal: '<path d="M2 8.5a15 15 0 0 1 6-3.2M12 5a15 15 0 0 1 10 3.5M5 12a10 10 0 0 1 4.5-2.3M15.5 10a10 10 0 0 1 3.5 2M8.5 15.5a5 5 0 0 1 6.5-.3"/><path d="M12 19.5v.5"/><path d="M3 3l18 18"/>',
+    cheia: '<path d="M4 11l8-6 8 6"/><path d="M6 10v5h12v-5"/><path d="M2 19c2-1.5 3.5-1.5 5 0s3.5 1.5 5 0 3.5-1.5 5 0 3 1.5 5 0"/>',
+    seca: '<circle cx="12" cy="8" r="3.5"/><path d="M12 1.5V3M4 8h1.5M18.5 8H20M6.6 3.6l1 1M17.4 3.6l-1 1"/><path d="M2 15h20"/><path d="M7 15l1.5 2.5-1 3.5M13 15l-1 2.5 1.5 3.5M18 15l1 3"/>',
+    deslizamento: '<path d="M2 20h20"/><path d="M3 20L12 7l3.5 4.5"/><circle cx="17" cy="15.5" r="1.6"/><circle cx="20.5" cy="18.3" r="1.1"/><path d="M14.5 13.2l1 1.1"/>',
     instalar: '<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7v7M9 11l3 3 3-3M10 18h4"/>'
   };
 
@@ -265,17 +268,21 @@
 
   /* ---------- Botão "Ouvir" (Web Speech API) ---------- */
 
-  function configurarOuvir(gerarTexto) {
-    const botao = document.getElementById('botao-ouvir');
-    if (!botao) return;
-    const rotulo = botao.querySelector('span');
+  /** Botão que lê um texto em voz alta e vira "Parar" enquanto fala. Só um botão fala de cada vez. */
+  let botaoFalando = null;
+
+  function ligarBotaoDeVoz(botao, gerarTexto, rotuloOuvir, comAvisoDeConexao) {
     const voz = window.speechSynthesis;
+    const rotulo = botao.querySelector('span');
 
     function mostrar(falando) {
       botao.setAttribute('aria-pressed', falando ? 'true' : 'false');
-      botao.querySelector('svg').outerHTML = icone(falando ? 'parar' : 'som');
-      rotulo.textContent = t(falando ? 'ouvir.parar' : 'ouvir');
+      const svg = botao.querySelector('svg');
+      if (svg) svg.outerHTML = icone(falando ? 'parar' : 'som');
+      else botao.insertAdjacentHTML('afterbegin', icone(falando ? 'parar' : 'som'));
+      rotulo.textContent = falando ? t('ouvir.parar') : rotuloOuvir;
     }
+    botao.mostrarFala = mostrar;
 
     mostrar(false);
     if (!voz) {
@@ -285,20 +292,31 @@
     }
 
     botao.addEventListener('click', function () {
-      if (voz.speaking) {
+      const eraEste = botaoFalando === botao;
+      if (voz.speaking || botaoFalando) {
         voz.cancel();
-        mostrar(false);
-        return;
+        if (botaoFalando) botaoFalando.mostrarFala(false);
+        botaoFalando = null;
+        if (eraEste) return;
       }
       const aviso = document.getElementById('aviso-conexao');
-      const fala = new SpeechSynthesisUtterance((aviso && !aviso.hidden ? aviso.textContent + ' ' : '') + gerarTexto());
+      const prefixo = comAvisoDeConexao && aviso && !aviso.hidden ? aviso.textContent + ' ' : '';
+      const fala = new SpeechSynthesisUtterance(prefixo + gerarTexto());
       fala.lang = localidade;
       fala.rate = 0.9;
-      fala.onend = function () { mostrar(false); };
-      fala.onerror = function () { mostrar(false); };
+      fala.onend = fala.onerror = function () {
+        if (botaoFalando === botao) botaoFalando = null;
+        mostrar(false);
+      };
       voz.speak(fala);
+      botaoFalando = botao;
       mostrar(true);
     });
+  }
+
+  function configurarOuvir(gerarTexto) {
+    const botao = document.getElementById('botao-ouvir');
+    if (botao) ligarBotaoDeVoz(botao, gerarTexto, t('ouvir'), true);
   }
 
   /* ---------- Topo comum ---------- */
@@ -309,6 +327,7 @@
     { id: 'proximos-dias', href: '/proximos-dias.html', texto: 'nav.proximosDias' },
     { id: 'mapa', href: '/mapa.html', texto: 'nav.mapa' },
     { id: 'ajuda', href: '/ajuda.html', texto: 'nav.ajuda' },
+    { id: 'riscos', href: '/riscos.html', texto: 'nav.riscos' },
     { id: 'painel', href: '/painel.html', texto: 'nav.painel' }
   ];
 
@@ -542,6 +561,7 @@
     avisoSituacao: avisoSituacao,
     rodapeFonte: rodapeFonte,
     configurarOuvir: configurarOuvir,
+    ligarBotaoDeVoz: ligarBotaoDeVoz,
     iniciarPagina: iniciarPagina
   };
 })();

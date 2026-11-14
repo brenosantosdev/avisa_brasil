@@ -1,6 +1,7 @@
 package br.com.avisabrasil.agendador;
 
 import br.com.avisabrasil.ajuda.PedidosAjudaServico;
+import br.com.avisabrasil.avisos.AvisosInmetServico;
 import br.com.avisabrasil.mapa.MapaServico;
 import br.com.avisabrasil.previsao.PrevisaoRioServico;
 import br.com.avisabrasil.previsao.PrevisaoTempoServico;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Confere a cada minuto se alguma fonte precisa ser atualizada. Cada cache decide sozinho
- * (Open-Meteo a cada 1 hora, GloFAS a cada 6 horas, histórico e OpenStreetMap uma vez por dia,
+ * (Open-Meteo a cada 1 hora, GloFAS a cada 6 horas, avisos do INMET a cada 30 minutos, histórico e OpenStreetMap uma vez por dia,
  * e nova tentativa 5 minutos depois de uma falha). Depois, o motor de risco reavalia o nível.
  */
 @Component
@@ -28,10 +29,11 @@ public class AtualizadorDeFontes {
     private final HistoricoAnaServico historicoAna;
     private final MotorDeRisco motor;
     private final PedidosAjudaServico pedidos;
+    private final AvisosInmetServico avisosInmet;
 
     public AtualizadorDeFontes(PrevisaoTempoServico tempo, PrevisaoRioServico rio, MapaServico mapa,
             RioAgoraServico rioAgora, HistoricoAnaServico historicoAna, MotorDeRisco motor,
-            PedidosAjudaServico pedidos) {
+            PedidosAjudaServico pedidos, AvisosInmetServico avisosInmet) {
         this.tempo = tempo;
         this.rio = rio;
         this.mapa = mapa;
@@ -39,6 +41,7 @@ public class AtualizadorDeFontes {
         this.historicoAna = historicoAna;
         this.motor = motor;
         this.pedidos = pedidos;
+        this.avisosInmet = avisosInmet;
     }
 
     @Scheduled(initialDelay = 0, fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
@@ -47,6 +50,7 @@ public class AtualizadorDeFontes {
         rio.atualizarSeNecessario();
         mapa.atualizarSeNecessario();
         rioAgora.atualizarSeNecessario();
+        avisosInmet.atualizarSeNecessario();
         motor.avaliar();
     }
 
