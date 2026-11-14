@@ -435,5 +435,15 @@
     "Tudo é opcional: nome, telefone e localização. Você pode pedir ajuda sem eles.",
     "Por que podemos usar: para proteger a vida (LGPD, art. 7º, VII). Para pedir que apaguem seus dados, fale com a Defesa Civil."
   ],
-  "painel.limpar.pedidos": "Também apagar todos os pedidos de ajuda e respostas (só para preparar a apresentação)"
+  "painel.limpar.pedidos": "Também apagar todos os pedidos de ajuda e respostas (só para preparar a apresentação)",
+  "conexao.sem": "Sem conexão com a internet. Esta tela continua funcionando com o que está salvo neste celular.",
+  "conexao.dadoSalvo": "Sem conexão. Mostrando o último dado salvo neste celular, de {quando}. A situação pode ter mudado: ouça o rádio e os avisos da Defesa Civil.",
+  "conexao.semDadoSalvo": "Sem conexão, e este celular ainda não tem dados salvos. Quando a internet voltar, os dados aparecem sozinhos.",
+  "instalar.titulo": "Instalar no celular",
+  "instalar.explica": "O AvisaBrasil fica na tela do celular, como um aplicativo, e abre mesmo sem internet (Início e Preciso de ajuda), com o último dado salvo.",
+  "instalar.botao": "Instalar o AvisaBrasil",
+  "instalar.ios": "No iPhone: toque no botão Compartilhar e depois em \"Adicionar à Tela de Início\".",
+  "offline.titulo": "Sem conexão",
+  "offline.explica": "Esta tela precisa de internet. Sem conexão, estas telas funcionam com o último dado salvo neste celular:",
+  "offline.ligar": "A ligação de telefone funciona mesmo sem internet."
 }

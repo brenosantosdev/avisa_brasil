@@ -186,7 +186,9 @@
     local: '<path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
     pessoa: '<circle cx="12" cy="6" r="3"/><path d="M12 10v6M8 21l4-5 4 5M7 13h10"/>',
     lixeira: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
-    camadas: '<path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/>'
+    camadas: '<path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/>',
+    semSinal: '<path d="M2 8.5a15 15 0 0 1 6-3.2M12 5a15 15 0 0 1 10 3.5M5 12a10 10 0 0 1 4.5-2.3M15.5 10a10 10 0 0 1 3.5 2M8.5 15.5a5 5 0 0 1 6.5-.3"/><path d="M12 19.5v.5"/><path d="M3 3l18 18"/>',
+    instalar: '<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7v7M9 11l3 3 3-3M10 18h4"/>'
   };
 
   function icone(nome, titulo) {
@@ -288,7 +290,8 @@
         mostrar(false);
         return;
       }
-      const fala = new SpeechSynthesisUtterance(gerarTexto());
+      const aviso = document.getElementById('aviso-conexao');
+      const fala = new SpeechSynthesisUtterance((aviso && !aviso.hidden ? aviso.textContent + ' ' : '') + gerarTexto());
       fala.lang = localidade;
       fala.rate = 0.9;
       fala.onend = function () { mostrar(false); };
@@ -312,7 +315,7 @@
   /** Título da aba do navegador no idioma escolhido. */
   function traduzirTitulo(atual) {
     const pagina = PAGINAS.find(function (p) { return p.id === atual; });
-    const chave = atual === 'painel' ? 'painel.titulo' : (pagina ? pagina.texto : null);
+    const chave = atual === 'painel' ? 'painel.titulo' : atual === 'offline' ? 'offline.titulo' : (pagina ? pagina.texto : null);
     document.title = !chave || atual === 'inicio' ? t('app.nome') : t(chave) + ' · ' + t('app.nome');
   }
 
@@ -361,6 +364,115 @@
     document.body.appendChild(script);
   }
 
+  /* ---------- Sem conexão ---------- */
+
+  const aoVoltar = [];
+
+  function mostrarAvisoConexao(texto) {
+    const nav = document.getElementById('navegacao');
+    if (nav && nav.dataset.atual === 'offline') return; // a própria página já diz "sem conexão"
+    let aviso = document.getElementById('aviso-conexao');
+    if (!aviso) {
+      const main = document.querySelector('main');
+      if (!main) return;
+      aviso = document.createElement('div');
+      aviso.id = 'aviso-conexao';
+      aviso.className = 'aviso-conexao';
+      aviso.setAttribute('role', 'status');
+      aviso.setAttribute('aria-live', 'polite');
+      main.insertBefore(aviso, main.firstChild);
+    }
+    aviso.innerHTML = icone('semSinal') + '<span>' + escapar(texto) + '</span>';
+    aviso.hidden = false;
+  }
+
+  function esconderAvisoConexao() {
+    const aviso = document.getElementById('aviso-conexao');
+    if (aviso) aviso.hidden = true;
+  }
+
+  /**
+   * fetch que avisa quando não há conexão. Sem internet, o service worker devolve o último dado salvo com
+   * o cabeçalho X-Sem-Conexao (e X-Salvo-Em). Com mostrarData, o aviso diz de quando é o dado salvo.
+   */
+  async function buscar(url, opcoes, mostrarData) {
+    let resposta;
+    try {
+      resposta = await fetch(url, opcoes);
+    } catch (e) {
+      mostrarAvisoConexao(t('conexao.sem'));
+      throw e;
+    }
+    if (resposta.headers.get('X-Sem-Conexao')) {
+      const salvoEm = resposta.headers.get('X-Salvo-Em');
+      if (!resposta.ok) mostrarAvisoConexao(t('conexao.semDadoSalvo'));
+      else if (mostrarData && salvoEm) mostrarAvisoConexao(t('conexao.dadoSalvo', { quando: quando(salvoEm) }));
+      else if (!document.querySelector('#aviso-conexao:not([hidden])')) mostrarAvisoConexao(t('conexao.sem'));
+    } else if (resposta.ok) {
+      esconderAvisoConexao();
+    }
+    return resposta;
+  }
+
+  /** A tela pede para recarregar os dados quando a internet voltar. */
+  function aoVoltarConexao(funcao) {
+    aoVoltar.push(funcao);
+  }
+
+  window.addEventListener('offline', function () { mostrarAvisoConexao(t('conexao.sem')); });
+  window.addEventListener('online', function () {
+    esconderAvisoConexao();
+    aoVoltar.forEach(function (f) { f(); });
+  });
+
+  /* ---------- Instalar no celular (PWA) ---------- */
+
+  let pedidoDeInstalacao = null;
+
+  function instalado() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  function mostrarConviteInstalar() {
+    const lugar = document.getElementById('lugar-instalar');
+    if (!lugar || instalado()) return;
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (!pedidoDeInstalacao && !ios) { lugar.innerHTML = ''; return; }
+    lugar.innerHTML = '<section class="cartao secao convite-instalar" aria-labelledby="titulo-instalar">' +
+      '<h2 id="titulo-instalar">' + icone('instalar') + escapar(t('instalar.titulo')) + '</h2>' +
+      '<p>' + escapar(t('instalar.explica')) + '</p>' +
+      (pedidoDeInstalacao
+        ? '<button type="button" class="botao botao-primario botao-largo" id="botao-instalar">' + icone('instalar') +
+          '<span>' + escapar(t('instalar.botao')) + '</span></button>'
+        : '<p class="nota">' + escapar(t('instalar.ios')) + '</p>') +
+      '</section>';
+    const botao = document.getElementById('botao-instalar');
+    if (botao) {
+      botao.addEventListener('click', async function () {
+        const pedido = pedidoDeInstalacao;
+        pedidoDeInstalacao = null;
+        pedido.prompt();
+        await pedido.userChoice.catch(function () { return null; });
+        mostrarConviteInstalar();
+      });
+    }
+  }
+
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault(); // o convite aparece no nosso cartão, com explicação
+    pedidoDeInstalacao = e;
+    if (textos._idioma) mostrarConviteInstalar();
+  });
+  window.addEventListener('appinstalled', function () {
+    pedidoDeInstalacao = null;
+    mostrarConviteInstalar();
+  });
+
+  function registrarServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    navigator.serviceWorker.register('/sw.js').catch(function () { /* sem PWA: a tela funciona com internet */ });
+  }
+
   /** Monta o menu em <nav id="navegacao" data-atual="..."> marcando a página atual. */
   function montarNavegacao() {
     const nav = document.getElementById('navegacao');
@@ -380,8 +492,13 @@
     traduzirTitulo(nav ? nav.dataset.atual : null);
     montarSeletorIdioma();
     carregarVLibras();
+    registrarServiceWorker();
+    mostrarConviteInstalar();
+    if (navigator.onLine === false) mostrarAvisoConexao(t('conexao.sem'));
     try {
-      const comunidade = await (await fetch('/api/comunidade')).json();
+      const resposta = await buscar('/api/comunidade');
+      if (!resposta.ok) throw new Error('sem dados da comunidade');
+      const comunidade = await resposta.json();
       document.querySelectorAll('[data-comunidade-local]').forEach(function (el) {
         el.textContent = t('app.local', { lugar: comunidade.nome, uf: comunidade.uf, rio: comunidade.rio });
       });
@@ -389,6 +506,14 @@
     } catch (e) {
       return { nome: '', uf: '', rio: '' };
     }
+  }
+
+  /* ---------- Gráficos (Chart.js) ---------- */
+
+  if (window.Chart) {
+    window.Chart.defaults.font.family = "'Atkinson Hyperlegible', system-ui, sans-serif";
+    window.Chart.defaults.font.size = window.matchMedia('(max-width: 600px)').matches ? 14 : 15;
+    window.Chart.defaults.color = '#10262E';
   }
 
   window.AB = {
@@ -409,6 +534,8 @@
     mesEAno: mesEAno,
     quando: quando,
     hora: hora,
+    buscar: buscar,
+    aoVoltarConexao: aoVoltarConexao,
     idioma: function () { return idiomaAtual; },
     icone: icone,
     escapar: escapar,

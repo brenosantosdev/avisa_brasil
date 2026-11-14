@@ -3,7 +3,7 @@
 Rede de alerta de cheias e secas para comunidades ribeirinhas e indígenas, com linguagem simples, voz e orientação do que fazer.
 Projeto da **Global Solution 2026.2 da FIAP** (tema CitizenTech). Território piloto: **São Gabriel da Cachoeira (AM), Rio Negro**.
 
-> Estado atual: **etapa 8** (português, espanhol e inglês, VLibras e botão Ouvir no idioma escolhido), depois do "Preciso de ajuda" com fila offline e do Painel da Defesa Civil ao vivo. A tela **Início** mostra o semáforo da comunidade (maior risco entre cheia e seca),
+> Estado atual: **etapa 10** (versão para celular: layout revisado, PWA instalável e telas principais sem internet). A etapa 9 (INMET e "Entenda os riscos") ainda não foi feita. Já prontos: idiomas (PT, ES, EN), VLibras, Ouvir, "Preciso de ajuda" com fila offline e Painel da Defesa Civil ao vivo. A tela **Início** mostra o semáforo da comunidade (maior risco entre cheia e seca),
 > calculado pelo motor de risco com dados reais da ANA, chuva e GloFAS, mais um sensor **simulado**. As telas
 > **O rio agora**, **Próximos dias** e **Mapa** também usam dados reais.
 
@@ -185,6 +185,25 @@ cookie HttpOnly e SameSite=Lax, válida por 8 horas. Para parar o servidor use `
   está completo (mesmas chaves, listas e `{variáveis}`).
 - Ficam em português: as mensagens dos alertas enviados (ntfy, Telegram, SMS) e os avisos técnicos do painel
   sobre variáveis de ambiente.
+
+## Versão para celular (PWA)
+
+- **Layout:** todas as telas foram revisadas em 320 a 390 px de largura. O menu vira uma grade (as 6 telas à
+  vista, sem rolar para o lado), notas e fontes ficam com 16 px ou mais e a **régua do rio** é desenhada na
+  largura real da tela, com os nomes das cotas numa lista abaixo dela.
+- **Instalável:** `manifest.webmanifest` com ícones de 192 e 512 px (e versão adaptável para Android) em
+  `static/icones/`. No Chrome do Android aparece o cartão **"Instalar no celular"** (Início e Preciso de ajuda);
+  no iPhone, o cartão explica o "Adicionar à Tela de Início". Segurar o ícone mostra os atalhos "Preciso de ajuda"
+  e "O rio agora".
+- **Sem internet** (`static/sw.js`, service worker): **Início** e **Preciso de ajuda** abrem com o último dado
+  salvo no celular e uma faixa escura **"Sem conexão"** com o horário do dado (o botão Ouvir também lê o aviso).
+  As outras telas mostram a página "Sem conexão", com atalhos e os telefones 199, 193 e 192. A tela
+  **Entenda os riscos** entra na lista `TELAS_SEM_CONEXAO` do `sw.js` quando existir (etapa 9).
+- O service worker sempre tenta a rede primeiro. Ele guarda só dados públicos (`/api/comunidade`, `/api/risco`
+  e o prazo de privacidade). **Nada do painel nem pedidos de ajuda de outras pessoas fica no celular.**
+- O "instalar" e o service worker funcionam em `localhost` ou em HTTPS. Para testar num celular de verdade,
+  publique o sistema com HTTPS (um IP da rede local com http não basta).
+- Teste rápido no computador: Chrome → F12 → Application → Service workers → marque **Offline** e recarregue.
 
 ## Simulador do sensor (demonstração)
 

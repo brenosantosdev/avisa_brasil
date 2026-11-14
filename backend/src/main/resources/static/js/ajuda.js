@@ -155,7 +155,7 @@
     };
     desenhar();
     try {
-      const r = await (await fetch('/api/pedidos-ajuda/privacidade')).json();
+      const r = await (await AB.buscar('/api/pedidos-ajuda/privacidade')).json();
       if (r && r.diasDeRetencao) {
         diasDeRetencao = r.diasDeRetencao;
         desenhar();

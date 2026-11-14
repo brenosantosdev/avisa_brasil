@@ -24,6 +24,14 @@
 .regua-svg { width: 100%; height: auto; display: block; }
 .regua-svg text { font-family: inherit; font-size: 13px; fill: var(--texto); }
 .regua-svg .rotulo-cota { font-weight: 700; }
+/* celular: desenho na largura real, letras de 15 px e os nomes das cotas numa lista */
+.regua-svg.regua-estreita text { font-size: 15px; }
+.regua-lista { list-style: none; margin: 12px 0 0; padding: 0; }
+.regua-lista li { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--borda); }
+.regua-lista svg { width: 32px; height: 10px; flex: none; }
+.regua-lista span { flex: 1; }
+.regua-lista .rotulo-hoje { font-weight: 700; }
+.regua-lista strong { white-space: nowrap; }
 
 /* ---------- Comparação ANA × GloFAS ---------- */
 
@@ -37,7 +45,7 @@
 
 /* ---------- Histórico ---------- */
 
-.historico-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.historico-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 16px; }
 .tabela-eventos { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 1rem; }
 .tabela-eventos caption { text-align: left; font-weight: 700; font-size: 1.05rem; padding: 6px 0; }
 .tabela-eventos th, .tabela-eventos td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--borda); }

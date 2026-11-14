@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sem conexão · AvisaBrasil</title>
+  <meta name="theme-color" content="#0B4F73">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icones/icone.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icones/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="AvisaBrasil">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilo.css">
+  <link rel="stylesheet" href="/css/ajuda.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 13c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 18c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/></svg>
+        <span>
+          <span class="marca-nome" data-i18n="app.nome">AvisaBrasil</span>
+          <span class="marca-local" data-comunidade-local></span>
+        </span>
+      </a>
+      <button id="botao-ouvir" class="botao botao-ouvir" type="button" aria-pressed="false">
+        <svg aria-hidden="true"></svg><span data-i18n="ouvir">Ouvir</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="navegacao" id="navegacao" data-atual="offline"></nav>
+
+  <main>
+    <h1 data-i18n="offline.titulo">Sem conexão</h1>
+    <p class="intro" data-i18n="offline.explica"></p>
+    <div class="atalhos-offline">
+      <a class="botao botao-primario" href="/"><span data-i18n="nav.inicio">Início</span></a>
+      <a class="botao botao-ajuda" href="/ajuda.html"><span data-i18n="nav.ajuda">Preciso de ajuda</span></a>
+    </div>
+
+    <section class="cartao secao" aria-labelledby="titulo-urgente">
+      <h2 id="titulo-urgente" data-i18n="ajuda.urgente">Se for urgente, ligue agora</h2>
+      <p class="nota" data-i18n="offline.ligar"></p>
+      <div class="ligacoes">
+        <a class="botao botao-ligar" href="tel:199"><span data-i18n="ajuda.ligar199"></span></a>
+        <a class="botao botao-ligar" href="tel:193"><span data-i18n="ajuda.ligar193"></span></a>
+        <a class="botao botao-ligar" href="tel:192"><span data-i18n="ajuda.ligar192"></span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape"><p data-i18n="app.rodape"></p></footer>
+
+  <script src="/js/comum.js"></script>
+  <script>
+    (async function () {
+      await AB.iniciarPagina();
+      document.querySelectorAll('.botao-ligar').forEach(function (b) { b.insertAdjacentHTML('afterbegin', AB.icone('alerta')); });
+      AB.configurarOuvir(function () {
+        return [AB.t('offline.titulo'), AB.t('offline.explica'), AB.t('ajuda.urgente'), AB.t('offline.ligar'),
+          AB.t('ajuda.ligar199'), AB.t('ajuda.ligar193'), AB.t('ajuda.ligar192')].join('. ');
+      });
+    })();
+  </script>
+</body>
+</html>

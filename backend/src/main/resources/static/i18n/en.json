@@ -435,5 +435,15 @@
     "Everything is optional: name, phone and location. You can ask for help without them.",
     "Why we can use it: to protect life (Brazil's LGPD, art. 7, VII). To ask for your data to be deleted, talk to Civil Defense."
   ],
-  "painel.limpar.pedidos": "Also delete all help requests and replies (only to prepare the presentation)"
+  "painel.limpar.pedidos": "Also delete all help requests and replies (only to prepare the presentation)",
+  "conexao.sem": "No internet connection. This screen keeps working with what is saved on this phone.",
+  "conexao.dadoSalvo": "No connection. Showing the last data saved on this phone, from {quando}. The situation may have changed: listen to the radio and to Civil Defense warnings.",
+  "conexao.semDadoSalvo": "No connection, and this phone has no saved data yet. When the internet comes back, the data will appear automatically.",
+  "instalar.titulo": "Install on your phone",
+  "instalar.explica": "AvisaBrasil stays on your phone screen like an app and opens even without internet (Home and I need help), with the last saved data.",
+  "instalar.botao": "Install AvisaBrasil",
+  "instalar.ios": "On iPhone: tap the Share button and then \"Add to Home Screen\".",
+  "offline.titulo": "No connection",
+  "offline.explica": "This screen needs the internet. Without a connection, these screens work with the last data saved on this phone:",
+  "offline.ligar": "Phone calls work even without internet."
 }

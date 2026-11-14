@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- AvisaBrasil: três ondas do rio sobre o azul do rio; cabe na área segura dos ícones adaptáveis -->
+  <rect width="512" height="512" fill="#0B4F73"/>
+  <g transform="translate(-16 0)" fill="none" stroke="#FFFFFF" stroke-width="34" stroke-linecap="round">
+    <path d="M128 196c40-32 72-32 112 0s72 32 112 0 48-24 64-16"/>
+    <path d="M128 268c40-32 72-32 112 0s72 32 112 0 48-24 64-16"/>
+    <path d="M128 340c40-32 72-32 112 0s72 32 112 0 48-24 64-16"/>
+  </g>
+</svg>

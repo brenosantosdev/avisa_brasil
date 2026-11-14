@@ -30,8 +30,8 @@
     }).join('');
     alvo.innerHTML = '<div class="luzes">' + luzes + '</div><div>' +
       '<p class="pergunta" id="pergunta-seguro">' + AB.escapar(t('inicio.perguntaSeguro')) + '</p>' +
-      '<p class="palavra-nivel">' + AB.icone(ICONE[r.nivel]) + AB.escapar(t('nivel.' + r.nivel)) +
-      (r.tipo ? ' · ' + AB.escapar(t('tipoRisco.' + r.tipo)) : '') + '</p>' +
+      '<p class="palavra-nivel">' + AB.icone(ICONE[r.nivel]) + '<span>' + AB.escapar(t('nivel.' + r.nivel)) +
+      (r.tipo ? ' · ' + AB.escapar(t('tipoRisco.' + r.tipo)) : '') + '</span></p>' +
       '<p class="resposta">' + AB.escapar(t('seguro.' + chaveDoNivel(r))) + '</p></div>';
   }
 
@@ -131,7 +131,7 @@
 
   async function carregar() {
     try {
-      const resposta = await fetch('/api/risco', { cache: 'no-store' });
+      const resposta = await AB.buscar('/api/risco', { cache: 'no-store' }, true);
       risco = resposta.ok ? await resposta.json() : null;
     } catch (e) {
       risco = null;
@@ -150,6 +150,7 @@
     checklist(document.getElementById('mochila'), 'mochila', AB.lista('mochila'));
     await carregar();
     setInterval(carregar, ATUALIZAR_A_CADA_MS);
+    AB.aoVoltarConexao(carregar);
   }
 
   iniciar();

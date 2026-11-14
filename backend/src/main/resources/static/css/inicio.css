@@ -41,7 +41,7 @@
 
 .pergunta { font-size: 1.1rem; font-weight: 700; margin: 0; opacity: 0.9; }
 .palavra-nivel { font-size: 2.6rem; line-height: 1.1; font-weight: 700; margin: 4px 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.palavra-nivel svg { width: 44px; height: 44px; }
+.palavra-nivel svg { width: 44px; height: 44px; flex: none; }
 .resposta { font-size: 1.35rem; font-weight: 700; margin: 6px 0 0; }
 
 .inicio-grade {
@@ -82,5 +82,8 @@
 @media (max-width: 600px) {
   .semaforo { grid-template-columns: 1fr; }
   .luzes { flex-direction: row; justify-content: center; }
-  .palavra-nivel { font-size: 2.1rem; }
+  .palavra-nivel { font-size: 1.9rem; flex-wrap: nowrap; gap: 10px; }
+  .palavra-nivel svg { width: 36px; height: 36px; }
+  .resposta { font-size: 1.2rem; }
+  .semaforo { padding: 18px; gap: 14px; }
 }

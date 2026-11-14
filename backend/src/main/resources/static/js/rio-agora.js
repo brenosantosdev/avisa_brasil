@@ -103,9 +103,16 @@
 
   /* ---------- Régua ilustrada (SVG em escala) ---------- */
 
+  let dadosDaRegua = null;
+
   function renderizarRegua(d) {
     const alvo = document.getElementById('regua');
+    dadosDaRegua = d;
     if (!d || !d.atual) { alvo.innerHTML = ''; return; }
+    // No celular, a régua é desenhada na largura real da tela (1 unidade = 1 pixel) e os nomes das cotas
+    // vão para uma lista abaixo dela, em letra de tamanho normal. No computador, os nomes ficam no desenho.
+    const largura = alvo.clientWidth;
+    const estreito = largura > 0 && largura < 520;
     const hoje = d.atual.cotaCm;
     const cheia = d.historicoPrincipal.maioresCheias[0];
     const seca = d.historicoPrincipal.maioresSecas[0];
@@ -115,10 +122,11 @@
     const minimo = Math.floor((Math.min.apply(null, valores) - 120) / 100) * 100;
     const maximo = Math.ceil((Math.max.apply(null, valores) + 120) / 100) * 100;
 
-    const L = 400, A = 540, topo = 14, base = A - 14, xRegua = 54, larguraRegua = 26;
+    const L = estreito ? Math.round(largura) : 400, A = estreito ? 520 : 540, topo = 14, base = A - 14;
+    const xRegua = 54, larguraRegua = estreito ? 22 : 26;
     const y = function (cm) { return topo + (maximo - cm) / (maximo - minimo) * (base - topo); };
     const pxPorCm = (base - topo) / (maximo - minimo);
-    let s = '<svg class="regua-svg" viewBox="0 0 ' + L + ' ' + A + '" role="img" aria-label="' +
+    let s = '<svg class="regua-svg' + (estreito ? ' regua-estreita' : '') + '" viewBox="0 0 ' + L + ' ' + A + '" role="img" aria-label="' +
       AB.escapar(t('ra.regua.descricao', { hoje: metros(hoje) })) + '">';
 
     // céu e água (a água vai do nível de hoje até o fundo)
@@ -147,7 +155,8 @@
 
     // casa de palafita com o piso na cota de Emergência de cheia (ilustração) e o bonequinho de 1,60 m
     if (c) {
-      const piso = y(c.cheia.emergenciaCm), xCasa = 280, larguraCasa = 100, parede = 250 * pxPorCm;
+      const larguraCasa = estreito ? 76 : 100, xCasa = estreito ? L - larguraCasa - 14 : 280;
+      const piso = y(c.cheia.emergenciaCm), parede = 250 * pxPorCm;
       for (let i = 0; i < 4; i++) {
         const x = xCasa + 8 + i * (larguraCasa - 16) / 3;
         s += '<line x1="' + x + '" x2="' + x + '" y1="' + piso + '" y2="' + base + '" stroke="#6B4A2B" stroke-width="5"/>';
@@ -185,17 +194,32 @@
     let ultimoRotulo = -Infinity;
     linhas.forEach(function (l) {
       const yl = y(l[0]);
-      const yr = Math.max(yl - 4, ultimoRotulo + 15);
-      ultimoRotulo = yr;
       s += '<line x1="' + (xRegua + larguraRegua) + '" x2="' + (L - 6) + '" y1="' + yl + '" y2="' + yl + '" stroke="' + l[1] + '" stroke-width="' + (l[4] ? 3 : 2) + '"' +
         (l[3] ? ' stroke-dasharray="6 4"' : '') + '/>';
+      if (estreito && !l[4]) return; // no celular, só "Hoje" fica escrito no desenho
+      const yr = Math.max(yl - 4, ultimoRotulo + 15);
+      ultimoRotulo = yr;
       s += '<text x="' + (xRegua + larguraRegua + 6) + '" y="' + yr + '" class="' + (l[4] ? 'rotulo-cota' : '') + '" fill="' + l[1] + '"' +
         ' paint-order="stroke" stroke="#EAF3F8" stroke-width="3">' + AB.escapar(l[2] + ' · ' + metros(l[0])) + '</text>';
     });
     s += '</svg>';
 
-    alvo.innerHTML = s + '<p class="nota">' + AB.escapar(t('ra.regua.legenda', { estacao: d.estacao.nome })) + '</p>';
+    // lista das linhas, de cima para baixo, com o mesmo traço e a mesma cor do desenho
+    const lista = estreito ? '<ul class="regua-lista">' + linhas.map(function (l) {
+      return '<li><svg viewBox="0 0 32 10" aria-hidden="true"><line x1="0" x2="32" y1="5" y2="5" stroke="' + l[1] + '" stroke-width="' +
+        (l[4] ? 4 : 3) + '"' + (l[3] ? ' stroke-dasharray="6 4"' : '') + '/></svg><span' + (l[4] ? ' class="rotulo-hoje"' : '') + '>' +
+        AB.escapar(l[2]) + '</span><strong>' + AB.escapar(metros(l[0])) + '</strong></li>';
+    }).join('') + '</ul>' : '';
+
+    alvo.innerHTML = s + lista + '<p class="nota">' + AB.escapar(t('ra.regua.legenda', { estacao: d.estacao.nome })) + '</p>';
   }
+
+  // girar o celular ou mudar o tamanho da janela redesenha a régua na nova largura
+  let esperaRedesenho;
+  window.addEventListener('resize', function () {
+    clearTimeout(esperaRedesenho);
+    esperaRedesenho = setTimeout(function () { if (dadosDaRegua) renderizarRegua(dadosDaRegua); }, 200);
+  });
 
   /* ---------- Medição × modelo ---------- */
 

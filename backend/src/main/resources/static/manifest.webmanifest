@@ -1,0 +1,24 @@
+{
+  "name": "AvisaBrasil: alerta de cheias e secas",
+  "short_name": "AvisaBrasil",
+  "description": "Alerta de cheias e secas para São Gabriel da Cachoeira (AM), em linguagem simples e com voz. Funciona sem internet.",
+  "lang": "pt-BR",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F3F6F5",
+  "theme_color": "#0B4F73",
+  "categories": ["weather", "utilities"],
+  "icons": [
+    { "src": "/icones/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icones/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icones/icone-adaptavel-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icones/icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Preciso de ajuda", "url": "/ajuda.html", "icons": [{ "src": "/icones/icone-192.png", "sizes": "192x192" }] },
+    { "name": "O rio agora", "url": "/rio-agora.html", "icons": [{ "src": "/icones/icone-192.png", "sizes": "192x192" }] }
+  ]
+}

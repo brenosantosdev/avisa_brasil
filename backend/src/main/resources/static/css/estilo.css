@@ -207,10 +207,43 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 
 .rodape { max-width: 1100px; margin: 0 auto; padding: 0 16px 32px; color: var(--texto-suave); font-size: 0.9rem; }
 
+/* ---------- Celular ---------- */
+
+@media (max-width: 700px) {
+  /* menu em grade: as 6 telas ficam à vista, sem rolar para o lado */
+  .navegacao ul {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  .navegacao a {
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+    line-height: 1.15;
+    padding: 6px 4px;
+    min-height: 52px;
+    font-size: 0.92rem;
+    border-bottom-width: 4px;
+  }
+}
+
 @media (max-width: 600px) {
   body { font-size: 18px; }
   h1 { font-size: 1.7rem; }
+  h2 { font-size: 1.35rem; }
   .marca-local { font-size: 0.85rem; }
+  .topo-interno { gap: 10px; padding: 10px 16px; }
+  .marca { flex-basis: 100%; }
+  .seletor-idioma { flex: 1; }
+  .seletor-idioma select { flex: 1; min-width: 0; }
+  .botao-ouvir { flex: 1; }
+  .cartao { padding: 16px; }
+  main { padding: 16px 16px 40px; }
+  /* textos de fonte e notas: nunca menores que 16 px no celular */
+  .fonte, .rodape, .nota { font-size: 16px; }
 }
 
 /* ---------- Seletor de idioma ---------- */
@@ -238,3 +271,28 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 }
 .seletor-idioma select option { color: var(--texto); background: #fff; }
 .seletor-idioma:focus-within { outline: 3px solid var(--atencao); outline-offset: 2px; }
+
+/* ---------- Sem conexão e instalar no celular (PWA) ---------- */
+
+.aviso-conexao {
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #10262E;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: var(--sombra);
+}
+.aviso-conexao svg { width: 26px; height: 26px; flex: none; }
+
+.convite-instalar h2 { display: flex; align-items: center; gap: 10px; }
+.convite-instalar h2 svg { width: 30px; height: 30px; flex: none; color: var(--rio); }
+
+.atalhos-offline { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 0; }
+.atalhos-offline .botao { flex: 1 1 220px; margin-top: 0; min-height: 60px; font-size: 1.15rem; }

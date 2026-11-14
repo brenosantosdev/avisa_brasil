@@ -435,5 +435,15 @@
     "Todo es opcional: nombre, teléfono y ubicación. Puede pedir ayuda sin ellos.",
     "Por qué podemos usarlos: para proteger la vida (LGPD de Brasil, art. 7º, VII). Para pedir que borren sus datos, hable con la Defensa Civil."
   ],
-  "painel.limpar.pedidos": "También borrar todos los pedidos de ayuda y respuestas (solo para preparar la presentación)"
+  "painel.limpar.pedidos": "También borrar todos los pedidos de ayuda y respuestas (solo para preparar la presentación)",
+  "conexao.sem": "Sin conexión a internet. Esta pantalla sigue funcionando con lo que está guardado en este celular.",
+  "conexao.dadoSalvo": "Sin conexión. Mostrando el último dato guardado en este celular, de {quando}. La situación puede haber cambiado: escuche la radio y los avisos de la Defensa Civil.",
+  "conexao.semDadoSalvo": "Sin conexión, y este celular todavía no tiene datos guardados. Cuando vuelva internet, los datos aparecen solos.",
+  "instalar.titulo": "Instalar en el celular",
+  "instalar.explica": "AvisaBrasil queda en la pantalla del celular, como una aplicación, y abre incluso sin internet (Inicio y Necesito ayuda), con el último dato guardado.",
+  "instalar.botao": "Instalar AvisaBrasil",
+  "instalar.ios": "En el iPhone: toque el botón Compartir y después \"Agregar a pantalla de inicio\".",
+  "offline.titulo": "Sin conexión",
+  "offline.explica": "Esta pantalla necesita internet. Sin conexión, estas pantallas funcionan con el último dato guardado en este celular:",
+  "offline.ligar": "La llamada telefónica funciona incluso sin internet."
 }
