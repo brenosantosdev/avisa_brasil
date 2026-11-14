@@ -176,7 +176,7 @@
     if (ver) {
       const p = estado.pedidos.find(function (x) { return String(x.id) === ver.dataset.ver; });
       if (p) estado.mapaPedidos.setView([p.latitude, p.longitude], 17);
-      document.getElementById('mapa-pedidos').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      AB.rolarAte(document.getElementById('mapa-pedidos'), 'center');
     }
   }
 

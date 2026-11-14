@@ -12,21 +12,21 @@
   padding: 8px 12px;
   border: 2px solid var(--borda);
   border-radius: 8px;
-  background: #fff;
+  background: var(--superficie);
   color: var(--texto);
   width: 100%;
 }
 .formulario textarea { min-height: 88px; resize: vertical; }
 .formulario input:focus,
 .formulario select:focus,
-.formulario textarea:focus { border-color: var(--rio); }
+.formulario textarea:focus { border-color: var(--rio-texto); }
 .formulario [aria-invalid="true"] { border-color: var(--emergencia); }
 .formulario .botao { margin-top: 14px; }
 .duas-colunas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-.mensagem-ok { background: #D7EEDF; color: #145232; padding: 12px 14px; border-radius: 10px; margin-top: 10px; font-weight: 700; }
-.mensagem-alerta { background: #FFF4CC; border: 2px solid var(--atencao); padding: 12px 14px; border-radius: 10px; margin-top: 10px; font-weight: 700; }
-.mensagem-erro { background: #FBE3E1; border: 2px solid var(--emergencia); padding: 12px 14px; border-radius: 10px; margin-top: 10px; font-weight: 700; }
+.mensagem-ok { background: var(--verde-suave); color: var(--verde-texto); border: 2px solid var(--verde-texto); padding: 12px 14px; border-radius: 10px; margin-top: 10px; font-weight: 700; }
+.mensagem-alerta { background: var(--amarelo-suave); border: 2px solid var(--amarelo-borda); padding: 12px 14px; border-radius: 10px; margin-top: 10px; font-weight: 700; }
+.mensagem-erro { background: var(--vermelho-suave); border: 2px solid var(--vermelho-texto); padding: 12px 14px; border-radius: 10px; margin-top: 10px; font-weight: 700; }
 
 .botao-perigo { background: var(--superficie); color: var(--emergencia); border-color: var(--emergencia); }
 
@@ -40,7 +40,7 @@
 .tabela-alertas th, .tabela-alertas td { text-align: left; vertical-align: top; padding: 8px 6px; border-top: 1px solid var(--borda); }
 .tabela-alertas .envios { color: var(--texto-suave); font-size: 0.9rem; }
 .marca-simulacao { display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 6px; border: 2px dashed var(--texto);
-  background: #FFF4CC; font-weight: 700; font-size: 0.8rem; }
+  background: var(--amarelo-suave); font-weight: 700; font-size: 0.8rem; }
 
 /* ---------- Entrada, barra ao vivo, pedidos e sensor ---------- */
 
@@ -59,7 +59,7 @@
 .marcador-pedido { background: var(--emergencia); }
 .marcador-bem { background: var(--normal); }
 
-@media (max-width: 860px) {
+@container pagina (max-width: 860px) {
   .painel-grade { grid-template-columns: 1fr; }
   .tabela-alertas .coluna-mensagem { min-width: 220px; }
   .rolagem { overflow-x: auto; }

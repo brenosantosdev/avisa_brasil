@@ -11,6 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="AvisaBrasil">
+  <script src="/js/preferencias.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
@@ -46,7 +47,7 @@
     <section class="cartao secao avisos-inmet" id="avisos-inmet" aria-labelledby="titulo-inmet"></section>
 
     <div class="inicio-grade">
-      <section class="cartao" aria-labelledby="pergunta-acontecendo">
+      <section class="cartao so-completo" aria-labelledby="pergunta-acontecendo">
         <h2 id="pergunta-acontecendo" data-i18n="inicio.perguntaAcontecendo">O que está acontecendo?</h2>
         <div id="acontecendo"></div>
       </section>
@@ -56,18 +57,24 @@
       </section>
     </div>
 
-    <section class="secao" aria-labelledby="titulo-legenda">
+    <!-- modo simples (Configurações): só o semáforo, o que fazer e o botão de ajuda -->
+    <div class="so-modo-simples atalho-ajuda">
+      <a class="botao botao-ajuda-grande" id="botao-ajuda-simples" href="/ajuda.html"><span data-i18n="nav.ajuda">Preciso de ajuda</span></a>
+      <button type="button" class="botao botao-secundario botao-largo" id="sair-modo-simples"><span data-i18n="config.mostrarTudo"></span></button>
+    </div>
+
+    <section class="secao so-completo" aria-labelledby="titulo-legenda">
       <h2 id="titulo-legenda" data-i18n="inicio.legendaTitulo">O que significa cada cor</h2>
       <ul class="legenda-niveis" id="legenda"></ul>
     </section>
 
-    <section class="cartao secao" aria-labelledby="titulo-mochila">
+    <section class="cartao secao so-completo" aria-labelledby="titulo-mochila">
       <h2 id="titulo-mochila" data-i18n="inicio.mochilaTitulo">Mochila de emergência</h2>
       <p data-i18n="inicio.mochilaIntro"></p>
       <ul class="checklist" id="mochila"></ul>
     </section>
 
-    <div id="lugar-instalar"></div>
+    <div id="lugar-instalar" class="so-completo"></div>
 
     <section class="cartao secao" id="fontes"></section>
   </main>

@@ -151,7 +151,12 @@
     AB.configurarOuvir(textoParaOuvir);
     renderizarLegenda();
     checklist(document.getElementById('mochila'), 'mochila', AB.lista('mochila'));
+    document.getElementById('botao-ajuda-simples').insertAdjacentHTML('afterbegin', AB.icone('alerta'));
+    document.getElementById('sair-modo-simples').addEventListener('click', function () {
+      if (window.ABPreferencias) window.ABPreferencias.gravar({ modoSimples: false });
+    });
     await carregar();
+    AB.lerAoAbrir(textoParaOuvir);
     setInterval(carregar, ATUALIZAR_A_CADA_MS);
     AB.aoVoltarConexao(carregar);
   }

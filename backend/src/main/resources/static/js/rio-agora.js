@@ -271,9 +271,9 @@
         animation: false,
         interaction: { mode: 'index', intersect: false },
         scales: {
-          x: { ticks: { maxRotation: 0, autoSkipPadding: 24, font: { size: 14 } }, grid: { display: false } },
+          x: { ticks: { maxRotation: 0, autoSkipPadding: 24, font: { size: AB.tamanhoFonte(14) } }, grid: { display: false } },
           // a régua mede de 1 em 1 cm: marcas com no mínimo 1 cm, sem rótulos repetidos
-          y: { ticks: { font: { size: 14 }, precision: 2, callback: function (v) { return AB.numero(v, 2) + ' m'; } } }
+          y: { ticks: { font: { size: AB.tamanhoFonte(14) }, precision: 2, callback: function (v) { return AB.numero(v, 2) + ' m'; } } }
         },
         plugins: {
           legend: { display: false },

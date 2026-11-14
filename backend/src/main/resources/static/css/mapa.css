@@ -52,7 +52,7 @@
 
 .camadas { margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
 .opcao { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; font-size: 1rem; }
-.opcao input { width: 24px; height: 24px; accent-color: var(--rio); flex: none; }
+.opcao input { width: 24px; height: 24px; accent-color: var(--rio-texto); flex: none; }
 
 .botao-largo { width: 100%; }
 #resultado-localizacao p { margin: 10px 0 0; }
@@ -79,7 +79,7 @@
 .lista-pontos .texto { flex: 1; min-width: 0; }
 .lista-pontos .nome { font-weight: 700; margin: 0; }
 .lista-pontos .detalhe { margin: 0; color: var(--texto-suave); font-size: 0.95rem; }
-.botao-secundario { background: var(--superficie); color: var(--rio); border-color: var(--rio); }
+
 
 .aviso-info {
   display: flex;
@@ -88,16 +88,20 @@
   padding: 12px 14px;
   border-radius: 10px;
   background: var(--rio-claro);
-  color: var(--rio);
+  color: var(--rio-texto);
+  border: 1px solid var(--rio-texto);
   margin: 0 0 12px;
 }
 .aviso-info svg { width: 24px; height: 24px; flex: none; margin-top: 2px; }
 
-@media (max-width: 860px) {
+@container pagina (max-width: 860px) {
   .mapa-grade { grid-template-columns: 1fr; }
   .mapa { height: 55vh; min-height: 320px; }
 }
-@media (max-width: 600px) {
+@container pagina (max-width: 600px) {
   .lista-pontos li { flex-wrap: wrap; }
   .lista-pontos .botao { width: 100%; }
 }
+
+/* Créditos do mapa com a cor de link do tema (o azul padrão do Leaflet não chega ao alto contraste) */
+.leaflet-container .leaflet-control-attribution a { color: var(--rio-texto); text-decoration: underline; }

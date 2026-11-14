@@ -12,7 +12,7 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
-  color: #fff;
+  color: var(--sobre-cor);
   box-shadow: var(--sombra);
 }
 .escolha-bem { background: var(--normal); }
@@ -38,22 +38,22 @@
 .contador-botao { font-size: 1.8rem; min-width: 64px; min-height: 64px; padding: 0; }
 .contador output { font-size: 2.2rem; font-weight: 700; min-width: 3ch; text-align: center; }
 .opcao-grande { display: flex; gap: 12px; align-items: flex-start; font-weight: 400 !important; margin: 10px 0; cursor: pointer; }
-.opcao-grande input { width: 28px; height: 28px; flex: none; accent-color: var(--rio); }
-.botao-ajuda { background: var(--emergencia); color: #fff; font-size: 1.2rem; min-height: 60px; margin-top: 12px; }
+.opcao-grande input { width: 28px; height: 28px; flex: none; accent-color: var(--rio-texto); }
+.botao-ajuda { background: var(--emergencia); color: var(--sobre-cor); font-size: 1.2rem; min-height: 60px; margin-top: 12px; }
 
 .ligacoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
-.botao-ligar { background: var(--texto); color: #fff; min-height: 64px; font-size: 1.1rem; }
-.botao-whatsapp { background: #1E7A46; color: #fff; }
+.botao-ligar { background: var(--faixa); color: var(--sobre-faixa); min-height: 64px; font-size: 1.1rem; }
+.botao-whatsapp { background: var(--normal); color: var(--sobre-cor); }
 
 .envio-ok, .envio-guardado, .envio-erro {
   display: flex; gap: 10px; align-items: flex-start; padding: 14px 16px; border-radius: 10px; font-weight: 700; margin: 0 0 12px;
 }
 .envio-ok svg, .envio-guardado svg, .envio-erro svg { width: 26px; height: 26px; flex: none; }
-.envio-ok { background: #D7EEDF; color: #145232; }
-.envio-guardado { background: #FFF4CC; border: 2px solid var(--atencao); color: var(--texto); }
-.envio-erro { background: #FBE3E1; border: 2px solid var(--emergencia); color: var(--texto); }
+.envio-ok { background: var(--verde-suave); color: var(--verde-texto); border: 2px solid var(--verde-texto); }
+.envio-guardado { background: var(--amarelo-suave); border: 2px solid var(--amarelo-borda); color: var(--texto); }
+.envio-erro { background: var(--vermelho-suave); border: 2px solid var(--vermelho-texto); color: var(--texto); }
 
-@media (max-width: 600px) {
+@container pagina (max-width: 600px) {
   .escolhas { grid-template-columns: 1fr; }
   .ligacoes { grid-template-columns: 1fr; }
 }

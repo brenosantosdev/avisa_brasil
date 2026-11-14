@@ -4,6 +4,17 @@
   'use strict';
 
   const FUSO = 'America/Manaus';
+  /* preferências do aparelho (js/preferencias.js, carregado no <head>); valores padrão se faltar */
+  const PREF = window.ABPreferencias || {
+    ler: function () { return { vlibras: true, lerAoAbrir: false, modoSimples: false }; },
+    efetivas: function () { return { movimento: 'normal', tema: 'claro', contraste: 'normal' }; },
+    velocidadeDaVoz: function () { return 0.9; },
+    escalaDoTexto: function () { return 1; }
+  };
+
+  function menosMovimento() {
+    return PREF.efetivas().movimento === 'reduzido';
+  }
   /* Para acrescentar um idioma (por exemplo, uma língua indígena com tradução validada por falantes
      nativos): criar i18n/<código>.json com as mesmas chaves do pt.json, pôr o código aqui e o nome
      do idioma na chave "idioma.<código>" de cada arquivo. */
@@ -191,6 +202,8 @@
     cheia: '<path d="M4 11l8-6 8 6"/><path d="M6 10v5h12v-5"/><path d="M2 19c2-1.5 3.5-1.5 5 0s3.5 1.5 5 0 3.5-1.5 5 0 3 1.5 5 0"/>',
     seca: '<circle cx="12" cy="8" r="3.5"/><path d="M12 1.5V3M4 8h1.5M18.5 8H20M6.6 3.6l1 1M17.4 3.6l-1 1"/><path d="M2 15h20"/><path d="M7 15l1.5 2.5-1 3.5M13 15l-1 2.5 1.5 3.5M18 15l1 3"/>',
     deslizamento: '<path d="M2 20h20"/><path d="M3 20L12 7l3.5 4.5"/><circle cx="17" cy="15.5" r="1.6"/><circle cx="20.5" cy="18.3" r="1.1"/><path d="M14.5 13.2l1 1.1"/>',
+    engrenagem: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+    tema: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
     instalar: '<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7v7M9 11l3 3 3-3M10 18h4"/>'
   };
 
@@ -303,7 +316,7 @@
       const prefixo = comAvisoDeConexao && aviso && !aviso.hidden ? aviso.textContent + ' ' : '';
       const fala = new SpeechSynthesisUtterance(prefixo + gerarTexto());
       fala.lang = localidade;
-      fala.rate = 0.9;
+      fala.rate = PREF.velocidadeDaVoz();
       fala.onend = fala.onerror = function () {
         if (botaoFalando === botao) botaoFalando = null;
         mostrar(false);
@@ -328,7 +341,8 @@
     { id: 'mapa', href: '/mapa.html', texto: 'nav.mapa' },
     { id: 'ajuda', href: '/ajuda.html', texto: 'nav.ajuda' },
     { id: 'riscos', href: '/riscos.html', texto: 'nav.riscos' },
-    { id: 'painel', href: '/painel.html', texto: 'nav.painel' }
+    { id: 'painel', href: '/painel.html', texto: 'nav.painel' },
+    { id: 'configuracoes', href: '/configuracoes.html', texto: 'nav.configuracoes', icone: 'engrenagem' }
   ];
 
   /** Título da aba do navegador no idioma escolhido. */
@@ -364,7 +378,7 @@
 
   /** Widget VLibras (gov.br): traduz o texto da página para Libras. */
   function carregarVLibras() {
-    if (document.querySelector('[vw]')) return;
+    if (!PREF.ler().vlibras || document.querySelector('[vw]')) return;
     const widget = document.createElement('div');
     widget.setAttribute('vw', '');
     widget.className = 'enabled';
@@ -381,6 +395,58 @@
       } catch (e) { /* VLibras fora do ar: o resto da página continua funcionando */ }
     };
     document.body.appendChild(script);
+  }
+
+  /** VLibras ligado ou desligado nas Configurações: aplica na hora. */
+  function atualizarVLibras() {
+    const widget = document.querySelector('[vw]');
+    if (PREF.ler().vlibras) {
+      if (widget) widget.hidden = false;
+      else carregarVLibras();
+    } else if (widget) {
+      widget.hidden = true;
+    }
+  }
+
+  /** Rola até um elemento, sem animação quando a pessoa pediu menos movimento. */
+  function rolarAte(elemento, bloco) {
+    if (!elemento) return;
+    elemento.scrollIntoView({ behavior: menosMovimento() ? 'auto' : 'smooth', block: bloco || 'start' });
+  }
+
+  /**
+   * Lê o aviso em voz alta ao abrir a tela (Configurações, "Ler o aviso ao abrir"). O navegador só deixa
+   * falar depois de um toque na tela; se ainda não houve toque, aparece um botão grande "Tocar para ouvir".
+   */
+  function lerAoAbrir(gerarTexto) {
+    if (!PREF.ler().lerAoAbrir || !window.speechSynthesis) return;
+    const main = document.querySelector('main');
+    let comecou = false;
+    function falar() {
+      const aviso = document.getElementById('aviso-conexao');
+      const prefixo = aviso && !aviso.hidden ? aviso.textContent + ' ' : '';
+      const fala = new SpeechSynthesisUtterance(prefixo + gerarTexto());
+      fala.lang = localidade;
+      fala.rate = PREF.velocidadeDaVoz();
+      fala.onstart = function () { comecou = true; };
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(fala);
+    }
+    function pedirToque() {
+      if (comecou || document.getElementById('botao-ler-aviso') || !main) return;
+      window.speechSynthesis.cancel();
+      const botao = document.createElement('button');
+      botao.type = 'button';
+      botao.id = 'botao-ler-aviso';
+      botao.className = 'botao botao-primario botao-largo botao-ler-aviso';
+      botao.innerHTML = icone('som') + '<span>' + escapar(t('config.tocarParaOuvir')) + '</span>';
+      botao.addEventListener('click', function () { botao.remove(); falar(); });
+      main.insertBefore(botao, main.firstChild);
+    }
+    const ativo = navigator.userActivation ? navigator.userActivation.hasBeenActive : true;
+    if (!ativo) { pedirToque(); return; }
+    falar();
+    setTimeout(function () { if (!comecou && !window.speechSynthesis.speaking) pedirToque(); }, 1500);
   }
 
   /* ---------- Sem conexão ---------- */
@@ -499,7 +565,8 @@
     nav.setAttribute('aria-label', t('nav.principal'));
     nav.innerHTML = '<ul>' + PAGINAS.map(function (p) {
       const atual = p.id === nav.dataset.atual ? ' aria-current="page"' : '';
-      return '<li><a href="' + p.href + '"' + atual + '>' + escapar(t(p.texto)) + '</a></li>';
+      return '<li><a href="' + p.href + '"' + atual + (p.icone ? ' class="nav-com-icone"' : '') + '>' +
+        (p.icone ? icone(p.icone) : '') + escapar(t(p.texto)) + '</a></li>';
     }).join('') + '</ul>';
   }
 
@@ -529,11 +596,25 @@
 
   /* ---------- Gráficos (Chart.js) ---------- */
 
-  if (window.Chart) {
-    window.Chart.defaults.font.family = "'Atkinson Hyperlegible', system-ui, sans-serif";
-    window.Chart.defaults.font.size = window.matchMedia('(max-width: 600px)').matches ? 14 : 15;
-    window.Chart.defaults.color = '#10262E';
+  /** Tamanho de letra para desenhos (gráficos), acompanhando o "Tamanho do texto" das Configurações. */
+  function tamanhoFonte(px) {
+    return Math.round(px * PREF.escalaDoTexto());
   }
+
+  if (window.Chart) {
+    const estreita = (document.body ? document.body.clientWidth : window.innerWidth) <= 600;
+    window.Chart.defaults.font.family = "'Atkinson Hyperlegible', system-ui, sans-serif";
+    window.Chart.defaults.font.size = tamanhoFonte(estreita ? 14 : 15);
+    window.Chart.defaults.color = '#10262E'; // os gráficos ficam sempre num fundo claro
+    if (menosMovimento()) window.Chart.defaults.animation = false;
+  }
+
+  /* Mapas (Leaflet) sem animação de zoom quando a pessoa pediu menos movimento */
+  if (window.L && window.L.Map && menosMovimento()) {
+    window.L.Map.mergeOptions({ zoomAnimation: false, fadeAnimation: false, markerZoomAnimation: false, inertia: false });
+  }
+
+  window.addEventListener('ab:preferencias', atualizarVLibras);
 
   window.AB = {
     t: t,
@@ -553,6 +634,11 @@
     mesEAno: mesEAno,
     quando: quando,
     hora: hora,
+    rolarAte: rolarAte,
+    lerAoAbrir: lerAoAbrir,
+    tamanhoFonte: tamanhoFonte,
+    menosMovimento: menosMovimento,
+    preferencias: function () { return PREF; },
     buscar: buscar,
     aoVoltarConexao: aoVoltarConexao,
     idioma: function () { return idiomaAtual; },

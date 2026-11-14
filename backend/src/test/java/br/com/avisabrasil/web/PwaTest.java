@@ -84,7 +84,8 @@ class PwaTest {
         String codigo = sw();
         List<String> arquivos = new ArrayList<>(lista(codigo, "TELAS_SEM_CONEXAO"));
         arquivos.addAll(lista(codigo, "ARQUIVOS"));
-        assertThat(arquivos).contains("/", "/ajuda.html", "/riscos.html", "/offline.html");
+        assertThat(arquivos).contains("/", "/ajuda.html", "/riscos.html", "/configuracoes.html", "/offline.html",
+                "/js/preferencias.js", "/js/configuracoes.js", "/css/configuracoes.css");
         for (String arquivo : arquivos) {
             mockMvc.perform(get(arquivo)).andExpect(status().isOk());
         }
@@ -107,7 +108,11 @@ class PwaTest {
                 String html = Files.readString(tela, StandardCharsets.UTF_8);
                 assertThat(html).as(tela.getFileName().toString())
                         .contains("rel=\"manifest\" href=\"/manifest.webmanifest\"")
-                        .contains("name=\"viewport\" content=\"width=device-width, initial-scale=1\"");
+                        .contains("name=\"viewport\" content=\"width=device-width, initial-scale=1\"")
+                        // as preferências (tema, contraste, tamanho do texto) entram no <head>, antes do CSS, para não piscar
+                        .contains("<script src=\"/js/preferencias.js\"></script>");
+                assertThat(html.indexOf("/js/preferencias.js")).as(tela.getFileName() + ": preferências antes do CSS")
+                        .isLessThan(html.indexOf("/css/estilo.css"));
             }
         }
     }

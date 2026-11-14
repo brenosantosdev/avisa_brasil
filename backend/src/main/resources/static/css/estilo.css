@@ -1,23 +1,183 @@
 /* AvisaBrasil: estilo comum a todas as telas.
    Princípios: ícone + cor + palavra (nunca só cor), botões de 44 px ou mais, texto base 18 px. */
 
+/* ---------- Paleta (gerada; a ordem importa: claro, escuro, alto contraste, alto contraste escuro).
+   O teste ContrasteTest lê estes blocos e confere o contraste das combinações usadas nas telas. ---------- */
+
 :root {
   --rio: #0B4F73;
+  --rio-texto: #0B4F73;
   --rio-claro: #CFE3EE;
+  --topo: #0B4F73;
   --fundo: #F3F6F5;
   --superficie: #FFFFFF;
+  --superficie-2: #E6ECEA;
   --texto: #10262E;
   --texto-suave: #4A6169;
   --borda: #D5DEDB;
-
-  /* Semáforo */
+  --sobre-cor: #FFFFFF;
   --normal: #1E7A46;
   --atencao: #F2C230;
   --alerta: #C2541A;
   --emergencia: #A3221B;
-
-  --raio: 12px;
+  --sobre-atencao: #10262E;
+  --normal-texto: #1E7A46;
+  --alerta-texto: #C2541A;
+  --amarelo-suave: #FFF4CC;
+  --amarelo-suave-2: #FFE89A;
+  --amarelo-borda: #8A6A00;
+  --verde-suave: #D7EEDF;
+  --verde-texto: #145232;
+  --vermelho-suave: #FBE3E1;
+  --vermelho-texto: #8A1C16;
+  --laranja-suave: #FBE3D6;
+  --laranja-texto: #8A3A10;
+  --marrom-texto: #8A5A00;
+  --faixa: #10262E;
+  --sobre-faixa: #FFFFFF;
+  --foco: #F2C230;
+  --foco-contorno: #10262E;
   --sombra: 0 1px 3px rgba(16, 38, 46, 0.08), 0 4px 12px rgba(16, 38, 46, 0.05);
+  --borda-cartao: transparent;
+  --raio: 12px;
+}
+
+:root[data-tema="escuro"] {
+  --rio: #0B4F73;
+  --rio-texto: #8CCBEE;
+  --rio-claro: #173E55;
+  --topo: #0B3A55;
+  --fundo: #0F1A1E;
+  --superficie: #18272D;
+  --superficie-2: #24363D;
+  --texto: #E8F0EE;
+  --texto-suave: #A9BCC2;
+  --borda: #33474E;
+  --sobre-atencao: #10262E;
+  --normal-texto: #8FDDB0;
+  --alerta-texto: #FFB98F;
+  --amarelo-suave: #3A3112;
+  --amarelo-suave-2: #4A3E12;
+  --amarelo-borda: #D9AE2A;
+  --verde-suave: #15362A;
+  --verde-texto: #8FDDB0;
+  --vermelho-suave: #43201E;
+  --vermelho-texto: #FFA39C;
+  --laranja-suave: #45281A;
+  --laranja-texto: #FFB98F;
+  --marrom-texto: #E5B65A;
+  --faixa: #E8F0EE;
+  --sobre-faixa: #10262E;
+  --foco: #F2C230;
+  --foco-contorno: #000000;
+  --sombra: 0 1px 3px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.35);
+  --borda-cartao: #26383F;
+}
+
+:root[data-contraste="alto"] {
+  --rio: #002A40;
+  --rio-texto: #00395A;
+  --rio-claro: #FFFFFF;
+  --topo: #002A40;
+  --fundo: #FFFFFF;
+  --superficie: #FFFFFF;
+  --superficie-2: #FFFFFF;
+  --texto: #000000;
+  --texto-suave: #000000;
+  --borda: #000000;
+  --normal: #155C34;
+  --alerta: #8F3A0E;
+  --emergencia: #861A14;
+  --sobre-atencao: #000000;
+  --normal-texto: #155C34;
+  --alerta-texto: #8F3A0E;
+  --amarelo-suave: #FFF4CC;
+  --amarelo-suave-2: #FFFFFF;
+  --amarelo-borda: #000000;
+  --verde-suave: #FFFFFF;
+  --verde-texto: #0A3B20;
+  --vermelho-suave: #FFFFFF;
+  --vermelho-texto: #6B0F0A;
+  --laranja-suave: #FFFFFF;
+  --laranja-texto: #5C2306;
+  --marrom-texto: #5A3A00;
+  --faixa: #000000;
+  --sobre-faixa: #FFFFFF;
+  --foco: #F2C230;
+  --foco-contorno: #000000;
+  --sombra: none;
+  --borda-cartao: #000000;
+}
+
+:root[data-contraste="alto"][data-tema="escuro"] {
+  --rio: #003B5C;
+  --rio-texto: #9ED8FF;
+  --rio-claro: #000000;
+  --topo: #000000;
+  --fundo: #000000;
+  --superficie: #000000;
+  --superficie-2: #000000;
+  --texto: #FFFFFF;
+  --texto-suave: #FFFFFF;
+  --borda: #FFFFFF;
+  --normal-texto: #9CF0BF;
+  --alerta-texto: #FFC299;
+  --amarelo-suave: #2B2300;
+  --amarelo-suave-2: #000000;
+  --amarelo-borda: #FFD84D;
+  --verde-suave: #000000;
+  --verde-texto: #9CF0BF;
+  --vermelho-suave: #000000;
+  --vermelho-texto: #FFB3AD;
+  --laranja-suave: #000000;
+  --laranja-texto: #FFC299;
+  --marrom-texto: #FFD27A;
+  --faixa: #FFFFFF;
+  --sobre-faixa: #000000;
+  --foco: #F2C230;
+  --foco-contorno: #FFFFFF;
+  --sombra: none;
+  --borda-cartao: #FFFFFF;
+}
+
+/* Mapas, gráficos e régua têm fundo claro próprio: dentro deles valem as cores do tema claro. */
+:root[data-tema="escuro"] .leaflet-container,
+:root[data-tema="escuro"] .grafico-caixa,
+:root[data-tema="escuro"] .grafico-sensor,
+:root[data-tema="escuro"] .regua-svg {
+  --rio: #0B4F73;
+  --rio-texto: #0B4F73;
+  --rio-claro: #CFE3EE;
+  --topo: #0B4F73;
+  --fundo: #F3F6F5;
+  --superficie: #FFFFFF;
+  --superficie-2: #E6ECEA;
+  --texto: #10262E;
+  --texto-suave: #4A6169;
+  --borda: #D5DEDB;
+  --sobre-cor: #FFFFFF;
+  --normal: #1E7A46;
+  --atencao: #F2C230;
+  --alerta: #C2541A;
+  --emergencia: #A3221B;
+  --sobre-atencao: #10262E;
+  --normal-texto: #1E7A46;
+  --alerta-texto: #C2541A;
+  --amarelo-suave: #FFF4CC;
+  --amarelo-suave-2: #FFE89A;
+  --amarelo-borda: #8A6A00;
+  --verde-suave: #D7EEDF;
+  --verde-texto: #145232;
+  --vermelho-suave: #FBE3E1;
+  --vermelho-texto: #8A1C16;
+  --laranja-suave: #FBE3D6;
+  --laranja-texto: #8A3A10;
+  --marrom-texto: #8A5A00;
+  --faixa: #10262E;
+  --sobre-faixa: #FFFFFF;
+  --foco: #F2C230;
+  --foco-contorno: #10262E;
+  --borda-cartao: transparent;
 }
 
 * { box-sizing: border-box; }
@@ -25,20 +185,30 @@
 /* "hidden" vale mesmo em elementos com display definido no CSS */
 [hidden] { display: none !important; }
 
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; --escala-texto: 1; }
+
+/* Tamanho do texto (Configurações): tudo em rem cresce junto */
+:root[data-texto="grande"] { font-size: 120%; --escala-texto: 1.2; }
+:root[data-texto="muito-grande"] { font-size: 140%; --escala-texto: 1.4; }
 
 body {
   margin: 0;
   font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1.5;
   background: var(--fundo);
   color: var(--texto);
+  /* as regras de celular olham a largura da página (body), não a da janela: assim o modo "Celular"
+     das Configurações mostra o layout de celular de verdade numa moldura de 390 px, até no notebook */
+  container: pagina / inline-size;
+  /* palavras longas com texto muito grande quebram em vez de vazar para o lado */
+  overflow-wrap: break-word;
 }
 
-a { color: var(--rio); }
+a { color: var(--rio-texto); }
 
-:focus-visible { outline: 3px solid var(--atencao); outline-offset: 2px; }
+/* foco em duas cores: aparece tanto em fundo claro quanto escuro ou colorido */
+:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; box-shadow: 0 0 0 6px var(--foco-contorno); }
 
 .so-leitor {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -48,7 +218,7 @@ a { color: var(--rio); }
 /* ---------- Topo e navegação ---------- */
 
 .topo {
-  background: var(--rio);
+  background: var(--topo);
   color: #fff;
 }
 .topo-interno {
@@ -81,9 +251,9 @@ a { color: var(--rio); }
   text-decoration: none;
 }
 .botao svg { width: 24px; height: 24px; flex: none; }
-.botao-ouvir { background: #fff; color: var(--rio); }
-.botao-ouvir[aria-pressed="true"] { background: var(--atencao); color: var(--texto); }
-.botao-primario { background: var(--rio); color: #fff; }
+.botao-ouvir { background: #fff; color: #0B4F73; }
+.botao-ouvir[aria-pressed="true"] { background: var(--atencao); color: var(--sobre-atencao); }
+.botao-primario { background: var(--rio); color: var(--sobre-cor); }
 .botao-largo { width: 100%; }
 
 .navegacao { background: var(--superficie); border-bottom: 1px solid var(--borda); }
@@ -107,7 +277,7 @@ a { color: var(--rio); }
   border-bottom: 4px solid transparent;
   white-space: nowrap;
 }
-.navegacao a[aria-current="page"] { border-bottom-color: var(--rio); color: var(--rio); }
+.navegacao a[aria-current="page"] { border-bottom-color: var(--rio-texto); color: var(--rio-texto); }
 
 /* ---------- Conteúdo ---------- */
 
@@ -124,12 +294,13 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
   background: var(--superficie);
   border-radius: var(--raio);
   box-shadow: var(--sombra);
+  border: 2px solid var(--borda-cartao);
   padding: 18px;
 }
 
 .nota { color: var(--texto-suave); font-size: 0.95rem; }
 .rotulo { font-weight: 700; color: var(--texto-suave); margin: 0; }
-.botao-secundario { background: var(--superficie); color: var(--rio); border-color: var(--rio); }
+.botao-secundario { background: var(--superficie); color: var(--rio-texto); border-color: var(--rio-texto); }
 
 /* ---------- Etiquetas (ícone + cor + palavra) ---------- */
 
@@ -145,23 +316,23 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 }
 .etiqueta svg { width: 22px; height: 22px; flex: none; }
 
-.chuva-SEM_CHUVA   { background: #E6ECEA; color: var(--texto); }
-.chuva-FRACA       { background: var(--rio-claro); color: var(--rio); }
-.chuva-MODERADA    { background: var(--rio); color: #fff; }
-.chuva-FORTE       { background: var(--alerta); color: #fff; }
-.chuva-MUITO_FORTE { background: var(--emergencia); color: #fff; }
+.chuva-SEM_CHUVA   { background: var(--superficie-2); color: var(--texto); }
+.chuva-FRACA       { background: var(--rio-claro); color: var(--rio-texto); border: 1px solid var(--rio-texto); }
+.chuva-MODERADA    { background: var(--rio); color: var(--sobre-cor); }
+.chuva-FORTE       { background: var(--alerta); color: var(--sobre-cor); }
+.chuva-MUITO_FORTE { background: var(--emergencia); color: var(--sobre-cor); }
 
-.calor { background: #FBE3D6; color: #8A3A10; }
+.calor { background: var(--laranja-suave); color: var(--laranja-texto); border: 1px solid var(--laranja-texto); }
 
-.normal-MUITO_ABAIXO, .normal-MUITO_ACIMA { background: var(--atencao); color: var(--texto); }
-.normal-ABAIXO, .normal-ACIMA { background: #E6ECEA; color: var(--texto); }
-.normal-NORMAL { background: #D7EEDF; color: #145232; }
+.normal-MUITO_ABAIXO, .normal-MUITO_ACIMA { background: var(--atencao); color: var(--sobre-atencao); }
+.normal-ABAIXO, .normal-ACIMA { background: var(--superficie-2); color: var(--texto); border: 1px solid var(--borda); }
+.normal-NORMAL { background: var(--verde-suave); color: var(--verde-texto); border: 1px solid var(--verde-texto); }
 
 /* Semáforo: ícone + cor + palavra (Atenção usa texto escuro) */
-.nivel-NORMAL { background: var(--normal); color: #fff; }
-.nivel-ATENCAO { background: var(--atencao); color: var(--texto); }
-.nivel-ALERTA { background: var(--alerta); color: #fff; }
-.nivel-EMERGENCIA { background: var(--emergencia); color: #fff; }
+.nivel-NORMAL { background: var(--normal); color: var(--sobre-cor); }
+.nivel-ATENCAO { background: var(--atencao); color: var(--sobre-atencao); }
+.nivel-ALERTA { background: var(--alerta); color: var(--sobre-cor); }
+.nivel-EMERGENCIA { background: var(--emergencia); color: var(--sobre-cor); }
 
 .aviso-simulacao {
   display: flex;
@@ -173,7 +344,7 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
   font-weight: 700;
   color: var(--texto);
   border: 3px dashed var(--texto);
-  background: repeating-linear-gradient(135deg, #FFF4CC, #FFF4CC 12px, #FFE89A 12px, #FFE89A 24px);
+  background: repeating-linear-gradient(135deg, var(--amarelo-suave), var(--amarelo-suave) 12px, var(--amarelo-suave-2) 12px, var(--amarelo-suave-2) 24px);
 }
 .aviso-simulacao svg { width: 28px; height: 28px; flex: none; }
 
@@ -198,8 +369,8 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
   font-weight: 700;
 }
 .aviso-situacao svg { width: 26px; height: 26px; flex: none; }
-.aviso-DESATUALIZADO { background: #FFF4CC; border: 2px solid var(--atencao); }
-.aviso-INDISPONIVEL { background: #FBE3E1; border: 2px solid var(--emergencia); }
+.aviso-DESATUALIZADO { background: var(--amarelo-suave); border: 2px solid var(--amarelo-borda); }
+.aviso-INDISPONIVEL { background: var(--vermelho-suave); border: 2px solid var(--vermelho-texto); }
 
 .carregando { color: var(--texto-suave); padding: 24px 0; }
 
@@ -209,16 +380,15 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 
 /* ---------- Celular ---------- */
 
-@media (max-width: 960px) {
-  /* menu em grade: as 7 telas ficam à vista (4 + 3), sem rolar para o lado */
+@container pagina (max-width: 960px) {
+  /* menu em grade: as 8 telas ficam à vista (4 + 4), sem rolar para o lado */
   .navegacao ul {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0;
     padding: 0;
     overflow: visible;
   }
-  .navegacao li { flex: 1 1 25%; }
   .navegacao a {
     justify-content: center;
     text-align: center;
@@ -227,15 +397,16 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
     padding: 6px 4px;
     min-height: 52px;
     font-size: 0.92rem;
+    overflow-wrap: anywhere;
+    hyphens: auto;
     border-bottom-width: 4px;
   }
 }
-@media (max-width: 400px) {
+@container pagina (max-width: 400px) {
   .navegacao a { font-size: 0.85rem; padding: 6px 2px; }
 }
 
-@media (max-width: 600px) {
-  body { font-size: 18px; }
+@container pagina (max-width: 600px) {
   h1 { font-size: 1.7rem; }
   h2 { font-size: 1.35rem; }
   .marca-local { font-size: 0.85rem; }
@@ -247,7 +418,7 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
   .cartao { padding: 16px; }
   main { padding: 16px 16px 40px; }
   /* textos de fonte e notas: nunca menores que 16 px no celular */
-  .fonte, .rodape, .nota { font-size: 16px; }
+  .fonte, .rodape, .nota { font-size: 1rem; }
 }
 
 /* ---------- Seletor de idioma ---------- */
@@ -273,7 +444,7 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
   padding: 0 6px;
   cursor: pointer;
 }
-.seletor-idioma select option { color: var(--texto); background: #fff; }
+.seletor-idioma select option { color: var(--texto); background: var(--superficie); }
 .seletor-idioma:focus-within { outline: 3px solid var(--atencao); outline-offset: 2px; }
 
 /* ---------- Sem conexão e instalar no celular (PWA) ---------- */
@@ -288,15 +459,15 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
   margin: 0 0 16px;
   padding: 12px 14px;
   border-radius: 10px;
-  background: #10262E;
-  color: #fff;
+  background: var(--faixa);
+  color: var(--sobre-faixa);
   font-weight: 700;
   box-shadow: var(--sombra);
 }
 .aviso-conexao svg { width: 26px; height: 26px; flex: none; }
 
 .convite-instalar h2 { display: flex; align-items: center; gap: 10px; }
-.convite-instalar h2 svg { width: 30px; height: 30px; flex: none; color: var(--rio); }
+.convite-instalar h2 svg { width: 30px; height: 30px; flex: none; color: var(--rio-texto); }
 
 .atalhos-offline { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 0; }
 .atalhos-offline .botao { flex: 1 1 220px; margin-top: 0; min-height: 60px; font-size: 1.15rem; }
@@ -304,16 +475,66 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 /* ---------- Avisos oficiais do INMET (Início e Entenda os riscos) ---------- */
 
 .avisos-inmet h2 { display: flex; align-items: center; gap: 10px; }
-.avisos-inmet h2 svg { width: 28px; height: 28px; flex: none; color: var(--alerta); }
-.avisos-inmet.com-aviso { border: 3px solid var(--alerta); }
+.avisos-inmet h2 svg { width: 28px; height: 28px; flex: none; color: var(--alerta-texto); }
+.avisos-inmet.com-aviso { border: 3px solid var(--alerta-texto); }
 .aviso-inmet { border-top: 1px solid var(--borda); padding-top: 12px; margin-top: 12px; }
 .aviso-inmet:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
 .aviso-inmet-topo { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px; }
 .aviso-inmet-topo h3 { margin: 0; font-size: 1.3rem; }
 .aviso-inmet-quando { display: flex; gap: 8px; align-items: flex-start; font-weight: 700; margin: 0 0 8px; }
 .aviso-inmet-quando svg { width: 22px; height: 22px; flex: none; margin-top: 2px; }
-.inmet-nenhum { display: flex; gap: 10px; align-items: center; font-weight: 700; color: var(--normal); margin: 0 0 10px; }
+.inmet-nenhum { display: flex; gap: 10px; align-items: center; font-weight: 700; color: var(--normal-texto); margin: 0 0 10px; }
 .inmet-nenhum svg { width: 28px; height: 28px; flex: none; }
-.inmet-recentes summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 700; color: var(--rio); }
+.inmet-recentes summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 700; color: var(--rio-texto); }
 .inmet-recentes ul { margin: 4px 0 0; padding-left: 1.2em; }
 .inmet-recentes li { margin: 6px 0; }
+
+/* ---------- Configurações: modo de visualização, alto contraste, menos animações ---------- */
+
+/* Modo "Celular" numa tela grande: a página fica numa moldura de 390 px no centro (para apresentar) */
+@media (min-width: 520px) {
+  :root[data-visualizacao="celular"] { background: #3E4C51; }
+  :root[data-visualizacao="celular"] body {
+    max-width: 410px; /* 390 px de tela + 10 px de moldura de cada lado */
+    min-height: calc(100vh - 48px);
+    margin: 24px auto;
+    border: 10px solid #10262E;
+    border-radius: 32px;
+    overflow: clip;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* Tema escuro: gráficos ficam num fundo claro próprio (as cores do desenho foram feitas para fundo claro) */
+:root[data-tema="escuro"] .grafico-caixa,
+:root[data-tema="escuro"] .grafico-sensor { background: #FFFFFF; border-radius: 8px; padding: 6px; color: var(--texto); }
+
+/* Alto contraste: bordas fortes, sem sombras, links sempre sublinhados e grossos */
+:root[data-contraste="alto"] .cartao,
+:root[data-contraste="alto"] .semaforo { border: 2px solid var(--borda); box-shadow: none; }
+:root[data-contraste="alto"] .navegacao { border-bottom: 2px solid var(--borda); }
+:root[data-contraste="alto"] .navegacao a[aria-current="page"] { border-bottom-width: 6px; text-decoration: underline; text-underline-offset: 4px; }
+:root[data-contraste="alto"] a { text-decoration-thickness: 2px; text-underline-offset: 3px; }
+:root[data-contraste="alto"] .botao { border-color: currentColor; }
+:root[data-contraste="alto"] .etiqueta { outline: 2px solid currentColor; outline-offset: -2px; }
+:root[data-contraste="alto"] .topo { border-bottom: 3px solid var(--borda); }
+:root[data-contraste="alto"] :focus-visible { outline-width: 4px; outline-offset: 3px; }
+
+/* Menos animações: nada se mexe sozinho (vale também para o que o aparelho pedir) */
+:root[data-movimento="reduzido"] *,
+:root[data-movimento="reduzido"] *::before,
+:root[data-movimento="reduzido"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Menu: a tela Configurações tem o ícone de engrenagem (ícone + palavra) */
+.nav-com-icone { gap: 6px; }
+.nav-com-icone svg { width: 22px; height: 22px; flex: none; }
+@container pagina (max-width: 960px) {
+  .nav-com-icone { flex-direction: column; gap: 2px; }
+}
+
+.botao-ler-aviso { min-height: 64px; font-size: 1.2rem; margin-bottom: 16px; }

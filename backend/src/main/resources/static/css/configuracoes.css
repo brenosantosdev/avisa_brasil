@@ -1,0 +1,116 @@
+/* Tela Configurações: escolhas grandes (48 px ou mais), sempre com palavra, e interruptores liga/desliga */
+
+#grupos-config h2,
+#titulo-apagar { display: flex; align-items: center; gap: 10px; }
+#grupos-config h2 svg { width: 28px; height: 28px; flex: none; color: var(--rio-texto); }
+
+.campo-config {
+  border: 0;
+  margin: 0;
+  padding: 16px 0;
+  border-top: 1px solid var(--borda);
+  min-width: 0;
+}
+.campo-config:first-of-type { border-top: 0; padding-top: 4px; }
+.campo-config legend { font-weight: 700; font-size: 1.15rem; padding: 0; margin-bottom: 4px; float: left; width: 100%; }
+.campo-config legend + * { clear: both; }
+.campo-config .nota { margin: 0 0 10px; }
+
+/* Escolha única: botões grandes lado a lado (quebram linha no celular) */
+.opcoes-config { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; clear: both; }
+.opcao-config { position: relative; }
+.opcao-config input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.opcao-config span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 8px 12px;
+  border: 2px solid var(--borda);
+  border-radius: 10px;
+  background: var(--superficie);
+  color: var(--texto);
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+}
+.opcao-config input:checked + span {
+  border-color: var(--rio-texto);
+  border-width: 3px;
+  background: var(--rio-claro);
+  color: var(--texto);
+}
+/* escolhido: além da cor, um sinal de "certo" (nunca só cor) */
+.opcao-config input:checked + span::before { content: "✓"; font-size: 1.2em; line-height: 1; }
+.opcao-config input:focus-visible + span { outline: 3px solid var(--foco); outline-offset: 2px; box-shadow: 0 0 0 6px var(--foco-contorno); }
+
+#testar-voz { margin-top: 10px; }
+
+/* Interruptor liga/desliga */
+.interruptor { display: flex; align-items: flex-start; gap: 14px; cursor: pointer; min-height: 48px; }
+.interruptor input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.interruptor-trilho {
+  flex: none;
+  position: relative;
+  width: 60px;
+  height: 34px;
+  margin-top: 2px;
+  border-radius: 999px;
+  background: var(--superficie-2);
+  border: 2px solid var(--texto-suave);
+}
+.interruptor-trilho::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--texto-suave);
+  transition: transform 0.15s;
+}
+.interruptor input:checked + .interruptor-trilho { background: var(--normal); border-color: var(--normal-texto); }
+.interruptor input:checked + .interruptor-trilho::after { transform: translateX(26px); background: #FFFFFF; }
+.interruptor input:focus-visible + .interruptor-trilho { outline: 3px solid var(--foco); outline-offset: 2px; box-shadow: 0 0 0 6px var(--foco-contorno); }
+.interruptor-texto { display: flex; flex-direction: column; gap: 2px; }
+.interruptor-texto strong { font-size: 1.1rem; }
+.interruptor-texto .nota { margin: 0; }
+
+/* Guardado / apagado */
+.estado-config:empty { display: none; }
+.guardado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  background: var(--verde-suave);
+  color: var(--verde-texto);
+  border: 2px solid var(--verde-texto);
+}
+.guardado svg { width: 24px; height: 24px; flex: none; }
+.estado-config { position: sticky; top: 8px; z-index: 1000; }
+
+/* Apagar dados */
+.lista-apagar { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.lista-apagar li { display: flex; gap: 10px; align-items: flex-start; }
+.lista-apagar svg { width: 22px; height: 22px; flex: none; margin-top: 2px; color: var(--vermelho-texto); }
+.mensagem-alerta-config {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  margin: 8px 0 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  background: var(--amarelo-suave);
+  border: 2px solid var(--amarelo-borda);
+}
+.mensagem-alerta-config svg { width: 24px; height: 24px; flex: none; }
+.botao-perigo-config { background: var(--superficie); color: var(--vermelho-texto); border-color: var(--vermelho-texto); margin-top: 8px; }
+.botao-perigo-config[data-confirmar="true"] { background: var(--emergencia); color: var(--sobre-cor); border-color: var(--emergencia); }
+#resultado-apagar .guardado { margin-top: 12px; }

@@ -228,7 +228,7 @@
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = '#10262E';
-      ctx.font = 'bold 14px "Atkinson Hyperlegible", sans-serif';
+      ctx.font = 'bold ' + AB.tamanhoFonte(14) + 'px "Atkinson Hyperlegible", sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(opcoes.rotulo, x + 6, area.top + 14);
       ctx.restore();
@@ -268,17 +268,17 @@
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
         scales: {
-          x: { ticks: { maxRotation: 0, autoSkipPadding: 16, font: { size: 14 } }, grid: { display: false } },
+          x: { ticks: { maxRotation: 0, autoSkipPadding: 16, font: { size: AB.tamanhoFonte(14) } }, grid: { display: false } },
           y: {
-            title: { display: true, text: t('rio.grafico.eixo'), font: { size: 14 } },
-            ticks: { font: { size: 14 }, callback: function (v) { return AB.numero(v); } }
+            title: { display: true, text: t('rio.grafico.eixo'), font: { size: AB.tamanhoFonte(14) } },
+            ticks: { font: { size: AB.tamanhoFonte(14) }, callback: function (v) { return AB.numero(v); } }
           }
         },
         plugins: {
           legend: {
             labels: {
               filter: function (item) { return item.text !== ''; },
-              font: { size: 15 }, boxWidth: 18
+              font: { size: AB.tamanhoFonte(15) }, boxWidth: 18
             }
           },
           tooltip: {

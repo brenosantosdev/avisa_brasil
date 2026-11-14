@@ -10,10 +10,10 @@
   box-shadow: var(--sombra);
   background: var(--superficie);
 }
-.semaforo.nivel-NORMAL { background: var(--normal); color: #fff; }
-.semaforo.nivel-ATENCAO { background: var(--atencao); color: var(--texto); }
-.semaforo.nivel-ALERTA { background: var(--alerta); color: #fff; }
-.semaforo.nivel-EMERGENCIA { background: var(--emergencia); color: #fff; }
+.semaforo.nivel-NORMAL { background: var(--normal); color: var(--sobre-cor); }
+.semaforo.nivel-ATENCAO { background: var(--atencao); color: var(--sobre-atencao); }
+.semaforo.nivel-ALERTA { background: var(--alerta); color: var(--sobre-cor); }
+.semaforo.nivel-EMERGENCIA { background: var(--emergencia); color: var(--sobre-cor); }
 
 /* As 4 luzes: a acesa tem ícone e contorno; as outras ficam apagadas (não é só cor) */
 .luzes {
@@ -35,7 +35,7 @@
 .luz svg { width: 26px; height: 26px; }
 .luz.acesa { opacity: 1; outline: 4px solid #fff; outline-offset: 2px; }
 .luz.l-NORMAL { background: var(--normal); color: #fff; }
-.luz.l-ATENCAO { background: var(--atencao); color: var(--texto); }
+.luz.l-ATENCAO { background: var(--atencao); color: var(--sobre-atencao); }
 .luz.l-ALERTA { background: var(--alerta); color: #fff; }
 .luz.l-EMERGENCIA { background: var(--emergencia); color: #fff; }
 
@@ -60,7 +60,7 @@
 
 .checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .checklist label { display: flex; gap: 12px; align-items: flex-start; min-height: 44px; padding: 8px 4px; cursor: pointer; }
-.checklist input { width: 26px; height: 26px; flex: none; accent-color: var(--rio); margin-top: 1px; }
+.checklist input { width: 26px; height: 26px; flex: none; accent-color: var(--rio-texto); margin-top: 1px; }
 .checklist input:checked + span { text-decoration: line-through; color: var(--texto-suave); }
 
 .legenda-niveis {
@@ -75,11 +75,11 @@
 .legenda-niveis strong { display: flex; align-items: center; gap: 8px; font-size: 1.15rem; }
 .legenda-niveis svg { width: 26px; height: 26px; }
 
-@media (max-width: 860px) {
+@container pagina (max-width: 860px) {
   .inicio-grade { grid-template-columns: 1fr; }
   .legenda-niveis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (max-width: 600px) {
+@container pagina (max-width: 600px) {
   .semaforo { grid-template-columns: 1fr; }
   .luzes { flex-direction: row; justify-content: center; }
   .palavra-nivel { font-size: 1.9rem; flex-wrap: nowrap; gap: 10px; }
@@ -87,3 +87,27 @@
   .resposta { font-size: 1.2rem; }
   .semaforo { padding: 18px; gap: 14px; }
 }
+
+/* ---------- Modo simples (Configurações): semáforo, o que fazer e botão de ajuda ---------- */
+
+.so-modo-simples { display: none; }
+:root[data-modo-simples] .so-modo-simples { display: flex; }
+:root[data-modo-simples] .so-completo { display: none !important; }
+/* aviso oficial do INMET valendo agora continua aparecendo (é segurança); sem aviso, some */
+:root[data-modo-simples] .avisos-inmet:not(.com-aviso) { display: none; }
+:root[data-modo-simples] .inicio-grade { grid-template-columns: 1fr; }
+:root[data-modo-simples] .palavra-nivel { font-size: 3rem; }
+@container pagina (max-width: 600px) {
+  :root[data-modo-simples] .palavra-nivel { font-size: 2.3rem; }
+}
+
+.atalho-ajuda { flex-direction: column; gap: 12px; margin-top: 20px; }
+.botao-ajuda-grande {
+  background: var(--emergencia);
+  color: var(--sobre-cor);
+  min-height: 80px;
+  font-size: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--sombra);
+}
+.botao-ajuda-grande svg { width: 36px; height: 36px; }

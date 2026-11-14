@@ -179,7 +179,7 @@
       const form = document.getElementById('formulario');
       form.hidden = false;
       e.currentTarget.setAttribute('aria-expanded', 'true');
-      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      AB.rolarAte(form, 'start');
     });
     document.getElementById('menos').addEventListener('click', function () { mudarPessoas(-1); });
     document.getElementById('mais').addEventListener('click', function () { mudarPessoas(1); });

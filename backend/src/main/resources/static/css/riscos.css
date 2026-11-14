@@ -5,6 +5,16 @@
 .risco-calor { --cor-risco: #A3221B; --fundo-risco: #FBE3E1; }
 .risco-deslizamento { --cor-risco: #6B4A2B; --fundo-risco: #F1E6DA; }
 
+:root[data-tema="escuro"] .risco-cheia { --cor-risco: #8CCBEE; --fundo-risco: #173E55; }
+:root[data-tema="escuro"] .risco-seca { --cor-risco: #E5B65A; --fundo-risco: #3A3112; }
+:root[data-tema="escuro"] .risco-calor { --cor-risco: #FFA39C; --fundo-risco: #43201E; }
+:root[data-tema="escuro"] .risco-deslizamento { --cor-risco: #D9B48C; --fundo-risco: #3A2A1C; }
+:root[data-contraste="alto"] .risco-cheia,
+:root[data-contraste="alto"] .risco-seca,
+:root[data-contraste="alto"] .risco-calor,
+:root[data-contraste="alto"] .risco-deslizamento { --cor-risco: var(--texto); --fundo-risco: var(--superficie); }
+:root[data-contraste="alto"] .risco-aqui { border: 2px solid var(--borda); }
+
 /* Índice: 4 botões grandes (ícone + cor + palavra) */
 .indice-riscos {
   display: grid;
@@ -39,19 +49,19 @@
 .risco h3 { margin: 18px 0 8px; font-size: 1.2rem; }
 .risco p { margin: 0 0 8px; }
 
-.botao-ouvir-risco[aria-pressed="true"] { background: var(--atencao); color: var(--texto); border-color: var(--texto); }
+.botao-ouvir-risco[aria-pressed="true"] { background: var(--atencao); color: var(--sobre-atencao); border-color: var(--sobre-atencao); }
 
 .lista-sinais, .lista-proteger { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .lista-sinais li, .lista-proteger li { display: flex; gap: 10px; align-items: flex-start; }
 .lista-sinais svg, .lista-proteger svg { width: 24px; height: 24px; flex: none; margin-top: 2px; }
-.lista-sinais svg { color: var(--alerta); }
-.lista-proteger svg { color: var(--normal); }
+.lista-sinais svg { color: var(--alerta-texto); }
+.lista-proteger svg { color: var(--normal-texto); }
 
 .risco-aqui { margin-top: 18px; padding: 14px; border-radius: 10px; background: var(--fundo-risco); }
 .risco-aqui h3 { margin-top: 0; }
 .risco-aqui .botao { margin-top: 6px; }
 
-@media (max-width: 700px) {
+@container pagina (max-width: 700px) {
   .indice-riscos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .risco h2 { font-size: 1.5rem; }
   .botao-ouvir-risco { width: 100%; }

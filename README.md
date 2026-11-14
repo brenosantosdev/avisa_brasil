@@ -216,6 +216,38 @@ cookie HttpOnly e SameSite=Lax, válida por 8 horas. Para parar o servidor use `
   publique o sistema com HTTPS (um IP da rede local com http não basta).
 - Teste rápido no computador: Chrome → F12 → Application → Service workers → marque **Offline** e recarregue.
 
+## Configurações
+
+`/configuracoes.html`, com a engrenagem no menu de todas as telas. Funciona nos 3 idiomas, tem botão Ouvir e abre
+sem internet. As escolhas ficam **só neste aparelho** (localStorage, chave `avisabrasil.preferencias`) e valem em
+todas as telas. O `js/preferencias.js` roda no `<head>` e aplica as escolhas antes de desenhar, para a tela não piscar.
+
+- **Exibição:**
+  - Modo de visualização: Automático, Computador ou **Celular**. No modo Celular, uma tela grande mostra o layout
+    de celular numa moldura de 390 px, bom para projetar. As regras de celular usam *container queries* sobre a
+    largura da página, e não da janela.
+  - Tema: automático, claro ou escuro.
+- **Acessibilidade:**
+  - tamanho do texto (normal, grande ou muito grande);
+  - alto contraste;
+  - modo simples no Início (semáforo, o que fazer e um botão grande de ajuda; um aviso do INMET valendo continua
+    aparecendo, e a fonte dos dados também);
+  - ler o aviso em voz alta ao abrir o Início (o navegador exige um toque antes; sem ele, aparece o botão "Tocar
+    para ouvir");
+  - velocidade da voz;
+  - menos animações (CSS, gráficos e zoom do mapa);
+  - VLibras liga e desliga.
+- **Idioma** e **Apagar dados deste aparelho:** apaga preferências, idioma, marcações das listas, pedidos de ajuda
+  ainda não enviados (com aviso antes), dados salvos para usar sem internet e a entrada no painel. Não apaga
+  pedidos que já chegaram à Defesa Civil.
+- **Padrão:** "Automático" segue o aparelho (`prefers-color-scheme`, `prefers-contrast`/`forced-colors` e
+  `prefers-reduced-motion`) e muda junto se o aparelho mudar.
+- **Contraste testado:**
+  - O `ContrasteTest` lê a paleta do `estilo.css` e confere, nos 4 temas (claro, escuro, alto contraste e alto
+    contraste escuro), as combinações de cor usadas nas telas: 4,5:1 para texto, ou 7:1 no alto contraste.
+  - Uma auditoria no Chrome mediu 2.368 textos visíveis em 8 telas nos 4 temas, sem nenhuma falha.
+  - Mapas, gráficos e a régua mantêm fundo claro próprio também no tema escuro.
+
 ## Entenda os riscos
 
 `/riscos.html`: **cheia, seca, calor extremo e deslizamento**, cada um com "o que é", "sinais de perigo", "como se

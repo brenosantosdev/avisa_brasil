@@ -134,7 +134,11 @@ Enquanto o túnel está aberto, **qualquer pessoa com o link** acessa o sistema:
    - [ ] abrir Início, Preciso de ajuda e Entenda os riscos uma vez, para ficarem salvos para o modo sem internet;
    - [ ] idioma em **Português**;
    - [ ] volume alto e "Não perturbe" desligado.
-9. [ ] **Notebook:**
+9. [ ] **Projetar a tela do celular no notebook (opcional):**
+   - abra o endereço do túnel numa aba e vá em **Configurações → Modo de visualização: Celular**;
+   - a tela aparece numa moldura de 390 px no meio do projetor;
+   - as escolhas valem por endereço: o painel em `localhost` continua no modo Computador.
+10. [ ] **Notebook:**
    - [ ] painel em tela cheia, "Ao vivo" aceso;
    - [ ] notificações do Windows desligadas;
    - [ ] outras abas fechadas;

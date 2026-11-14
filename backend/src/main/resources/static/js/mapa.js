@@ -222,7 +222,7 @@
       }
       estado.mapa.setView(marcador.getLatLng(), 17);
       marcador.openPopup();
-      document.getElementById('mapa').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      AB.rolarAte(document.getElementById('mapa'), 'center');
     });
   }
 
