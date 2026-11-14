@@ -37,8 +37,12 @@ public class MotorDeRisco {
 
     private static final Logger log = LoggerFactory.getLogger(MotorDeRisco.class);
 
-    /** Novo alerta registrado (a etapa 6 envia as notificações a partir deste evento). */
+    /** Novo alerta registrado (os canais enviam as notificações a partir deste evento). */
     public record AlertaRegistrado(Alerta alerta, AvaliacaoDeRisco avaliacao) {
+    }
+
+    /** O risco foi reavaliado (o painel atualiza ao vivo). */
+    public record RiscoAvaliado(AvaliacaoDeRisco avaliacao) {
     }
 
     private final RioAgoraServico rioAgora;
@@ -128,6 +132,7 @@ public class MotorDeRisco {
                 principal.map(Fator::simulado).orElse(false));
         registrarMudanca(avaliacao, gerarAlertas);
         ultima = avaliacao;
+        eventos.publishEvent(new RiscoAvaliado(avaliacao));
         return avaliacao;
     }
 
@@ -159,6 +164,19 @@ public class MotorDeRisco {
             log.info("Risco: {} → {} ({})", antes, a.nivel(), alerta.getMensagem());
             eventos.publishEvent(new AlertaRegistrado(alerta, a));
         }
+    }
+
+    /**
+     * Alerta manual da Defesa Civil: vai pelos canais como os outros, mas não muda o nível calculado
+     * pelo motor. A mensagem é a escrita pela Defesa Civil.
+     */
+    @Transactional
+    public Alerta registrarManual(Nivel nivel, TipoRisco tipo, String mensagem) {
+        Alerta alerta = alertas.save(new Alerta(Alerta.Evento.MANUAL, nivel, tipo, null, false,
+                "Defesa Civil: " + mensagem.strip(), relogio.instant()));
+        log.info("Risco: alerta manual {} ({})", nivel, tipo);
+        eventos.publishEvent(new AlertaRegistrado(alerta, atual()));
+        return alerta;
     }
 
     @Transactional(readOnly = true)

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Preciso de ajuda · AvisaBrasil</title>
+  <meta name="theme-color" content="#0B4F73">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilo.css">
+  <link rel="stylesheet" href="/css/ajuda.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 13c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/><path d="M3 18c2.5-2 4.5-2 7 0s4.5 2 7 0 3-1.5 4-1"/></svg>
+        <span>
+          <span class="marca-nome" data-i18n="app.nome">AvisaBrasil</span>
+          <span class="marca-local" data-comunidade-local></span>
+        </span>
+      </a>
+      <button id="botao-ouvir" class="botao botao-ouvir" type="button" aria-pressed="false">
+        <svg aria-hidden="true"></svg><span data-i18n="ouvir">Ouvir</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="navegacao" id="navegacao" data-atual="ajuda"></nav>
+
+  <main>
+    <h1 data-i18n="ajuda.titulo">Preciso de ajuda</h1>
+    <p class="intro" data-i18n="ajuda.intro"></p>
+
+    <div id="situacao-envio" role="status" aria-live="polite"></div>
+
+    <div class="escolhas">
+      <button id="botao-bem" class="escolha escolha-bem" type="button">
+        <span class="escolha-icone"></span>
+        <span class="escolha-texto"><strong data-i18n="ajuda.estouBem">Estou bem</strong><span data-i18n="ajuda.estouBem.explica"></span></span>
+      </button>
+      <button id="botao-ajuda" class="escolha escolha-ajuda" type="button" aria-expanded="false" aria-controls="formulario">
+        <span class="escolha-icone"></span>
+        <span class="escolha-texto"><strong data-i18n="ajuda.precisoAjuda">Preciso de ajuda</strong><span data-i18n="ajuda.precisoAjuda.explica"></span></span>
+      </button>
+    </div>
+
+    <form id="formulario" class="cartao formulario-ajuda" hidden novalidate>
+      <h2 data-i18n="ajuda.detalhes">Conte um pouco mais</h2>
+
+      <p class="rotulo-campo" id="rotulo-pessoas" data-i18n="ajuda.pessoas"></p>
+      <div class="contador" role="group" aria-labelledby="rotulo-pessoas">
+        <button type="button" class="botao botao-secundario contador-botao" id="menos" data-i18n-aria="ajuda.menos">−</button>
+        <output id="pessoas" aria-live="polite">1</output>
+        <button type="button" class="botao botao-secundario contador-botao" id="mais" data-i18n-aria="ajuda.mais">+</button>
+      </div>
+
+      <label class="opcao-grande">
+        <input type="checkbox" id="localizacao" checked>
+        <span><strong data-i18n="ajuda.localizacao"></strong><br><span class="nota" data-i18n="ajuda.localizacao.explica"></span></span>
+      </label>
+
+      <label for="nome" data-i18n="ajuda.nome"></label>
+      <input id="nome" maxlength="80" autocomplete="name">
+      <label for="telefone" data-i18n="ajuda.telefone"></label>
+      <input id="telefone" maxlength="30" inputmode="tel" autocomplete="tel">
+      <label for="mensagem" data-i18n="ajuda.mensagem"></label>
+      <textarea id="mensagem" maxlength="300" rows="3"></textarea>
+
+      <button class="botao botao-ajuda botao-largo" type="submit" id="enviar" data-i18n="ajuda.enviar"></button>
+    </form>
+
+    <section class="cartao secao" aria-labelledby="titulo-urgente">
+      <h2 id="titulo-urgente" data-i18n="ajuda.urgente">Se for urgente, ligue agora</h2>
+      <div class="ligacoes">
+        <a class="botao botao-ligar" href="tel:199"><span data-i18n="ajuda.ligar199"></span></a>
+        <a class="botao botao-ligar" href="tel:193"><span data-i18n="ajuda.ligar193"></span></a>
+        <a class="botao botao-ligar" href="tel:192"><span data-i18n="ajuda.ligar192"></span></a>
+      </div>
+      <a class="botao botao-whatsapp botao-largo" id="whatsapp" href="#" target="_blank" rel="noopener"><span data-i18n="ajuda.whatsapp"></span></a>
+      <p class="nota" data-i18n="ajuda.whatsapp.explica"></p>
+    </section>
+  </main>
+
+  <footer class="rodape"><p data-i18n="app.rodape"></p></footer>
+
+  <script src="/js/comum.js"></script>
+  <script src="/js/ajuda.js"></script>
+</body>
+</html>

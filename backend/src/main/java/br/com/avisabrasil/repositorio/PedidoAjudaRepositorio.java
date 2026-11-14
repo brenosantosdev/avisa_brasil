@@ -13,4 +13,6 @@ public interface PedidoAjudaRepositorio extends JpaRepository<PedidoAjuda, Long>
             PedidoAjuda.Canal canal, String contato, PedidoAjuda.Tipo tipo, Instant depoisDe);
 
     List<PedidoAjuda> findTop100ByOrderByIdDesc();
+
+    Optional<PedidoAjuda> findByIdCliente(String idCliente);
 }

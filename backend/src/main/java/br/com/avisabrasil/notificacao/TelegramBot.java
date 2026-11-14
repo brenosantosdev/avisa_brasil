@@ -1,5 +1,6 @@
 package br.com.avisabrasil.notificacao;
 
+import br.com.avisabrasil.ajuda.PedidosAjudaServico;
 import br.com.avisabrasil.dominio.InscritoTelegram;
 import br.com.avisabrasil.dominio.PedidoAjuda;
 import br.com.avisabrasil.repositorio.InscritoTelegramRepositorio;
@@ -17,6 +18,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -67,6 +69,7 @@ public class TelegramBot implements SmartLifecycle {
     private final PedidoAjudaRepositorio pedidos;
     private final MotorDeRisco motor;
     private final TransactionTemplate transacao;
+    private final ApplicationEventPublisher eventos;
     private final Clock relogio;
     private final boolean ligado;
     private volatile boolean rodando;
@@ -74,13 +77,14 @@ public class TelegramBot implements SmartLifecycle {
     private long proximoOffset;
 
     public TelegramBot(TelegramApi api, InscritoTelegramRepositorio inscritos, PedidoAjudaRepositorio pedidos,
-            MotorDeRisco motor, TransactionTemplate transacao, Clock relogio,
+            MotorDeRisco motor, TransactionTemplate transacao, ApplicationEventPublisher eventos, Clock relogio,
             @Value("${avisabrasil.telegram.polling:true}") boolean polling) {
         this.api = api;
         this.inscritos = inscritos;
         this.pedidos = pedidos;
         this.motor = motor;
         this.transacao = transacao;
+        this.eventos = eventos;
         this.relogio = relogio;
         this.ligado = polling && api.habilitado();
     }
@@ -185,6 +189,7 @@ public class TelegramBot implements SmartLifecycle {
             double lon = mensagem.path("location").path("longitude").asDouble();
             return ultimoPedido(contato, agora).map(p -> {
                 p.informarLocalizacao(lat, lon, agora);
+                avisarPainel(p);
                 return "Localização recebida. A Defesa Civil vai ver no mapa do painel.";
             }).orElse("Recebemos sua localização. Se precisar de ajuda, responda 2.");
         }
@@ -205,12 +210,12 @@ public class TelegramBot implements SmartLifecycle {
             }
             case "1" -> {
                 inscrever(chatId, nome, agora);
-                pedidos.save(new PedidoAjuda(PedidoAjuda.Tipo.ESTOU_BEM, PedidoAjuda.Canal.TELEGRAM, contato, nome, agora));
+                avisarPainel(pedidos.save(new PedidoAjuda(PedidoAjuda.Tipo.ESTOU_BEM, PedidoAjuda.Canal.TELEGRAM, contato, nome, agora)));
                 return ESTOU_BEM;
             }
             case "2" -> {
                 inscrever(chatId, nome, agora);
-                pedidos.save(new PedidoAjuda(PedidoAjuda.Tipo.PRECISO_DE_AJUDA, PedidoAjuda.Canal.TELEGRAM, contato, nome, agora));
+                avisarPainel(pedidos.save(new PedidoAjuda(PedidoAjuda.Tipo.PRECISO_DE_AJUDA, PedidoAjuda.Canal.TELEGRAM, contato, nome, agora)));
                 log.info("Telegram: pedido de ajuda recebido");
                 return PRECISO_DE_AJUDA;
             }
@@ -220,12 +225,18 @@ public class TelegramBot implements SmartLifecycle {
                     int pessoas = Integer.parseInt(m.group(1));
                     return ultimoPedido(contato, agora).map(p -> {
                         p.informarPessoas(pessoas, agora);
+                        avisarPainel(p);
                         return "Anotado: " + pessoas + (pessoas == 1 ? " pessoa." : " pessoas.");
                     }).orElse("Se precisar de ajuda, responda 2 primeiro.");
                 }
                 return AJUDA;
             }
         }
+    }
+
+    /** O painel da Defesa Civil atualiza ao vivo (depois de gravar). */
+    private void avisarPainel(PedidoAjuda pedido) {
+        eventos.publishEvent(new PedidosAjudaServico.PedidoAtualizado(pedido.getId()));
     }
 
     private Optional<PedidoAjuda> ultimoPedido(String contato, Instant agora) {

@@ -3,7 +3,7 @@
 Rede de alerta de cheias e secas para comunidades ribeirinhas e indígenas, com linguagem simples, voz e orientação do que fazer.
 Projeto da **Global Solution 2026.2 da FIAP** (tema CitizenTech). Território piloto: **São Gabriel da Cachoeira (AM), Rio Negro**.
 
-> Estado atual: **etapa 6** (alertas por ntfy, Telegram e SMS). A tela **Início** mostra o semáforo da comunidade (maior risco entre cheia e seca),
+> Estado atual: **etapa 7** ("Preciso de ajuda" com fila offline e Painel da Defesa Civil ao vivo, com senha). A tela **Início** mostra o semáforo da comunidade (maior risco entre cheia e seca),
 > calculado pelo motor de risco com dados reais da ANA, chuva e GloFAS, mais um sensor **simulado**. As telas
 > **O rio agora**, **Próximos dias** e **Mapa** também usam dados reais.
 
@@ -31,7 +31,8 @@ Quando aparecer `Started AvisabrasilApplication`, abra no navegador:
 | **O rio agora** (nível da ANA, régua e histórico) | http://localhost:8080/rio-agora.html |
 | **Próximos dias** (chuva e rio, dados reais) | http://localhost:8080/proximos-dias.html |
 | **Mapa** (pontos de apoio e setores de risco) | http://localhost:8080/mapa.html |
-| **Painel da Defesa Civil** (cadastro de pontos seguros) | http://localhost:8080/painel.html |
+| **Preciso de ajuda** (funciona sem internet) | http://localhost:8080/ajuda.html |
+| **Painel da Defesa Civil** (com senha: `PAINEL_SENHA`) | http://localhost:8080/painel.html |
 | Swagger UI (testar a API) | http://localhost:8080/swagger-ui.html |
 | Previsão do tempo (JSON) | http://localhost:8080/api/previsao/tempo |
 | Previsão do rio (JSON) | http://localhost:8080/api/previsao/rio |
@@ -99,8 +100,9 @@ O arquivo do banco fica em `backend/data/` e não vai para o Git.
   (sem reprojeção: SIRGAS 2000 ≈ WGS84). Pontos que caem dentro de um setor são marcados no mapa e no painel.
 - **Overpass:** uma consulta por dia, com servidor reserva. Em horário de pico a fila pode passar de 30 s, por isso o
   tempo limite dessa fonte é 90 s.
-- **Painel sem senha (por enquanto):** qualquer pessoa com o endereço consegue cadastrar ou remover pontos,
-  enviar mensagem de teste e limpar a simulação. O sensor já pode exigir chave (`SENSOR_API_KEY`).
+- **Painel com senha:** cadastrar/remover pontos seguros, ver e atender pedidos de ajuda, alerta manual, mensagem
+  de teste, histórico de envios, limpar a simulação e os eventos ao vivo exigem a senha `PAINEL_SENHA`. Sem a
+  variável, o painel fica trancado. O sensor pode exigir chave (`SENSOR_API_KEY`).
 
 ## Motor de risco
 
@@ -139,6 +141,30 @@ $env:NTFY_TOPICO = "avisabrasil-sgc-k7q2m9x4"
 $env:TELEGRAM_BOT_TOKEN = "<token do BotFather>"
 .\mvnw.cmd spring-boot:run
 ```
+
+## Preciso de ajuda e Painel da Defesa Civil
+
+**Preciso de ajuda** (`/ajuda.html`, público): botões grandes "Estou bem" e "Preciso de ajuda", número de pessoas,
+localização (se a pessoa permitir), ligar para 199, 193 e 192 e aviso pronto para o WhatsApp.
+- **Fila offline:** o pedido é guardado no celular (localStorage) **antes** de enviar. Sem internet, ele espera e é
+  enviado sozinho quando a conexão volta. Cada pedido tem um `idCliente`, então um reenvio não duplica.
+- Para a própria tela abrir sem internet é preciso o modo instalável (PWA), que vem na etapa 10.
+- Limite de 20 envios por endereço a cada 10 minutos (o endpoint é público).
+
+**Painel da Defesa Civil** (`/painel.html`, com senha):
+- **Situação ao vivo** por Server-Sent Events: nível de risco, leituras do sensor (gráfico), novos alertas e novos
+  pedidos de ajuda (com aviso sonoro), sem recarregar a página.
+- **Pedidos de ajuda** no mapa e na lista, com "Marcar como atendido" e ligação para o telefone informado.
+- **Alerta manual** escrito pela Defesa Civil, enviado pelos canais ligados (não muda o nível do motor).
+- Canais de alerta, mensagem de teste, histórico de envios, limpar simulação e pontos seguros.
+
+```powershell
+$env:PAINEL_SENHA = "uma-senha-longa-e-dificil"
+.\mvnw.cmd spring-boot:run
+```
+
+Segurança: senha comparada em tempo constante; 5 senhas erradas bloqueiam o endereço por 15 minutos; sessão com
+cookie HttpOnly e SameSite=Lax, válida por 8 horas. Para parar o servidor use `Ctrl + C` (encerramento normal).
 
 ## Simulador do sensor (demonstração)
 

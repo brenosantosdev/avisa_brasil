@@ -22,6 +22,9 @@
 
 * { box-sizing: border-box; }
 
+/* "hidden" vale mesmo em elementos com display definido no CSS */
+[hidden] { display: none !important; }
+
 html { -webkit-text-size-adjust: 100%; }
 
 body {
@@ -81,6 +84,7 @@ a { color: var(--rio); }
 .botao-ouvir { background: #fff; color: var(--rio); }
 .botao-ouvir[aria-pressed="true"] { background: var(--atencao); color: var(--texto); }
 .botao-primario { background: var(--rio); color: #fff; }
+.botao-largo { width: 100%; }
 
 .navegacao { background: var(--superficie); border-bottom: 1px solid var(--borda); }
 .navegacao ul {

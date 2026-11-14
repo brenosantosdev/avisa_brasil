@@ -45,15 +45,17 @@ public class MontadorDeMensagem {
         Nivel nivel = alerta.getNivel();
         TipoRisco tipo = alerta.getTipo();
         boolean normalizado = alerta.getEvento() == Alerta.Evento.NORMALIZADO;
+        boolean manual = alerta.getEvento() == Alerta.Evento.MANUAL;
         String prefixo = alerta.isSimulado() ? MARCA_SIMULACAO + " " : "";
 
         String titulo = prefixo + simbolo(nivel) + " AvisaBrasil: " + MensagensDeRisco.titulo(nivel, tipo);
         String acontecendo = normalizado
                 ? "O rio voltou ao nível normal. Continue acompanhando os avisos."
+                : manual ? alerta.getMensagem()
                 : (avaliacao != null && avaliacao.principal() != null
                         ? MensagensDeRisco.explicar(avaliacao.principal())
                         : alerta.getMensagem());
-        List<String> acoes = acoes(normalizado ? "acoes.NORMAL" : "acoes." + tipo + "." + nivel);
+        List<String> acoes = acoes(normalizado || nivel == Nivel.NORMAL ? "acoes.NORMAL" : "acoes." + tipo + "." + nivel);
         String fonte = "Fonte: " + fonte(alerta) + ". AvisaBrasil, " + ZonedDateTime.ofInstant(alerta.getCriadoEm(),
                 relogio.getZone()).format(HORA) + ".";
 
@@ -70,7 +72,9 @@ public class MontadorDeMensagem {
         String curto = prefixo + "AvisaBrasil: " + MensagensDeRisco.titulo(nivel, tipo) + ". " + acontecendo
                 + (acoes.isEmpty() ? "" : " Faça: " + acoes.get(0)) + " " + fonte;
 
-        String assinatura = alerta.getEvento() + "|" + nivel + "|" + tipo + "|" + alerta.isSimulado();
+        // no alerta manual, o texto faz parte do conteúdo: textos diferentes não contam como repetição
+        String assinatura = alerta.getEvento() + "|" + nivel + "|" + tipo + "|" + alerta.isSimulado()
+                + (manual ? "|" + Integer.toHexString(alerta.getMensagem().hashCode()) : "");
         return new MensagemAlerta(titulo, texto.toString(), curto, nivel, tipo, alerta.isSimulado(), false, assinatura);
     }
 
@@ -88,6 +92,9 @@ public class MontadorDeMensagem {
     }
 
     private static String fonte(Alerta alerta) {
+        if (alerta.getEvento() == Alerta.Evento.MANUAL) {
+            return "Defesa Civil (alerta manual)";
+        }
         if (alerta.getFonte() == null) {
             return "régua da ANA e previsões";
         }

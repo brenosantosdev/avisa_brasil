@@ -87,7 +87,7 @@ class MotorDeRiscoTest {
                 .andExpect(jsonPath("$[3].nivel").value("ATENCAO"));
 
         // antes da demonstração: limpa tudo que é simulado; o estado volta ao real sem gerar alerta
-        mockMvc.perform(post("/api/simulacao/limpar"))
+        mockMvc.perform(post("/api/simulacao/limpar").session(SessaoDoPainel.entrar(mockMvc)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.leituras").value(7))
                 .andExpect(jsonPath("$.alertas").value(4))

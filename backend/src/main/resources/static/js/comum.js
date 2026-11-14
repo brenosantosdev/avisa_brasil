@@ -289,6 +289,7 @@
     { id: 'rio-agora', href: '/rio-agora.html', texto: 'nav.rioAgora' },
     { id: 'proximos-dias', href: '/proximos-dias.html', texto: 'nav.proximosDias' },
     { id: 'mapa', href: '/mapa.html', texto: 'nav.mapa' },
+    { id: 'ajuda', href: '/ajuda.html', texto: 'nav.ajuda' },
     { id: 'painel', href: '/painel.html', texto: 'nav.painel' }
   ];
 

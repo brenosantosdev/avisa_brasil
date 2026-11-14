@@ -50,6 +50,19 @@ public class PedidoAjuda {
     @Column(nullable = false)
     private boolean atendido;
 
+    /** Gerado no celular (tela web): a fila offline pode reenviar sem duplicar. */
+    @Column(length = 40, unique = true)
+    private String idCliente;
+
+    @Column(length = 30)
+    private String telefone;
+
+    @Column(length = 300)
+    private String mensagem;
+
+    /** Quando a pessoa apertou o botão (pode ser antes do envio, se estava sem internet). */
+    private Instant criadoNoCliente;
+
     @Column(nullable = false)
     private Instant criadoEm;
 
@@ -64,6 +77,13 @@ public class PedidoAjuda {
         this.contato = contato;
         this.nome = nome;
         this.criadoEm = criadoEm;
+    }
+
+    public void informarDadosDaWeb(String idCliente, String telefone, String mensagem, Instant criadoNoCliente) {
+        this.idCliente = idCliente;
+        this.telefone = telefone;
+        this.mensagem = mensagem;
+        this.criadoNoCliente = criadoNoCliente;
     }
 
     public void informarPessoas(int pessoas, Instant quando) {
@@ -124,5 +144,17 @@ public class PedidoAjuda {
 
     public Instant getAtualizadoEm() {
         return atualizadoEm;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public String getMensagem() {
+        return mensagem;
+    }
+
+    public Instant getCriadoNoCliente() {
+        return criadoNoCliente;
     }
 }

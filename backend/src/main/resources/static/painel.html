@@ -33,81 +33,138 @@
 
   <main>
     <h1 data-i18n="painel.titulo">Painel da Defesa Civil</h1>
-    <p class="aviso-situacao aviso-DESATUALIZADO" id="aviso-acesso"></p>
 
-    <section class="secao" aria-labelledby="titulo-alertas">
-      <h2 id="titulo-alertas" data-i18n="painel.alertas.titulo">Alertas</h2>
-      <div class="painel-grade">
-        <div class="cartao">
-          <h3 data-i18n="painel.alertas.canais">Canais de envio</h3>
-          <ul class="lista-canais" id="canais"></ul>
-          <button id="botao-teste" class="botao botao-primario botao-largo" type="button" data-i18n="painel.teste"></button>
-          <div id="resultado-teste" role="status" aria-live="polite"></div>
-        </div>
-        <div class="cartao">
-          <p class="nota" data-i18n="painel.limpar.explica"></p>
-          <button id="botao-limpar" class="botao botao-perigo botao-largo" type="button"><span data-i18n="painel.limpar"></span></button>
-          <div id="resultado-limpar" role="status" aria-live="polite"></div>
-        </div>
-      </div>
-      <div class="cartao secao">
-        <h3 data-i18n="painel.ultimos">Últimos alertas</h3>
-        <div id="ultimos-alertas"></div>
-      </div>
-      <div class="cartao secao">
-        <h3 data-i18n="painel.respostas">Respostas da comunidade</h3>
-        <div id="respostas"></div>
-      </div>
+    <!-- Entrada com a senha do painel (PAINEL_SENHA) -->
+    <section id="area-login" class="cartao area-login" hidden aria-labelledby="titulo-login">
+      <h2 id="titulo-login" data-i18n="painel.entrar.titulo">Entrar no painel</h2>
+      <p data-i18n="painel.entrar.explica"></p>
+      <form id="form-login" class="formulario" novalidate>
+        <label for="senha" data-i18n="painel.entrar.senha">Senha</label>
+        <input id="senha" type="password" autocomplete="current-password" required>
+        <button class="botao botao-primario botao-largo" type="submit" data-i18n="painel.entrar.botao">Entrar</button>
+        <div id="mensagem-login" role="alert"></div>
+      </form>
     </section>
 
-    <section class="secao" aria-labelledby="titulo-pontos">
-      <h2 id="titulo-pontos" data-i18n="painel.pontos.titulo">Pontos seguros</h2>
-      <p data-i18n="painel.pontos.explica"></p>
+    <div id="area-painel" hidden>
+      <div class="barra-painel">
+        <span id="ao-vivo" class="ao-vivo" role="status"></span>
+        <button id="botao-sair" class="botao botao-secundario" type="button" data-i18n="painel.sair">Sair</button>
+      </div>
 
-      <div class="mapa-grade">
-        <div class="cartao mapa-cartao">
-          <div id="mapa" class="mapa mapa-painel"></div>
+      <section class="cartao" aria-labelledby="titulo-situacao">
+        <h2 id="titulo-situacao" data-i18n="painel.situacao">Situação agora</h2>
+        <div id="situacao" aria-live="polite"></div>
+      </section>
+
+      <section class="secao" aria-labelledby="titulo-pedidos">
+        <h2 id="titulo-pedidos" data-i18n="painel.pedidos">Pedidos de ajuda</h2>
+        <div class="mapa-grade">
+          <div class="cartao mapa-cartao"><div id="mapa-pedidos" class="mapa mapa-pedidos"></div></div>
+          <div class="cartao"><div id="pedidos" aria-live="polite"></div></div>
         </div>
+      </section>
 
-        <form id="formulario" class="cartao formulario" novalidate>
-          <p class="nota" data-i18n="painel.pontos.cliqueMapa"></p>
-          <label for="campo-nome" data-i18n="painel.campo.nome"></label>
-          <input id="campo-nome" name="nome" required maxlength="120" autocomplete="off">
+      <section class="secao" aria-labelledby="titulo-sensores">
+        <h2 id="titulo-sensores" data-i18n="painel.sensores">Sensores</h2>
+        <div class="cartao">
+          <div id="sensor"></div>
+          <div class="grafico-sensor"><canvas id="grafico-sensor" role="img"></canvas></div>
+        </div>
+      </section>
 
-          <label for="campo-tipo" data-i18n="painel.campo.tipo"></label>
-          <select id="campo-tipo" name="tipo"></select>
-
+      <section class="secao" aria-labelledby="titulo-manual">
+        <h2 id="titulo-manual" data-i18n="painel.manual.titulo">Alerta manual</h2>
+        <form id="form-manual" class="cartao formulario" novalidate>
+          <p class="nota" data-i18n="painel.manual.explica"></p>
           <div class="duas-colunas">
             <div>
-              <label for="campo-latitude" data-i18n="painel.campo.latitude"></label>
-              <input id="campo-latitude" name="latitude" required inputmode="decimal">
+              <label for="manual-nivel" data-i18n="painel.manual.nivel"></label>
+              <select id="manual-nivel"></select>
             </div>
             <div>
-              <label for="campo-longitude" data-i18n="painel.campo.longitude"></label>
-              <input id="campo-longitude" name="longitude" required inputmode="decimal">
+              <label for="manual-tipo" data-i18n="painel.manual.tipo"></label>
+              <select id="manual-tipo"></select>
             </div>
           </div>
-
-          <label for="campo-capacidade" data-i18n="painel.campo.capacidade"></label>
-          <input id="campo-capacidade" name="capacidade" type="number" min="0" max="100000" inputmode="numeric">
-
-          <label for="campo-observacao" data-i18n="painel.campo.observacao"></label>
-          <textarea id="campo-observacao" name="observacao" maxlength="500" rows="3"></textarea>
-
-          <button class="botao botao-primario botao-largo" type="submit" data-i18n="painel.salvar"></button>
-          <div id="mensagem" role="status" aria-live="polite"></div>
+          <label for="manual-mensagem" data-i18n="painel.manual.mensagem"></label>
+          <textarea id="manual-mensagem" maxlength="300" rows="3" required></textarea>
+          <button id="botao-manual" class="botao botao-perigo botao-largo" type="submit"><span data-i18n="painel.manual.enviar"></span></button>
+          <div id="resultado-manual" role="status" aria-live="polite"></div>
         </form>
-      </div>
+      </section>
 
-      <div class="cartao secao">
-        <div id="lista"><p class="carregando" data-i18n="carregando">Carregando dados reais…</p></div>
-      </div>
-    </section>
+      <section class="secao" aria-labelledby="titulo-alertas">
+        <h2 id="titulo-alertas" data-i18n="painel.alertas.titulo">Alertas</h2>
+        <div class="painel-grade">
+          <div class="cartao">
+            <h3 data-i18n="painel.alertas.canais">Canais de envio</h3>
+            <ul class="lista-canais" id="canais"></ul>
+            <button id="botao-teste" class="botao botao-primario botao-largo" type="button" data-i18n="painel.teste"></button>
+            <div id="resultado-teste" role="status" aria-live="polite"></div>
+          </div>
+          <div class="cartao">
+            <p class="nota" data-i18n="painel.limpar.explica"></p>
+            <button id="botao-limpar" class="botao botao-perigo botao-largo" type="button"><span data-i18n="painel.limpar"></span></button>
+            <div id="resultado-limpar" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+        <div class="cartao secao">
+          <h3 data-i18n="painel.ultimos">Últimos alertas</h3>
+          <div id="ultimos-alertas"></div>
+        </div>
+      </section>
+
+      <section class="secao" aria-labelledby="titulo-pontos">
+        <h2 id="titulo-pontos" data-i18n="painel.pontos.titulo">Pontos seguros</h2>
+        <p data-i18n="painel.pontos.explica"></p>
+
+        <div class="mapa-grade">
+          <div class="cartao mapa-cartao">
+            <div id="mapa" class="mapa mapa-painel"></div>
+          </div>
+
+          <form id="formulario" class="cartao formulario" novalidate>
+            <p class="nota" data-i18n="painel.pontos.cliqueMapa"></p>
+            <label for="campo-nome" data-i18n="painel.campo.nome"></label>
+            <input id="campo-nome" name="nome" required maxlength="120" autocomplete="off">
+
+            <label for="campo-tipo" data-i18n="painel.campo.tipo"></label>
+            <select id="campo-tipo" name="tipo"></select>
+
+            <div class="duas-colunas">
+              <div>
+                <label for="campo-latitude" data-i18n="painel.campo.latitude"></label>
+                <input id="campo-latitude" name="latitude" required inputmode="decimal">
+              </div>
+              <div>
+                <label for="campo-longitude" data-i18n="painel.campo.longitude"></label>
+                <input id="campo-longitude" name="longitude" required inputmode="decimal">
+              </div>
+            </div>
+
+            <label for="campo-capacidade" data-i18n="painel.campo.capacidade"></label>
+            <input id="campo-capacidade" name="capacidade" type="number" min="0" max="100000" inputmode="numeric">
+
+            <label for="campo-observacao" data-i18n="painel.campo.observacao"></label>
+            <textarea id="campo-observacao" name="observacao" maxlength="500" rows="3"></textarea>
+
+            <button class="botao botao-primario botao-largo" type="submit" data-i18n="painel.salvar"></button>
+            <div id="mensagem" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+
+        <div class="cartao secao">
+          <div id="lista"><p class="carregando" data-i18n="carregando">Carregando dados reais…</p></div>
+        </div>
+      </section>
+    </div>
   </main>
 
   <footer class="rodape"><p data-i18n="app.rodape"></p></footer>
 
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.6.1/dist/chart.umd.min.js"></script>
   <script src="/js/comum.js"></script>
   <script src="/js/mapa-comum.js"></script>
   <script src="/js/painel.js"></script>

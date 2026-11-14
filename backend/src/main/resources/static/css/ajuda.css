@@ -1,0 +1,59 @@
+/* Tela "Preciso de ajuda": botões grandes, fila offline e ligações de emergência */
+
+.escolhas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin: 8px 0 20px; }
+.escolha {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 120px;
+  padding: 18px 20px;
+  border: 0;
+  border-radius: 16px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: #fff;
+  box-shadow: var(--sombra);
+}
+.escolha-bem { background: var(--normal); }
+.escolha-ajuda { background: var(--emergencia); }
+.escolha[aria-expanded="true"] { outline: 4px solid var(--texto); outline-offset: 3px; }
+.escolha-icone svg { width: 56px; height: 56px; }
+.escolha-texto { display: flex; flex-direction: column; gap: 4px; }
+.escolha-texto strong { font-size: 1.7rem; line-height: 1.15; }
+
+.formulario-ajuda { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.formulario-ajuda label { font-weight: 700; margin-top: 6px; }
+.formulario-ajuda input:not([type="checkbox"]),
+.formulario-ajuda textarea {
+  font: inherit;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 2px solid var(--borda);
+  border-radius: 8px;
+  width: 100%;
+}
+.rotulo-campo { font-weight: 700; margin: 0; }
+.contador { display: flex; align-items: center; gap: 16px; }
+.contador-botao { font-size: 1.8rem; min-width: 64px; min-height: 64px; padding: 0; }
+.contador output { font-size: 2.2rem; font-weight: 700; min-width: 3ch; text-align: center; }
+.opcao-grande { display: flex; gap: 12px; align-items: flex-start; font-weight: 400 !important; margin: 10px 0; cursor: pointer; }
+.opcao-grande input { width: 28px; height: 28px; flex: none; accent-color: var(--rio); }
+.botao-ajuda { background: var(--emergencia); color: #fff; font-size: 1.2rem; min-height: 60px; margin-top: 12px; }
+
+.ligacoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+.botao-ligar { background: var(--texto); color: #fff; min-height: 64px; font-size: 1.1rem; }
+.botao-whatsapp { background: #1E7A46; color: #fff; }
+
+.envio-ok, .envio-guardado, .envio-erro {
+  display: flex; gap: 10px; align-items: flex-start; padding: 14px 16px; border-radius: 10px; font-weight: 700; margin: 0 0 12px;
+}
+.envio-ok svg, .envio-guardado svg, .envio-erro svg { width: 26px; height: 26px; flex: none; }
+.envio-ok { background: #D7EEDF; color: #145232; }
+.envio-guardado { background: #FFF4CC; border: 2px solid var(--atencao); color: var(--texto); }
+.envio-erro { background: #FBE3E1; border: 2px solid var(--emergencia); color: var(--texto); }
+
+@media (max-width: 600px) {
+  .escolhas { grid-template-columns: 1fr; }
+  .ligacoes { grid-template-columns: 1fr; }
+}

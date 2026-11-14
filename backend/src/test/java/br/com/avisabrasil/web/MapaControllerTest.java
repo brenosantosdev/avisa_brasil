@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -53,8 +54,12 @@ class MapaControllerTest {
         FileSystemUtils.deleteRecursively(Path.of("target/cache-teste"));
     }
 
+    /** Cadastrar e remover pontos seguros exige a senha do painel. */
+    private MockHttpSession painel;
+
     @BeforeEach
-    void preparar() {
+    void preparar() throws Exception {
+        painel = SessaoDoPainel.entrar(mockMvc);
         repositorio.deleteAll();
         when(overpass.buscarPontos()).thenReturn(Fixtures.ler(Fixtures.OVERPASS));
         mapa.atualizar();
@@ -77,7 +82,7 @@ class MapaControllerTest {
 
     @Test
     void cadastrarPontoSeguroAvisaSeFicaEmSetorDeRisco() throws Exception {
-        mockMvc.perform(post("/api/pontos-seguros").contentType(MediaType.APPLICATION_JSON).content(PONTO_EM_SETOR_DE_RISCO))
+        mockMvc.perform(post("/api/pontos-seguros").session(painel).contentType(MediaType.APPLICATION_JSON).content(PONTO_EM_SETOR_DE_RISCO))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.origem").value("DEFESA_CIVIL"))
@@ -93,30 +98,39 @@ class MapaControllerTest {
     }
 
     @Test
+    void cadastrarSemSenhaDoPainelERecusado() throws Exception {
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/pontos-seguros")
+                        .contentType(MediaType.APPLICATION_JSON).content(PONTO_EM_SETOR_DE_RISCO))
+                .andExpect(status().isUnauthorized());
+        // a lista continua pública (aparece no mapa da comunidade)
+        mockMvc.perform(get("/api/pontos-seguros")).andExpect(status().isOk());
+    }
+
+    @Test
     void recusarCadastroInvalido() throws Exception {
-        mockMvc.perform(post("/api/pontos-seguros").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/pontos-seguros").session(painel).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"nome\":\"  \",\"tipo\":\"ABRIGO\",\"latitude\":120,\"longitude\":-67}"))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(post("/api/pontos-seguros").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/pontos-seguros").session(painel).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"nome\":\"X\",\"tipo\":\"CASTELO\",\"latitude\":0,\"longitude\":0}"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void removerTiraDoMapaMasGuardaORegistro() throws Exception {
-        String location = mockMvc.perform(post("/api/pontos-seguros")
+        String location = mockMvc.perform(post("/api/pontos-seguros").session(painel)
                         .contentType(MediaType.APPLICATION_JSON).content(PONTO_EM_SETOR_DE_RISCO))
                 .andReturn().getResponse().getHeader("Location");
 
-        mockMvc.perform(delete(location)).andExpect(status().isNoContent());
-        mockMvc.perform(delete(location)).andExpect(status().isNotFound());
+        mockMvc.perform(delete(location).session(painel)).andExpect(status().isNoContent());
+        mockMvc.perform(delete(location).session(painel)).andExpect(status().isNotFound());
         mockMvc.perform(get("/api/pontos-seguros")).andExpect(jsonPath("$.length()").value(0));
         org.assertj.core.api.Assertions.assertThat(repositorio.count()).isEqualTo(1);
     }
 
     @Test
     void osmForaDoArContinuaMostrandoPontosDaDefesaCivil() throws Exception {
-        mockMvc.perform(post("/api/pontos-seguros").contentType(MediaType.APPLICATION_JSON).content(PONTO_EM_SETOR_DE_RISCO));
+        mockMvc.perform(post("/api/pontos-seguros").session(painel).contentType(MediaType.APPLICATION_JSON).content(PONTO_EM_SETOR_DE_RISCO));
         when(overpass.buscarPontos()).thenThrow(new IllegalStateException("Overpass fora do ar"));
         mapa.atualizar();
 

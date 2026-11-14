@@ -26,8 +26,8 @@ public class SensorServico {
     /** Leituras usadas para a tendência (regressão linear). */
     static final int LEITURAS_PARA_TENDENCIA = 12;
 
-    /** Uma nova leitura chegou: o motor de risco reavalia na hora. */
-    public record NovaLeitura(String codigoSensor) {
+    /** Uma nova leitura chegou: o motor de risco reavalia na hora e o painel mostra ao vivo. */
+    public record NovaLeitura(String codigoSensor, double nivelCm, Instant dataHora) {
     }
 
     /**
@@ -76,7 +76,7 @@ public class SensorServico {
     public Leitura registrar(Sensor sensor, double nivelCm, OffsetDateTime dataHora) {
         Instant agora = relogio.instant();
         Leitura leitura = leituras.save(new Leitura(sensor, dataHora == null ? agora : dataHora.toInstant(), nivelCm, agora));
-        eventos.publishEvent(new NovaLeitura(sensor.getCodigo()));
+        eventos.publishEvent(new NovaLeitura(sensor.getCodigo(), nivelCm, leitura.getDataHora()));
         return leitura;
     }
 
