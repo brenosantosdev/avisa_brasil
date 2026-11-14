@@ -210,7 +210,7 @@
   function aoReceberLeitura(l) {
     if (estado.grafico) {
       estado.grafico.data.labels.push(AB.dataCurta(l.dataHora.slice(0, 10)) + ' ' +
-        new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Manaus' }).format(new Date(l.dataHora)));
+        AB.hora(l.dataHora));
       estado.grafico.data.datasets[0].data.push(l.nivelCm / 100);
       if (estado.grafico.data.labels.length > 48) {
         estado.grafico.data.labels.shift();
@@ -299,15 +299,21 @@
     }
     botao.dataset.confirmar = 'false';
     botao.querySelector('span').textContent = t('painel.limpar');
-    const r = await json('/api/simulacao/limpar', { method: 'POST' }).catch(function () { return null; });
+    const comPedidos = document.getElementById('limpar-pedidos').checked;
+    const r = await json('/api/simulacao/limpar' + (comPedidos ? '?pedidos=true' : ''), { method: 'POST' })
+      .catch(function () { return null; });
     document.getElementById('resultado-limpar').innerHTML = r
       ? '<p class="mensagem-ok">' + AB.escapar(t('painel.limpar.feito', {
-        leituras: r.leituras, alertas: r.alertas,
+        leituras: r.leituras, alertas: r.alertas, pedidos: r.pedidos,
         nivel: t('nivel.' + r.situacaoAtual.nivel) + (r.situacaoAtual.tipo ? ' · ' + t('tipoRisco.' + r.situacaoAtual.tipo) : '')
       })) + '</p>'
       : '<p class="mensagem-erro">' + AB.escapar(t('painel.erro')) + '</p>';
     carregarAlertas();
     carregarLeituras();
+    if (comPedidos) {
+      document.getElementById('limpar-pedidos').checked = false;
+      carregarPedidos();
+    }
   }
 
   async function carregarAlertas() {

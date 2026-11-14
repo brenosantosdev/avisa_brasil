@@ -133,12 +133,45 @@
     atualizarWhatsApp();
   }
 
+  /* ---------- Aviso de privacidade (LGPD) ---------- */
+
+  let diasDeRetencao = 90; // o servidor diz o prazo configurado; 90 é o padrão
+
+  function textosPrivacidade() {
+    return AB.lista('ajuda.privacidade').map(function (frase) {
+      return frase.split('{dias}').join(AB.numero(diasDeRetencao));
+    });
+  }
+
+  async function mostrarPrivacidade() {
+    const desenhar = function () {
+      document.getElementById('privacidade').innerHTML = textosPrivacidade().map(function (frase) {
+        const partes = frase.split(': ');
+        // "Para que: ..." → rótulo em negrito e o resto normal
+        return '<li>' + (partes.length > 1
+          ? '<strong>' + AB.escapar(partes[0]) + ':</strong> ' + AB.escapar(partes.slice(1).join(': '))
+          : AB.escapar(frase)) + '</li>';
+      }).join('');
+    };
+    desenhar();
+    try {
+      const r = await (await fetch('/api/pedidos-ajuda/privacidade')).json();
+      if (r && r.diasDeRetencao) {
+        diasDeRetencao = r.diasDeRetencao;
+        desenhar();
+      }
+    } catch (e) { /* sem internet: fica o prazo padrão */ }
+  }
+
   async function iniciar() {
     comunidade = await AB.iniciarPagina();
     document.querySelector('#botao-bem .escolha-icone').innerHTML = AB.icone('seguro');
     document.querySelector('#botao-ajuda .escolha-icone').innerHTML = AB.icone('alerta');
     document.querySelectorAll('.botao-ligar').forEach(function (b) { b.insertAdjacentHTML('afterbegin', AB.icone('alerta')); });
-    AB.configurarOuvir(function () { return t('ajuda.ouvir'); });
+    AB.configurarOuvir(function () {
+      return [t('ajuda.ouvir'), t('ajuda.privacidade.titulo')].concat(textosPrivacidade()).join(' ');
+    });
+    mostrarPrivacidade();
     atualizarWhatsApp();
 
     document.getElementById('botao-bem').addEventListener('click', function () { registrar('ESTOU_BEM'); });

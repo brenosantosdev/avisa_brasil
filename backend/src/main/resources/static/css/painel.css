@@ -65,3 +65,6 @@
   .rolagem { overflow-x: auto; }
 }
 .botao-perigo[data-confirmar="true"] { background: var(--emergencia); color: #fff; }
+
+.opcao-limpar { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0; font-weight: 400; cursor: pointer; }
+.opcao-limpar input { width: 24px; height: 24px; flex: none; accent-color: var(--emergencia); }

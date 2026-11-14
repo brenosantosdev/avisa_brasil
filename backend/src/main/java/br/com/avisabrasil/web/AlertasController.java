@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -85,8 +86,9 @@ public class AlertasController {
 
     @PostMapping("/simulacao/limpar")
     @Operation(summary = "Apaga leituras e alertas SIMULADOS (antes da demonstração)",
-            description = "Dados reais ficam. O estado do risco volta ao real sem enviar alerta.")
-    public SimulacaoServico.Limpeza limparSimulacao() {
-        return simulacao.limpar();
+            description = "Dados reais ficam. O estado do risco volta ao real sem enviar alerta. Com pedidos=true, "
+                    + "apaga também todos os pedidos de ajuda e respostas (testes antes da apresentação).")
+    public SimulacaoServico.Limpeza limparSimulacao(@RequestParam(defaultValue = "false") boolean pedidos) {
+        return simulacao.limpar(pedidos);
     }
 }

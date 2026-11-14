@@ -57,3 +57,7 @@
   .escolhas { grid-template-columns: 1fr; }
   .ligacoes { grid-template-columns: 1fr; }
 }
+
+/* Aviso de privacidade (LGPD) */
+.privacidade ul { margin: 0; padding-left: 1.2em; }
+.privacidade li { margin: 6px 0; }

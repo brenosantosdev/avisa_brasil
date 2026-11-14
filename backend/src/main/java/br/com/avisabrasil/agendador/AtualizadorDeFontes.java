@@ -1,5 +1,6 @@
 package br.com.avisabrasil.agendador;
 
+import br.com.avisabrasil.ajuda.PedidosAjudaServico;
 import br.com.avisabrasil.mapa.MapaServico;
 import br.com.avisabrasil.previsao.PrevisaoRioServico;
 import br.com.avisabrasil.previsao.PrevisaoTempoServico;
@@ -26,15 +27,18 @@ public class AtualizadorDeFontes {
     private final RioAgoraServico rioAgora;
     private final HistoricoAnaServico historicoAna;
     private final MotorDeRisco motor;
+    private final PedidosAjudaServico pedidos;
 
     public AtualizadorDeFontes(PrevisaoTempoServico tempo, PrevisaoRioServico rio, MapaServico mapa,
-            RioAgoraServico rioAgora, HistoricoAnaServico historicoAna, MotorDeRisco motor) {
+            RioAgoraServico rioAgora, HistoricoAnaServico historicoAna, MotorDeRisco motor,
+            PedidosAjudaServico pedidos) {
         this.tempo = tempo;
         this.rio = rio;
         this.mapa = mapa;
         this.rioAgora = rioAgora;
         this.historicoAna = historicoAna;
         this.motor = motor;
+        this.pedidos = pedidos;
     }
 
     @Scheduled(initialDelay = 0, fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
@@ -44,6 +48,12 @@ public class AtualizadorDeFontes {
         mapa.atualizarSeNecessario();
         rioAgora.atualizarSeNecessario();
         motor.avaliar();
+    }
+
+    /** Apaga pedidos de ajuda que passaram do prazo de guarda (a cada 6 horas). */
+    @Scheduled(initialDelay = 60_000, fixedDelay = 6 * 60 * 60 * 1000)
+    public void apagarPedidosAntigos() {
+        pedidos.apagarAntigos();
     }
 
     /** Baixa um ano do histórico da ANA por vez, com pausa entre os pedidos. */

@@ -4,6 +4,13 @@
 
   const AB = window.AB;
   const t = AB.t;
+
+  /** Onde fica a estação, no idioma escolhido (o servidor manda em português). */
+  function localDaEstacao(e) {
+    const chave = 'estacao.' + e.codigo + '.localizacao';
+    const texto = t(chave);
+    return texto === chave ? e.localizacao : texto;
+  }
   const ATUALIZAR_A_CADA_MS = 5 * 60 * 1000;
   const COR_DO_NIVEL = { NORMAL: '#1E7A46', ATENCAO: '#F2C230', ALERTA: '#C2541A', EMERGENCIA: '#A3221B' };
 
@@ -265,7 +272,7 @@
 
   function cartaoHistorico(h, hojeCm) {
     const e = h.estacao;
-    let html = '<div class="cartao"><h3>' + AB.escapar(t('ra.historico.estacao', { nome: e.nome, codigo: e.codigo, localizacao: e.localizacao })) + '</h3>';
+    let html = '<div class="cartao"><h3>' + AB.escapar(t('ra.historico.estacao', { nome: e.nome, codigo: e.codigo, localizacao: localDaEstacao(e) })) + '</h3>';
     if (h.primeiraLeitura) {
       html += '<p class="nota">' + AB.escapar(t('ra.historico.periodo', {
         ini: h.primeiraLeitura.slice(0, 4), fim: h.ultimaLeitura.slice(0, 4), anos: h.anosCompletos
@@ -342,7 +349,7 @@
     estado.resposta = r;
     const d = r.dados;
     if (d) {
-      document.getElementById('intro').textContent = t('ra.intro', { rio: d.estacao.rio, estacao: d.estacao.nome, localizacao: d.estacao.localizacao });
+      document.getElementById('intro').textContent = t('ra.intro', { rio: d.estacao.rio, estacao: d.estacao.nome, localizacao: localDaEstacao(d.estacao) });
     }
     document.getElementById('aviso-situacao').innerHTML = AB.avisoSituacao(r);
     renderizarAgora(d);

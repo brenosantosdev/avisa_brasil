@@ -43,6 +43,12 @@ public class PedidosAjudaController {
                 .body(Map.of("id", registro.pedido().getId(), "recebidoEm", registro.pedido().getCriadoEm().toString()));
     }
 
+    @GetMapping("/privacidade")
+    @Operation(summary = "Por quantos dias os pedidos ficam guardados (público, para o aviso de privacidade)")
+    public Map<String, Long> privacidade() {
+        return Map.of("diasDeRetencao", servico.diasDeRetencao());
+    }
+
     @GetMapping
     @Operation(summary = "Últimos 100 pedidos e respostas (painel da Defesa Civil)")
     public List<PedidoAjuda> listar() {

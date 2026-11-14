@@ -15,4 +15,6 @@ public interface PedidoAjudaRepositorio extends JpaRepository<PedidoAjuda, Long>
     List<PedidoAjuda> findTop100ByOrderByIdDesc();
 
     Optional<PedidoAjuda> findByIdCliente(String idCliente);
+
+    long deleteByCriadoEmBefore(Instant limite);
 }

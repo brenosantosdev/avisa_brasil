@@ -3,7 +3,7 @@
 Rede de alerta de cheias e secas para comunidades ribeirinhas e indígenas, com linguagem simples, voz e orientação do que fazer.
 Projeto da **Global Solution 2026.2 da FIAP** (tema CitizenTech). Território piloto: **São Gabriel da Cachoeira (AM), Rio Negro**.
 
-> Estado atual: **etapa 7** ("Preciso de ajuda" com fila offline e Painel da Defesa Civil ao vivo, com senha). A tela **Início** mostra o semáforo da comunidade (maior risco entre cheia e seca),
+> Estado atual: **etapa 8** (português, espanhol e inglês, VLibras e botão Ouvir no idioma escolhido), depois do "Preciso de ajuda" com fila offline e do Painel da Defesa Civil ao vivo. A tela **Início** mostra o semáforo da comunidade (maior risco entre cheia e seca),
 > calculado pelo motor de risco com dados reais da ANA, chuva e GloFAS, mais um sensor **simulado**. As telas
 > **O rio agora**, **Próximos dias** e **Mapa** também usam dados reais.
 
@@ -133,7 +133,9 @@ em sequência. O resultado de cada envio aparece no **Painel da Defesa Civil**.
 | SMS (Twilio) | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM`, `TWILIO_DESTINOS` | só envio; na conta trial, só para números verificados |
 
 Sem a variável, o canal fica desligado. No painel há o botão **Enviar mensagem de teste** (não é alerta) e o botão
-**Limpar dados simulados** (apaga leituras e alertas simulados antes da demonstração, sem enviar nada).
+**Limpar dados simulados** (apaga leituras e alertas simulados antes da demonstração, sem enviar nada). Marcando
+**"Também apagar todos os pedidos de ajuda e respostas"**, a limpeza apaga também os pedidos de teste
+(`POST /api/simulacao/limpar?pedidos=true`), deixando o banco limpo para a apresentação.
 
 ```powershell
 # Exemplo no PowerShell (vale só para este terminal)
@@ -150,6 +152,10 @@ localização (se a pessoa permitir), ligar para 199, 193 e 192 e aviso pronto p
   enviado sozinho quando a conexão volta. Cada pedido tem um `idCliente`, então um reenvio não duplica.
 - Para a própria tela abrir sem internet é preciso o modo instalável (PWA), que vem na etapa 10.
 - Limite de 20 envios por endereço a cada 10 minutos (o endpoint é público).
+- **Privacidade (LGPD):** a tela explica em linguagem simples para que servem os dados (só para a Defesa Civil
+  ajudar), quem vê (só a equipe, no painel com senha), por quanto tempo ficam guardados e que nome, telefone e
+  localização são opcionais. Base legal citada: proteção da vida (LGPD, art. 7º, VII). Os pedidos são apagados
+  sozinhos depois do prazo `avisabrasil.ajuda.retencao` (padrão `P90D`, 90 dias; conferido a cada 6 horas).
 
 **Painel da Defesa Civil** (`/painel.html`, com senha):
 - **Situação ao vivo** por Server-Sent Events: nível de risco, leituras do sensor (gráfico), novos alertas e novos
@@ -165,6 +171,20 @@ $env:PAINEL_SENHA = "uma-senha-longa-e-dificil"
 
 Segurança: senha comparada em tempo constante; 5 senhas erradas bloqueiam o endereço por 15 minutos; sessão com
 cookie HttpOnly e SameSite=Lax, válida por 8 horas. Para parar o servidor use `Ctrl + C` (encerramento normal).
+
+## Idiomas, Libras e voz
+
+- **Português, espanhol e inglês** completos em `static/i18n/pt.json`, `es.json` e `en.json`. O seletor fica no
+  topo de todas as telas e a escolha é guardada no aparelho. Um link pode já abrir no idioma: `/?idioma=es`.
+- **Ouvir** em todas as telas, lendo na voz do idioma escolhido (Web Speech API; a voz depende das vozes
+  instaladas no aparelho).
+- **Libras:** widget **VLibras** (gov.br), o botão azul com as mãos no lado direito da tela. Precisa de internet.
+- **Línguas indígenas:** não há tradução inventada. Para acrescentar uma, com tradução validada por falantes
+  nativos: criar `i18n/<código>.json` com as mesmas chaves do `pt.json`, pôr o código em `IDIOMAS_DISPONIVEIS`
+  (`js/comum.js`) e o nome do idioma na chave `idioma.<código>`. O teste `TraducoesTest` confere se o arquivo
+  está completo (mesmas chaves, listas e `{variáveis}`).
+- Ficam em português: as mensagens dos alertas enviados (ntfy, Telegram, SMS) e os avisos técnicos do painel
+  sobre variáveis de ambiente.
 
 ## Simulador do sensor (demonstração)
 

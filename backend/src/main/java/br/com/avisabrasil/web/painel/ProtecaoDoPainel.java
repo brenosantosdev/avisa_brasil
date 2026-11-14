@@ -50,6 +50,9 @@ public class ProtecaoDoPainel implements WebMvcConfigurer, HandlerInterceptor {
         if (caminho.equals("/api/pedidos-ajuda")) {
             return !metodo.equals("POST"); // qualquer pessoa pede ajuda; só a Defesa Civil vê a lista
         }
+        if (caminho.equals("/api/pedidos-ajuda/privacidade")) {
+            return false; // prazo de guarda dos dados, mostrado no aviso de privacidade
+        }
         return true; // /api/alertas/**, /api/simulacao/**, /api/pedidos-ajuda/{id}/...
     }
 

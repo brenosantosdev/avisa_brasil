@@ -9,7 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import br.com.avisabrasil.ajuda.PedidosAjudaServico;
+import br.com.avisabrasil.dominio.PedidoAjuda;
 import br.com.avisabrasil.repositorio.PedidoAjudaRepositorio;
+import java.time.Duration;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +43,8 @@ class PainelEAjudaTest {
     private MockMvc mockMvc;
     @Autowired
     private PedidoAjudaRepositorio pedidos;
+    @Autowired
+    private PedidosAjudaServico servico;
 
     @BeforeEach
     void limpar() {
@@ -134,5 +142,42 @@ class PainelEAjudaTest {
         mockMvc.perform(get("/api/painel/eventos").session(SessaoDoPainel.entrar(mockMvc)))
                 .andExpect(request().asyncStarted())
                 .andExpect(header().string("Content-Type", startsWith("text/event-stream")));
+    }
+
+    @Test
+    void avisoDePrivacidadeEPublicoEDizOPrazoDeGuarda() throws Exception {
+        mockMvc.perform(get("/api/pedidos-ajuda/privacidade"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.diasDeRetencao").value(90));
+    }
+
+    @Test
+    void pedidosMaisAntigosQueOPrazoSaoApagados() {
+        pedidos.save(new PedidoAjuda(PedidoAjuda.Tipo.PRECISO_DE_AJUDA, PedidoAjuda.Canal.WEB, null, "antigo",
+                Instant.now().minus(Duration.ofDays(91))));
+        pedidos.save(new PedidoAjuda(PedidoAjuda.Tipo.ESTOU_BEM, PedidoAjuda.Canal.WEB, null, "recente",
+                Instant.now().minus(Duration.ofDays(89))));
+
+        assertThat(servico.apagarAntigos()).isEqualTo(1);
+        assertThat(pedidos.findAll()).extracting(PedidoAjuda::getNome).containsExactly("recente");
+    }
+
+    @Test
+    void limparSimulacaoSoApagaPedidosQuandoPedido() throws Exception {
+        mockMvc.perform(post("/api/pedidos-ajuda").contentType(MediaType.APPLICATION_JSON).content(PEDIDO.formatted("teste-limpeza")))
+                .andExpect(status().isCreated());
+        MockHttpSession painel = SessaoDoPainel.entrar(mockMvc);
+
+        // sem a opção, os pedidos ficam
+        mockMvc.perform(post("/api/simulacao/limpar").session(painel))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.pedidos").value(0));
+        assertThat(pedidos.count()).isEqualTo(1);
+
+        // com a opção "também apagar pedidos de ajuda", o banco fica limpo para a apresentação
+        mockMvc.perform(post("/api/simulacao/limpar").param("pedidos", "true").session(painel))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.pedidos").value(1));
+        assertThat(pedidos.count()).isZero();
     }
 }

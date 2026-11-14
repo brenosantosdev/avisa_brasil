@@ -4,16 +4,26 @@
   'use strict';
 
   const FUSO = 'America/Manaus';
-  const IDIOMAS_DISPONIVEIS = ['pt'];
+  /* Para acrescentar um idioma (por exemplo, uma língua indígena com tradução validada por falantes
+     nativos): criar i18n/<código>.json com as mesmas chaves do pt.json, pôr o código aqui e o nome
+     do idioma na chave "idioma.<código>" de cada arquivo. */
+  const IDIOMAS_DISPONIVEIS = ['pt', 'es', 'en'];
 
   let textos = {};
   let localidade = 'pt-BR';
+  let idiomaAtual = 'pt';
 
   /* ---------- Textos (i18n) ---------- */
 
   function idiomaEscolhido() {
     let idioma = 'pt';
     try { idioma = localStorage.getItem('idioma') || 'pt'; } catch (e) { /* sem localStorage */ }
+    // ?idioma=es no endereço também vale (e fica guardado), útil para mandar o link já no idioma certo
+    const naUrl = new URLSearchParams(location.search).get('idioma');
+    if (naUrl && IDIOMAS_DISPONIVEIS.includes(naUrl)) {
+      idioma = naUrl;
+      try { localStorage.setItem('idioma', naUrl); } catch (e) { /* sem localStorage */ }
+    }
     return IDIOMAS_DISPONIVEIS.includes(idioma) ? idioma : 'pt';
   }
 
@@ -21,6 +31,7 @@
     const idioma = idiomaEscolhido();
     const resposta = await fetch('/i18n/' + idioma + '.json');
     textos = await resposta.json();
+    idiomaAtual = idioma;
     localidade = textos._idioma || 'pt-BR';
     document.documentElement.lang = localidade;
   }
@@ -130,6 +141,11 @@
     if (cm <= 110) return t('altura.cintura');
     if (cm <= 190) return t('altura.pessoa');
     return t('altura.pessoas', { n: numero(cm / 160, 1) });
+  }
+
+  /** "19:45" no fuso da comunidade. */
+  function hora(dataHoraIso) {
+    return new Intl.DateTimeFormat(localidade, { hour: '2-digit', minute: '2-digit', timeZone: FUSO }).format(new Date(dataHoraIso));
   }
 
   /** "hoje às 19:45", "ontem às 08:00", "em 09/11 às 14:00" (no fuso da comunidade). */
@@ -293,6 +309,58 @@
     { id: 'painel', href: '/painel.html', texto: 'nav.painel' }
   ];
 
+  /** Título da aba do navegador no idioma escolhido. */
+  function traduzirTitulo(atual) {
+    const pagina = PAGINAS.find(function (p) { return p.id === atual; });
+    const chave = atual === 'painel' ? 'painel.titulo' : (pagina ? pagina.texto : null);
+    document.title = !chave || atual === 'inicio' ? t('app.nome') : t(chave) + ' · ' + t('app.nome');
+  }
+
+  /** Seletor de idioma no topo, ao lado do botão Ouvir. A escolha fica guardada no aparelho. */
+  function montarSeletorIdioma() {
+    const topo = document.querySelector('.topo-interno');
+    if (!topo || IDIOMAS_DISPONIVEIS.length < 2) return;
+    const caixa = document.createElement('label');
+    caixa.className = 'seletor-idioma';
+    caixa.innerHTML = '<span class="so-leitor">' + escapar(t('idioma.rotulo')) + '</span>' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">' +
+      '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg>' +
+      '<select id="seletor-idioma">' + IDIOMAS_DISPONIVEIS.map(function (codigo) {
+        return '<option value="' + codigo + '" lang="' + codigo + '"' + (codigo === idiomaAtual ? ' selected' : '') + '>' +
+          escapar(t('idioma.' + codigo)) + '</option>';
+      }).join('') + '</select>';
+    topo.insertBefore(caixa, document.getElementById('botao-ouvir'));
+    caixa.querySelector('select').addEventListener('change', function (e) {
+      try { localStorage.setItem('idioma', e.target.value); } catch (erro) { /* sem localStorage: vale só agora */ }
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      // recarrega para que todos os textos, números e datas mudem juntos
+      const url = new URL(location.href);
+      url.searchParams.set('idioma', e.target.value);
+      location.replace(url.toString());
+    });
+  }
+
+  /** Widget VLibras (gov.br): traduz o texto da página para Libras. */
+  function carregarVLibras() {
+    if (document.querySelector('[vw]')) return;
+    const widget = document.createElement('div');
+    widget.setAttribute('vw', '');
+    widget.className = 'enabled';
+    widget.innerHTML = '<div vw-access-button class="active"></div>' +
+      '<div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>';
+    document.body.appendChild(widget);
+    const script = document.createElement('script');
+    script.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
+    script.onload = function () {
+      try {
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+        // o VLibras inicia no evento load da página, que pode já ter passado
+        if (document.readyState === 'complete' && typeof window.onload === 'function') window.onload();
+      } catch (e) { /* VLibras fora do ar: o resto da página continua funcionando */ }
+    };
+    document.body.appendChild(script);
+  }
+
   /** Monta o menu em <nav id="navegacao" data-atual="..."> marcando a página atual. */
   function montarNavegacao() {
     const nav = document.getElementById('navegacao');
@@ -308,6 +376,10 @@
     await carregarTextos();
     aplicarTextos();
     montarNavegacao();
+    const nav = document.getElementById('navegacao');
+    traduzirTitulo(nav ? nav.dataset.atual : null);
+    montarSeletorIdioma();
+    carregarVLibras();
     try {
       const comunidade = await (await fetch('/api/comunidade')).json();
       document.querySelectorAll('[data-comunidade-local]').forEach(function (el) {
@@ -336,6 +408,8 @@
     dataCurta: dataCurta,
     mesEAno: mesEAno,
     quando: quando,
+    hora: hora,
+    idioma: function () { return idiomaAtual; },
     icone: icone,
     escapar: escapar,
     avisoSituacao: avisoSituacao,
