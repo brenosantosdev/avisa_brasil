@@ -218,8 +218,12 @@ cookie HttpOnly e SameSite=Lax, válida por 8 horas. Para parar o servidor use `
 
 ## Configurações
 
-`/configuracoes.html`, com a engrenagem no menu de todas as telas. Funciona nos 3 idiomas, tem botão Ouvir e abre
-sem internet. As escolhas ficam **só neste aparelho** (localStorage, chave `avisabrasil.preferencias`) e valem em
+`/configuracoes.html`, aberta pela **engrenagem no topo** de todas as telas, ao lado do seletor de idioma. O botão
+mostra só o ícone, com área de toque de 48 px, nome acessível nos 3 idiomas (aria-label "Configurações" /
+"Configuración" / "Settings") e dica ao passar o mouse (title). Na própria tela fica "aceso" (fundo branco e barra
+amarela) e marcado com `aria-current="page"`. O menu tem as 7 telas: no celular, 4 + 3; com pouco espaço para o
+tamanho da letra, 3 + 3 + 1. Conferido no Chrome: nada rola para o lado em 320, 360 e 390 px, nem com o texto
+"muito grande". A tela funciona nos 3 idiomas, tem botão Ouvir e abre sem internet. As escolhas ficam **só neste aparelho** (localStorage, chave `avisabrasil.preferencias`) e valem em
 todas as telas. O `js/preferencias.js` roda no `<head>` e aplica as escolhas antes de desenhar, para a tela não piscar.
 
 - **Exibição:**

@@ -608,5 +608,6 @@
   "config.apagar.botao": "Delete data from this device",
   "config.apagar.confirmar": "Confirm: delete everything from this device",
   "config.apagar.filaPendente": "Warning: there are help requests waiting for internet on this device ({n}). If you delete, they are lost.",
-  "config.apagar.feito": "Done: the data on this device was deleted. To use it without internet again, open the screens once with internet."
+  "config.apagar.feito": "Done: the data on this device was deleted. To use it without internet again, open the screens once with internet.",
+  "config.dica": "Settings: theme, text size, voice and language"
 }

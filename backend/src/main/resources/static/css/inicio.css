@@ -76,11 +76,15 @@
 .legenda-niveis svg { width: 26px; height: 26px; }
 
 @container pagina (max-width: 860px) {
-  .inicio-grade { grid-template-columns: 1fr; }
+  .inicio-grade { grid-template-columns: minmax(0, 1fr); }
   .legenda-niveis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+/* pouco espaço para o tamanho da letra (em rem: com texto muito grande, vale em celulares comuns) */
+@container pagina (max-width: 20rem) {
+  .legenda-niveis { grid-template-columns: minmax(0, 1fr); }
+}
 @container pagina (max-width: 600px) {
-  .semaforo { grid-template-columns: 1fr; }
+  .semaforo { grid-template-columns: minmax(0, 1fr); }
   .luzes { flex-direction: row; justify-content: center; }
   .palavra-nivel { font-size: 1.9rem; flex-wrap: nowrap; gap: 10px; }
   .palavra-nivel svg { width: 36px; height: 36px; }
@@ -95,7 +99,7 @@
 :root[data-modo-simples] .so-completo { display: none !important; }
 /* aviso oficial do INMET valendo agora continua aparecendo (é segurança); sem aviso, some */
 :root[data-modo-simples] .avisos-inmet:not(.com-aviso) { display: none; }
-:root[data-modo-simples] .inicio-grade { grid-template-columns: 1fr; }
+:root[data-modo-simples] .inicio-grade { grid-template-columns: minmax(0, 1fr); }
 :root[data-modo-simples] .palavra-nivel { font-size: 3rem; }
 @container pagina (max-width: 600px) {
   :root[data-modo-simples] .palavra-nivel { font-size: 2.3rem; }

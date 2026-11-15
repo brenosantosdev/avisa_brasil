@@ -17,7 +17,7 @@
 .campo-config .nota { margin: 0 0 10px; }
 
 /* Escolha única: botões grandes lado a lado (quebram linha no celular) */
-.opcoes-config { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; clear: both; }
+.opcoes-config { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr)); gap: 8px; clear: both; }
 .opcao-config { position: relative; }
 .opcao-config input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .opcao-config span {

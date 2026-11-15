@@ -608,5 +608,6 @@
   "config.apagar.botao": "Apagar dados deste aparelho",
   "config.apagar.confirmar": "Confirmar: apagar tudo deste aparelho",
   "config.apagar.filaPendente": "Atenção: há pedidos de ajuda esperando internet neste aparelho ({n}). Se apagar, eles se perdem.",
-  "config.apagar.feito": "Pronto: os dados deste aparelho foram apagados. Para usar sem internet de novo, abra as telas uma vez com internet."
+  "config.apagar.feito": "Pronto: os dados deste aparelho foram apagados. Para usar sem internet de novo, abra as telas uma vez com internet.",
+  "config.dica": "Configurações: tema, tamanho do texto, voz e idioma"
 }

@@ -54,6 +54,6 @@
 .seca caption { color: var(--marrom-texto); }
 
 @container pagina (max-width: 860px) {
-  .ra-grade { grid-template-columns: 1fr; }
+  .ra-grade { grid-template-columns: minmax(0, 1fr); }
   .nivel-grande { font-size: 2.5rem; }
 }

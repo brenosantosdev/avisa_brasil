@@ -54,8 +54,8 @@
 .envio-erro { background: var(--vermelho-suave); border: 2px solid var(--vermelho-texto); color: var(--texto); }
 
 @container pagina (max-width: 600px) {
-  .escolhas { grid-template-columns: 1fr; }
-  .ligacoes { grid-template-columns: 1fr; }
+  .escolhas { grid-template-columns: minmax(0, 1fr); }
+  .ligacoes { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* Aviso de privacidade (LGPD) */

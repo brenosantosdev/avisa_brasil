@@ -341,14 +341,14 @@
     { id: 'mapa', href: '/mapa.html', texto: 'nav.mapa' },
     { id: 'ajuda', href: '/ajuda.html', texto: 'nav.ajuda' },
     { id: 'riscos', href: '/riscos.html', texto: 'nav.riscos' },
-    { id: 'painel', href: '/painel.html', texto: 'nav.painel' },
-    { id: 'configuracoes', href: '/configuracoes.html', texto: 'nav.configuracoes', icone: 'engrenagem' }
+    { id: 'painel', href: '/painel.html', texto: 'nav.painel' }
   ];
 
   /** Título da aba do navegador no idioma escolhido. */
   function traduzirTitulo(atual) {
     const pagina = PAGINAS.find(function (p) { return p.id === atual; });
-    const chave = atual === 'painel' ? 'painel.titulo' : atual === 'offline' ? 'offline.titulo' : (pagina ? pagina.texto : null);
+    const chave = atual === 'painel' ? 'painel.titulo' : atual === 'offline' ? 'offline.titulo'
+      : atual === 'configuracoes' ? 'config.titulo' : (pagina ? pagina.texto : null);
     document.title = !chave || atual === 'inicio' ? t('app.nome') : t(chave) + ' · ' + t('app.nome');
   }
 
@@ -374,6 +374,25 @@
       url.searchParams.set('idioma', e.target.value);
       location.replace(url.toString());
     });
+  }
+
+  /**
+   * Botão de Configurações no topo, ao lado do seletor de idioma: só o ícone da engrenagem, com nome acessível
+   * (aria-label) e dica ao passar o mouse (title). Na própria tela de Configurações fica marcado (aria-current).
+   */
+  function montarBotaoConfiguracoes(atual) {
+    const topo = document.querySelector('.topo-interno');
+    if (!topo || document.getElementById('botao-configuracoes')) return;
+    const aberta = atual === 'configuracoes';
+    const botao = document.createElement('a');
+    botao.id = 'botao-configuracoes';
+    botao.className = 'botao-configuracoes';
+    botao.href = '/configuracoes.html';
+    botao.setAttribute('aria-label', t('nav.configuracoes'));
+    botao.title = t('config.dica');
+    if (aberta) botao.setAttribute('aria-current', 'page');
+    botao.innerHTML = icone('engrenagem');
+    topo.insertBefore(botao, document.getElementById('botao-ouvir'));
   }
 
   /** Widget VLibras (gov.br): traduz o texto da página para Libras. */
@@ -565,8 +584,7 @@
     nav.setAttribute('aria-label', t('nav.principal'));
     nav.innerHTML = '<ul>' + PAGINAS.map(function (p) {
       const atual = p.id === nav.dataset.atual ? ' aria-current="page"' : '';
-      return '<li><a href="' + p.href + '"' + atual + (p.icone ? ' class="nav-com-icone"' : '') + '>' +
-        (p.icone ? icone(p.icone) : '') + escapar(t(p.texto)) + '</a></li>';
+      return '<li><a href="' + p.href + '"' + atual + '>' + escapar(t(p.texto)) + '</a></li>';
     }).join('') + '</ul>';
   }
 
@@ -577,6 +595,7 @@
     const nav = document.getElementById('navegacao');
     traduzirTitulo(nav ? nav.dataset.atual : null);
     montarSeletorIdioma();
+    montarBotaoConfiguracoes(nav ? nav.dataset.atual : null);
     carregarVLibras();
     registrarServiceWorker();
     mostrarConviteInstalar();

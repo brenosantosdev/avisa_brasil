@@ -608,5 +608,6 @@
   "config.apagar.botao": "Borrar los datos de este aparato",
   "config.apagar.confirmar": "Confirmar: borrar todo de este aparato",
   "config.apagar.filaPendente": "Atención: hay pedidos de ayuda esperando internet en este aparato ({n}). Si borra, se pierden.",
-  "config.apagar.feito": "Listo: los datos de este aparato fueron borrados. Para usar sin internet de nuevo, abra las pantallas una vez con internet."
+  "config.apagar.feito": "Listo: los datos de este aparato fueron borrados. Para usar sin internet de nuevo, abra las pantallas una vez con internet.",
+  "config.dica": "Configuración: tema, tamaño del texto, voz e idioma"
 }

@@ -60,7 +60,7 @@
 .marcador-bem { background: var(--normal); }
 
 @container pagina (max-width: 860px) {
-  .painel-grade { grid-template-columns: 1fr; }
+  .painel-grade { grid-template-columns: minmax(0, 1fr); }
   .tabela-alertas .coluna-mensagem { min-width: 220px; }
   .rolagem { overflow-x: auto; }
 }

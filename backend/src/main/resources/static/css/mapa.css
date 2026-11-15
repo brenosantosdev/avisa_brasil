@@ -95,7 +95,7 @@
 .aviso-info svg { width: 24px; height: 24px; flex: none; margin-top: 2px; }
 
 @container pagina (max-width: 860px) {
-  .mapa-grade { grid-template-columns: 1fr; }
+  .mapa-grade { grid-template-columns: minmax(0, 1fr); }
   .mapa { height: 55vh; min-height: 320px; }
 }
 @container pagina (max-width: 600px) {

@@ -107,7 +107,7 @@
 .rio-textos p { margin: 8px 0 0; }
 
 @container pagina (max-width: 600px) {
-  .dias { grid-template-columns: 1fr; }
-  .rio-destaques { grid-template-columns: 1fr; }
+  .dias { grid-template-columns: minmax(0, 1fr); }
+  .rio-destaques { grid-template-columns: minmax(0, 1fr); }
   .grafico-caixa { height: 280px; }
 }

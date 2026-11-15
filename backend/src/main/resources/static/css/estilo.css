@@ -381,14 +381,16 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 /* ---------- Celular ---------- */
 
 @container pagina (max-width: 960px) {
-  /* menu em grade: as 8 telas ficam à vista (4 + 4), sem rolar para o lado */
+  /* menu em grade: as 7 telas ficam à vista (4 + 3), sem rolar para o lado */
   .navegacao ul {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: 0;
     padding: 0;
     overflow: visible;
   }
+  .navegacao li { grid-column: span 3; }
+  .navegacao li:nth-child(n+5) { grid-column: span 4; }
   .navegacao a {
     justify-content: center;
     text-align: center;
@@ -405,6 +407,11 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
 @container pagina (max-width: 400px) {
   .navegacao a { font-size: 0.85rem; padding: 6px 2px; }
 }
+/* tela estreita para o tamanho da letra (em rem: com texto grande, vale em telas mais largas): 3 + 3 + 1 */
+@container pagina (max-width: 22rem) {
+  .navegacao li, .navegacao li:nth-child(n+5) { grid-column: span 4; }
+  .navegacao li:nth-child(7) { grid-column: span 12; }
+}
 
 @container pagina (max-width: 600px) {
   h1 { font-size: 1.7rem; }
@@ -412,9 +419,11 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
   .marca-local { font-size: 0.85rem; }
   .topo-interno { gap: 10px; padding: 10px 16px; }
   .marca { flex-basis: 100%; }
-  .seletor-idioma { flex: 1; }
-  .seletor-idioma select { flex: 1; min-width: 0; }
-  .botao-ouvir { flex: 1; }
+  /* idioma, engrenagem e Ouvir dividem a linha; nenhum encolhe abaixo do próprio texto:
+     com letra muito grande, o Ouvir desce para a linha de baixo em vez de vazar para o lado */
+  .seletor-idioma { flex: 1 0 auto; }
+  .seletor-idioma select { flex: 1; }
+  .botao-ouvir { flex: 1 0 auto; }
   .cartao { padding: 16px; }
   main { padding: 16px 16px 40px; }
   /* textos de fonte e notas: nunca menores que 16 px no celular */
@@ -530,11 +539,29 @@ h3 { font-size: 1.15rem; margin: 0 0 6px; }
   scroll-behavior: auto !important;
 }
 
-/* Menu: a tela Configurações tem o ícone de engrenagem (ícone + palavra) */
-.nav-com-icone { gap: 6px; }
-.nav-com-icone svg { width: 22px; height: 22px; flex: none; }
-@container pagina (max-width: 960px) {
-  .nav-com-icone { flex-direction: column; gap: 2px; }
+/* ---------- Botão de Configurações no topo (só o ícone, com nome acessível e dica) ---------- */
+
+.botao-configuracoes {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  color: #fff;
+  text-decoration: none;
 }
+.botao-configuracoes svg { width: 26px; height: 26px; }
+.botao-configuracoes:hover { background: rgba(255, 255, 255, 0.15); }
+/* tela de Configurações aberta: botão "aceso" (fundo branco) e uma barra embaixo; não depende só da cor */
+.botao-configuracoes[aria-current="page"] {
+  background: #fff;
+  color: #0B4F73;
+  border-color: #fff;
+  box-shadow: inset 0 -5px 0 #F2C230;
+}
+:root[data-contraste="alto"] .botao-configuracoes { border-color: #fff; }
 
 .botao-ler-aviso { min-height: 64px; font-size: 1.2rem; margin-bottom: 16px; }
